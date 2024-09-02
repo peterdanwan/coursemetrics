@@ -44,7 +44,9 @@ const NavBar: React.FC = () => {
     const mobileMenuLinkStyles =
       'text-black block rounded-md px-3 py-2 hover:bg-gray-900 hover:text-white font-medium';
     const getMobileMenuLinkStyle = (linkPath: string) => {
-      return `${pathname === linkPath && 'bg-white'} ${mobileMenuLinkStyles}`;
+      return `${
+        pathname === linkPath && 'bg-gray-600 text-white'
+      } ${mobileMenuLinkStyles}`;
     };
 
     return (
@@ -53,22 +55,13 @@ const NavBar: React.FC = () => {
           <Link href='/' className={getMobileMenuLinkStyle('/')}>
             Home
           </Link>
-          <Link
-            href='/properties'
-            className={getMobileMenuLinkStyle('/properties')}
-          >
+          <Link href='/about' className={getMobileMenuLinkStyle('/about')}>
             About
           </Link>
-          <Link
-            href='/properties'
-            className={getMobileMenuLinkStyle('/properties')}
-          >
+          <Link href='/contact' className={getMobileMenuLinkStyle('/contact')}>
             Contact Me
           </Link>
-          <Link
-            href='/properties'
-            className={getMobileMenuLinkStyle('/properties')}
-          >
+          <Link href='/faq' className={getMobileMenuLinkStyle('/faq')}>
             FAQ
           </Link>
           <div className='relative cursor-pointer bg-white text-black py-2 px-3 rounded font-semibold'>
