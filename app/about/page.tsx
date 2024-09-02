@@ -1,3 +1,4 @@
+// app/about/page.tsx
 const About = () => {
   return <div>about</div>;
 };
