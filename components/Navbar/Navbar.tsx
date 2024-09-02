@@ -1,7 +1,7 @@
 // components/Navbar/Navbar.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -28,6 +28,23 @@ const NavBar: React.FC = () => {
   // Get the path after our domain (e.g., with localhost:3000/home/users you would get /home/users)
   const pathname = usePathname();
 
+  // Effect to handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if screen size is md or larger
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false); // Collapse mobile menu on larger screens
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   // Boilerplate code for useUser (from Auth0)
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -52,7 +69,10 @@ const NavBar: React.FC = () => {
     return (
       <div id='mobile-menu' className='md:hidden'>
         <div className='space-y-1 px-2 pb-3 pt-2'>
-          <Link href='/' className={getMobileMenuLinkStyle('/')}>
+          <Link
+            href='/'
+            className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+          >
             Home
           </Link>
           <Link href='/about' className={getMobileMenuLinkStyle('/about')}>
