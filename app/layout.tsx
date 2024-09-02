@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <UserProvider>
-        <body>
+        <body className="bg-[#0B2027] text-white min-h-screen">
           <Providers>
             <NavBar />
             {children}

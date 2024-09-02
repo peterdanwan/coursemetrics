@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import logo from "@/assets/images/pin.svg";
+import logo from "@/assets/images/CourseMetricsLogo.png";
 import profileDefault from "@/assets/images/pin.svg";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
@@ -269,7 +269,7 @@ const NavBar: React.FC = () => {
 
   return (
     <nav className="bg-white border-b border-[#0B2027]-500 sticky top-0 z-50">
-      <div className="mx-auto max-w-7xl px-1 sm:px-2 lg:px-4">
+      <div className="mx-auto max-w-8xl px-1 sm:px-2 lg:px-4">
         <div className="relative flex h-20 items-center justify-start">
           <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
             <button
@@ -300,9 +300,9 @@ const NavBar: React.FC = () => {
           </div>
 
           {/* Left side of the Navbar*/}
-          <div className="flex flex-1 items-center justify-center md:justify-start">
+          <div className="flex flex-auto items-center justify-end md:justify-start">
             <Link className="flex flex-shrink-0 items-center" href="/">
-              <Image className="h-10 w-auto" src={logo} alt="CourseMetrics" />
+              <Image className="h-20 w-auto" src={logo} alt="CourseMetrics" />
               <span className="hidden md:block text-black text-2xl font-bold ml-2">
                 CourseMetrics
               </span>
