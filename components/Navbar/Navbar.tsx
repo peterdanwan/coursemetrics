@@ -50,7 +50,7 @@ const NavBar: React.FC = () => {
     };
 
     return (
-      <div id='mobile-menu'>
+      <div id='mobile-menu' className='md:hidden'>
         <div className='space-y-1 px-2 pb-3 pt-2'>
           <Link href='/' className={getMobileMenuLinkStyle('/')}>
             Home
