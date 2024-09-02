@@ -36,7 +36,7 @@ const NavBar: React.FC = () => {
   const desktopMenuLinkStyle = (linkPath: string) => {
     const baseStyle =
       'text-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
-    return `${pathname === linkPath && 'bg-white'} ${baseStyle}`;
+    return `${pathname === linkPath && 'bg-gray-600 text-white'} ${baseStyle} `;
   };
 
   // Styles for mobile menu links
@@ -98,13 +98,13 @@ const NavBar: React.FC = () => {
                 >
                   Skill
                 </Link>
-                <a
+                <Link
                   href='#'
                   onClick={() => handleSelectCategory('Program/Category')}
                   className='block px-4 py-2 hover:bg-gray-200'
                 >
                   Program/Category
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -378,10 +378,7 @@ const NavBar: React.FC = () => {
                 >
                   Contact Me
                 </Link>
-                <Link
-                  href='/properties'
-                  className={desktopMenuLinkStyle('/properties')}
-                >
+                <Link href='/faq' className={desktopMenuLinkStyle('/faq')}>
                   FAQ
                 </Link>
               </div>
