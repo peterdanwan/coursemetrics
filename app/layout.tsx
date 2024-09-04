@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
-import MainNav from '@/components/MainNav';
+import MainNav from '@/components/Navbar/MainNav';
 import { Container } from '@chakra-ui/react';
 
 export const metadata: Metadata = {
