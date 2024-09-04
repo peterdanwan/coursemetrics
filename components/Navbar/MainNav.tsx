@@ -65,7 +65,7 @@ export default function MainNav() {
   };
 
   return (
-    <Box>
+    <Box className='sticky z-50 top-0'>
       <Flex
         bg={useColorModeValue('white', 'gray.800')}
         color={useColorModeValue('gray.600', 'white')}
@@ -126,8 +126,8 @@ export default function MainNav() {
               <MenuItem as='a' href='/api/auth/login'>
                 Sign In
               </MenuItem>
-              <MenuItem as='a' href='#'>
-                Sign Up
+              <MenuItem as='a' href='/api/auth/logout'>
+                Sign out
               </MenuItem>
             </MenuList>
           </Menu>
