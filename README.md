@@ -2,7 +2,7 @@
 
 Coursemetrics is a dedicated platform specifically designed for providing detailed information about college and university courses.
 
-<div align="center>
+<div align="center">
   <img src="./assets/images/CourseMetricsLogo.png" alt="Logo" style="width: 30%; height: auto;">
 </div>
 
