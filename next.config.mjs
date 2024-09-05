@@ -6,17 +6,21 @@ const nextConfig = {
     remotePatterns: [
       // For googleusercontent.com, and all its different paths
       {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-        pathname: "**",
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '**',
       },
       {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
-        pathname: "**",
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'platform-lookaside.fbsbx.com',
+        pathname: '**',
       },
     ],
   },
 };
-
 export default nextConfig;

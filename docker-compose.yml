@@ -1,0 +1,43 @@
+# This file is used to setup local database server and a GUI
+# for the database server. The GUI is accessible at localhost:8081
+
+version: '3.1'
+services:
+  mongo:
+    # https://hub.docker.com/_/mongo
+    image: mongo:6.0@sha256:52347770bd1318b87e832f47a97545ce7b521172fd4fc93c8480e0cbf6fbeb8a
+    container_name: mongo
+    restart: always
+    networks:
+      - mongo-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: coursemetricsDB
+    # The volume is mounted in order to automatically run the sample DB init script
+    # Refer to the doc below for more details:
+    # https://stackoverflow.com/questions/42912755/how-to-create-a-db-for-mongodb-container-on-start-up
+    volumes:
+      - ./_scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  # https://hub.docker.com/_/mongo-express
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19@sha256:51a528b847cc0c6a5768dec8de8d0becba145eee92d121f25a22038efe7d2d02
+    container_name: mongo-express
+    restart: always
+    networks:
+      - mongo-network
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+      ME_CONFIG_MONGODB_URL: mongodb://root:pass@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongo
+
+# Read up more on bridge networks here: https://docs.docker.com/engine/network/drivers/bridge/
+networks:
+  mongo-network:
+    driver: bridge
