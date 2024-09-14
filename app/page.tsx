@@ -1,7 +1,7 @@
 // app/page.tsx
-"use client";
-import React from "react";
-import Head from "next/head";
+'use client';
+import React from 'react';
+import Head from 'next/head';
 import {
   Box,
   Heading,
@@ -12,66 +12,61 @@ import {
   Icon,
   useColorModeValue,
   createIcon,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 export default function Home() {
   return (
     <>
       <Container
         // maxW={{ base: "container.sm", md: "container.lg", lg: "container.xl" }}
-        width={"100vw"}
-        height={{ base: "85vh" }}
-        alignContent={"center"}
-        justifyContent={"center"}
+        width={'100vw'}
+        height={{ base: '85vh' }}
+        alignContent={'center'}
+        justifyContent={'center'}
       >
-        <Stack
-          as={Box}
-          textAlign={"center"}
-          spacing={{ base: 8, md: 14 }}
-          width={{ base: "90%" }}
-        >
+        <Stack as={Box} textAlign={'center'} spacing={{ base: 8, md: 14 }} width={{ base: '90%' }}>
           <Heading
             fontWeight={600}
-            fontSize={{ base: "4xl", sm: "4xl", md: "6xl" }}
-            lineHeight={"110%"}
+            fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}
+            lineHeight={'110%'}
           >
             Course
             <br />
             <Text
-              as={"span"}
+              as={'span'}
               bgGradient="linear(to-l, #FFDC4D, #FF6464)"
               bgClip="text"
-              fontSize={{ base: "4xl", sm: "4xl", md: "6xl" }}
+              fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}
               fontWeight="extrabold"
             >
               Metrics
             </Text>
           </Heading>
           <Box>
-            <Heading as="h3" fontSize={{ base: "xl", sm: "xl", md: "2xl" }}>
+            <Heading as="h3" fontSize={{ base: 'xl', sm: 'xl', md: '2xl' }}>
               Unlock Course Insights
             </Heading>
-            <Text color={"gray.500"} mt={4}>
-              Explore real student reviews and ratings for courses and
-              professors at Seneca Polytechnic. Make informed decisions and
-              tailor your educational journey with confidence.
+            <Text color={'gray.500'} mt={4}>
+              Explore real student reviews and ratings for courses and professors at Seneca
+              Polytechnic. Make informed decisions and tailor your educational journey with
+              confidence.
             </Text>
           </Box>
 
           <Stack
-            direction={"column"}
+            direction={'column'}
             spacing={3}
-            align={"center"}
-            alignSelf={"center"}
-            position={"relative"}
+            align={'center'}
+            alignSelf={'center'}
+            position={'relative'}
           >
             <Button
-              colorScheme={"green"}
-              bg={"#F45B69"}
-              rounded={"full"}
+              colorScheme={'green'}
+              bg={'#F45B69'}
+              rounded={'full'}
               px={6}
               _hover={{
-                bg: "#F67984",
+                bg: '#F67984',
               }}
             >
               Get Started
@@ -107,8 +102,8 @@ export default function Home() {
 }
 
 const Arrow = createIcon({
-  displayName: "Arrow",
-  viewBox: "0 0 72 24",
+  displayName: 'Arrow',
+  viewBox: '0 0 72 24',
   path: (
     <path
       fillRule="evenodd"

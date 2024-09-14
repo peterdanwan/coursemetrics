@@ -1,6 +1,6 @@
 // interfaces/models.ts
 
-import { Document, Types } from "mongoose";
+import { Document, Types } from 'mongoose';
 
 export interface ICourse extends Document {
   courseCode: string;

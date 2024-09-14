@@ -1,7 +1,7 @@
 // models/CourseDetail.ts
 
-import mongoose from "mongoose";
-import { type ICourseDetail } from "@/interfaces";
+import mongoose from 'mongoose';
+import { type ICourseDetail } from '@/interfaces';
 
 const CourseDetailsSchema: mongoose.Schema = new mongoose.Schema({
   courseName: { type: String, required: true },
@@ -12,4 +12,4 @@ const CourseDetailsSchema: mongoose.Schema = new mongoose.Schema({
 // Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
 export const CourseDetail =
   mongoose.models.CourseDetail ||
-  mongoose.model<ICourseDetail>("CourseDetail", CourseDetailsSchema);
+  mongoose.model<ICourseDetail>('CourseDetail', CourseDetailsSchema);

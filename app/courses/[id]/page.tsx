@@ -1,7 +1,7 @@
 // app/courses/[id]/page.tsx
 
-"use client";
-import useSWR from "swr";
+'use client';
+import useSWR from 'swr';
 
 /*
 

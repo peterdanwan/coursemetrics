@@ -1,4 +1,4 @@
-// app/api/courses/route.ts
+// app/api/reviews/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
@@ -11,7 +11,7 @@ import { logger } from '@/utils';
 export const GET = withApiAuthRequired(async function get_courses(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'api/courses' });
+  const log = logger.child({ module: 'api/reviews' });
 
   try {
     await connectDB();
@@ -22,7 +22,7 @@ export const GET = withApiAuthRequired(async function get_courses(
       limit: url.searchParams.get('limit') || '10',
     };
 
-    const pageNumber: number = parseInt(queryParams.page, 1);
+    const pageNumber: number = parseInt(queryParams.page, 10);
     const limitNumber: number = parseInt(queryParams.limit, 10);
 
     // Validate pagination parameters

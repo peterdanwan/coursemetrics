@@ -1,12 +1,12 @@
 // interfaces/utils.ts
 
 export interface ISuccessResponse<T = any> {
-  status: "ok";
+  status: 'ok';
   data: T;
 }
 
 export interface IErrorResponse {
-  status: "error";
+  status: 'error';
   error: {
     code: number;
     message: string;
