@@ -1,5 +1,10 @@
 // app/api/auth/[auth0]/route.js
-import { handleAuth } from '@auth0/nextjs-auth0';
+
+import { handleAuth } from "@auth0/nextjs-auth0";
+import { logger } from "@/utils";
+
+const log = logger.child({ module: "api/courses" });
+log.info("Using Auth0 for authentication");
 
 /*
   This creates the following routes:
