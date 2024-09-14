@@ -1,6 +1,6 @@
 // app/admin/page.tsx
 // Admin homepage - have to get "Admin" role in auth0
-import React from 'react';
+import React from "react";
 
 export default function Admin() {
   return (

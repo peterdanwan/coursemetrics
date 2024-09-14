@@ -1,5 +1,11 @@
+// next.config.mjs
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Ref Doc: https://blog.arcjet.com/structured-logging-in-json-for-next-js/
+  experimental: {
+    serverComponentsExternalPackages: ['pino', 'pino-pretty'],
+  },
   images: {
     // Domains where we want to get images from
     // Reference: https://nextjs.org/docs/pages/api-reference/components/image#remotepatterns
@@ -23,4 +29,5 @@ const nextConfig = {
     ],
   },
 };
+
 export default nextConfig;
