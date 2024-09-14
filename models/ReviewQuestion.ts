@@ -1,21 +1,22 @@
 // models/CourseQuestion.ts
 
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const ReviewQuestionSchema = new mongoose.Schema({
   reviewID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'review',
+    ref: "review",
     required: true,
   },
   questionID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'question',
+    ref: "question",
     required: true,
   },
 });
 
-export const ReviewQuestion = mongoose.model(
-  'courseQuestion',
-  ReviewQuestionSchema
-);
+// Use ReviewQuestion model if already created, otherwise create a new one
+// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
+export const ReviewQuestion =
+  mongoose.models.ReviewQuestion ||
+  mongoose.model("ReviewQuestion", ReviewQuestionSchema);
