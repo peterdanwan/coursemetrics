@@ -1,10 +1,10 @@
 // app/layout.tsx
-import type { Metadata } from "next";
-import NavBar from "@/components/Navbar/Navbar";
-import Footer from "@/components/Footer/Footer";
-import "./globals.css";
-import { Providers } from "./providers";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from './providers';
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import MainNav from '@/components/Navbar/MainNav';
+import { Container } from '@chakra-ui/react';
 
 export const metadata: Metadata = {
   title: "CourseMetrics",
@@ -21,9 +21,10 @@ export default function RootLayout({
       <UserProvider>
         <body className="bg-ourBG text-white min-h-screen">
           <Providers>
-            <NavBar />
-            {children}
-            <Footer />
+            <MainNav />
+            <Container maxW='container.4xl' minHeight={'90vh'}>
+              {children}
+            </Container>
           </Providers>
         </body>
       </UserProvider>

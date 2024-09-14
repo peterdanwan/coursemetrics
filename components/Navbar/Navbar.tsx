@@ -15,7 +15,7 @@ const NavBar: React.FC = () => {
   const [showReviewsSubmenu, setShowReviewsSubmenu] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(
-    "Select the category... ▼",
+    "Select the category... ▼"
   );
 
   const handleSelectCategory = (category: string) => {
