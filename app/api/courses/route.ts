@@ -22,7 +22,7 @@ export const GET = withApiAuthRequired(async function get_courses(
       limit: url.searchParams.get("limit") || "10",
     };
 
-    const pageNumber: number = parseInt(queryParams.page, 10);
+    const pageNumber: number = parseInt(queryParams.page, 1);
     const limitNumber: number = parseInt(queryParams.limit, 10);
 
     // Validate pagination parameters
