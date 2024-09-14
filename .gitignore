@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# miscellaneous (will store our Teams Submission info)
+/miscellaneous

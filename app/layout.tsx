@@ -7,8 +7,8 @@ import MainNav from '@/components/Navbar/MainNav';
 import { Container } from '@chakra-ui/react';
 
 export const metadata: Metadata = {
-  title: "CourseMetrics",
-  description: "PRJ666 Final Project",
+  title: 'CourseMetrics',
+  description: 'PRJ666 Final Project',
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
         <body className="bg-ourBG text-white min-h-screen">
           <Providers>
             <MainNav />
-            <Container maxW='container.4xl' minHeight={'90vh'}>
+            <Container maxW="container.4xl" minHeight={'90vh'}>
               {children}
             </Container>
           </Providers>

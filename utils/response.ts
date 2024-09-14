@@ -1,21 +1,19 @@
 // utils/response.ts
 
-import { type ISuccessResponse, type IErrorResponse } from "@/interfaces";
+import { type ISuccessResponse, type IErrorResponse } from '@/interfaces';
 
 /**
  * A successful response looks like:
  *
  * {
  *   "status": "ok",
- *   ...
+ *   "data": ...
  * }
  */
 
-export const createSuccessResponse = function <T>(
-  data: T,
-): ISuccessResponse<T> {
+export const createSuccessResponse = function <T>(data: T): ISuccessResponse<T> {
   return {
-    status: "ok",
+    status: 'ok',
     data,
   };
 };
@@ -32,9 +30,6 @@ export const createSuccessResponse = function <T>(
  * }
  */
 
-export const createErrorResponse = function (
-  code: number,
-  message: string,
-): IErrorResponse {
-  return { status: "error", error: { code: code, message: message } };
+export const createErrorResponse = function (code: number, message: string): IErrorResponse {
+  return { status: 'error', error: { code: code, message: message } };
 };

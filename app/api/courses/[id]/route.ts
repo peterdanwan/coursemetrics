@@ -20,18 +20,13 @@ export const GET = withApiAuthRequired(async function get_course_by_id( // Ignor
     // Validate course ID
     if (!courseId) {
       log.error('Course ID is required');
-      return NextResponse.json(
-        createErrorResponse(400, 'Course ID is required'),
-        { status: 400 }
-      );
+      return NextResponse.json(createErrorResponse(400, 'Course ID is required'), { status: 400 });
     }
 
     log.info('Fetching course', { courseId });
 
     // Fetch the course by ID
-    const course = await Course.findById(courseId)
-      .populate('courseDetailId')
-      .exec();
+    const course = await Course.findById(courseId).populate('courseDetailId').exec();
 
     log.debug({ course }, 'Course fetched from DB');
     log.info('Course fetched successfully', { courseId });
@@ -56,10 +51,7 @@ export const GET = withApiAuthRequired(async function get_course_by_id( // Ignor
     }
 
     return NextResponse.json(
-      createErrorResponse(
-        500,
-        'Something went wrong. A server-side issue occurred.'
-      ),
+      createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }
     );
   }

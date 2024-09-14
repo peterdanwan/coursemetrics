@@ -21,12 +21,7 @@ import {
   Divider,
   Text,
 } from '@chakra-ui/react';
-import {
-  HamburgerIcon,
-  CloseIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-} from '@chakra-ui/icons';
+import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
@@ -59,13 +54,12 @@ export default function MainNav() {
 
   // Applies the base style + an optional black background depending if we are on the corresponding link
   const desktopMenuLinkStyle = (linkPath: string) => {
-    const baseStyle =
-      'text-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
+    const baseStyle = 'text-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
     return `${pathname === linkPath && 'bg-gray-600 text-white'} ${baseStyle} `;
   };
 
   return (
-    <Box className='sticky z-50 top-0'>
+    <Box className="sticky z-50 top-0">
       <Flex
         bg={useColorModeValue('white', 'gray.800')}
         color={useColorModeValue('gray.600', 'white')}
@@ -84,33 +78,26 @@ export default function MainNav() {
         >
           <IconButton
             onClick={onToggle}
-            icon={
-              isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
-            }
+            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
             variant={'ghost'}
             aria-label={'Toggle Navigation'}
           />
         </Flex>
 
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Image src={logo} alt='Course Metrics Logo' width={50} height={50} />
+          <Image src={logo} alt="Course Metrics Logo" width={50} height={50} />
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav position='left' />
+            <DesktopNav position="left" />
           </Flex>
 
-          <Flex display={{ base: 'none', md: 'flex' }} ml='auto'>
-            <DesktopNav position='right' />
+          <Flex display={{ base: 'none', md: 'flex' }} ml="auto">
+            <DesktopNav position="right" />
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={'flex-end'}
-          direction={'row'}
-          spacing={6}
-        >
-          <Divider orientation='vertical' height='30px' mx={3} />
+        <Stack flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} spacing={6}>
+          <Divider orientation="vertical" height="30px" mx={3} />
           {/* console.log("User Picture:", user.picture);  */}
           {/* <Image src={user?.picture} alt="User Avatar" width={30} height={30} /> */}
           <Menu>
@@ -123,10 +110,10 @@ export default function MainNav() {
               minW={0}
             />
             <MenuList>
-              <MenuItem as='a' href='/api/auth/login'>
+              <MenuItem as="a" href="/api/auth/login">
                 Sign In
               </MenuItem>
-              <MenuItem as='a' href='/api/auth/logout'>
+              <MenuItem as="a" href="/api/auth/logout">
                 Sign out
               </MenuItem>
             </MenuList>
@@ -152,7 +139,7 @@ const DesktopNav = ({ position }: { position: string }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <Stack direction={'row'} spacing={{ md: 1, lg: 2 }} alignItems='center'>
+    <Stack direction={'row'} spacing={{ md: 1, lg: 2 }} alignItems="center">
       {NAV_ITEMS.filter((navItem) => {
         if (position === 'left') {
           return !navItem.isRightAligned;
@@ -162,9 +149,9 @@ const DesktopNav = ({ position }: { position: string }) => {
       }).map((navItem) => {
         if (navItem.isSearch) {
           return (
-            <Flex key={navItem.label} align='center'>
+            <Flex key={navItem.label} align="center">
               <Input
-                placeholder='Search'
+                placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 w={{ base: 40, md: 32, lg: 72 }}
@@ -224,7 +211,7 @@ const DesktopNav = ({ position }: { position: string }) => {
 const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   return (
     <Box
-      as='a'
+      as="a"
       href={href}
       role={'group'}
       display={'block'}
@@ -234,11 +221,7 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
     >
       <Stack direction={'row'} align={'center'}>
         <Box>
-          <Text
-            transition={'all .3s ease'}
-            _groupHover={{ color: 'pink.400' }}
-            fontWeight={500}
-          >
+          <Text transition={'all .3s ease'} _groupHover={{ color: 'pink.400' }} fontWeight={500}>
             {label}
           </Text>
           <Text fontSize={'sm'}>{subLabel}</Text>
@@ -263,22 +246,18 @@ const MobileNav = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <Stack
-      bg={useColorModeValue('white', 'gray.800')}
-      p={4}
-      display={{ md: 'none' }}
-    >
+    <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
       {NAV_ITEMS.map((navItem, index) => (
         <React.Fragment key={navItem.label}>
           <MobileNavItem {...navItem} />
           {/* Insert search bar after "Select Category" */}
           {index === 0 && (
-            <Flex align='center' mt={2} mb={4}>
+            <Flex align="center" mt={2} mb={4}>
               <Input
-                placeholder='Search'
+                placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                width='full'
+                width="full"
               />
               <Button onClick={() => handleSearch(searchQuery)} ml={2}>
                 Search
@@ -298,18 +277,15 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
     <Stack spacing={4} onClick={children && onToggle}>
       <Box
         py={2}
-        as='a'
+        as="a"
         href={href ?? '#'}
-        justifyContent='space-between'
-        alignItems='center'
+        justifyContent="space-between"
+        alignItems="center"
         _hover={{
           textDecoration: 'none',
         }}
       >
-        <Text
-          fontWeight={600}
-          color={useColorModeValue('gray.600', 'gray.200')}
-        >
+        <Text fontWeight={600} color={useColorModeValue('gray.600', 'gray.200')}>
           {label}
         </Text>
         {children && (
@@ -334,7 +310,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         >
           {children &&
             children.map((child) => (
-              <Box as='a' key={child.label} py={2} href={child.href}>
+              <Box as="a" key={child.label} py={2} href={child.href}>
                 {child.label}
               </Box>
             ))}

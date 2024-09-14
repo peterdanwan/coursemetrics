@@ -16,7 +16,7 @@ Coursemetrics is a dedicated platform specifically designed for providing detail
 
 ## 1. Introduction
 
-CourseMetrics is blah. If you haven't done so already, read this [section on how to install][2-dependencies]
+CourseMetrics is our PRJ666 project. If you haven't done so already, read this [section on how to install][2-dependencies]
 
 ## 2. Dependencies
 

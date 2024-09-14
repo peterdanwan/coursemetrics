@@ -1,13 +1,7 @@
 // components/Footer/Footer.tsx
-import Image from "next/image";
-import logo from "@/assets/images/logo.png";
-import {
-  FaFacebook,
-  FaGithub,
-  FaXTwitter,
-  FaLinkedin,
-  FaInstagram,
-} from "react-icons/fa6";
+import Image from 'next/image';
+import logo from '@/assets/images/logo.png';
+import { FaFacebook, FaGithub, FaXTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa6';
 
 const Footer = () => {
   const currentYear: number = new Date().getFullYear();

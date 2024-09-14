@@ -1,22 +1,20 @@
 // components/Navbar/Navbar.tsx
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import logo from "@/assets/images/CourseMetricsLogo.png";
-import profileDefault from "@/assets/images/pin.svg";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import logo from '@/assets/images/CourseMetricsLogo.png';
+import profileDefault from '@/assets/images/pin.svg';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [showReviewsSubmenu, setShowReviewsSubmenu] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(
-    "Select the category... ▼"
-  );
+  const [selectedCategory, setSelectedCategory] = useState('Select the category... ▼');
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
@@ -37,11 +35,11 @@ const NavBar: React.FC = () => {
       }
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     // Cleanup the event listener on component unmount
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -51,69 +49,61 @@ const NavBar: React.FC = () => {
 
   // Applies the base style + an optional black background depending if we are on the corresponding link
   const desktopMenuLinkStyle = (linkPath: string) => {
-    const baseStyle =
-      "text-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2";
-    return `${pathname === linkPath && "bg-gray-600 text-white"} ${baseStyle} `;
+    const baseStyle = 'text-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
+    return `${pathname === linkPath && 'bg-gray-600 text-white'} ${baseStyle} `;
   };
 
   // Styles for mobile menu links
   const mobileMenu = () => {
     const mobileMenuLinkStyles =
-      "text-black block rounded-md px-3 py-2 hover:bg-gray-900 hover:text-white font-medium";
+      'text-black block rounded-md px-3 py-2 hover:bg-gray-900 hover:text-white font-medium';
     const getMobileMenuLinkStyle = (linkPath: string) => {
-      return `${
-        pathname === linkPath && "bg-gray-600 text-white"
-      } ${mobileMenuLinkStyles}`;
+      return `${pathname === linkPath && 'bg-gray-600 text-white'} ${mobileMenuLinkStyles}`;
     };
 
     return (
       <div id="mobile-menu" className="md:hidden">
         <div className="space-y-1 px-2 pb-3 pt-2">
-          <Link
-            href="/"
-            className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}
-          >
+          <Link href="/" className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
             Home
           </Link>
-          <Link href="/about" className={getMobileMenuLinkStyle("/about")}>
+          <Link href="/about" className={getMobileMenuLinkStyle('/about')}>
             About
           </Link>
-          <Link href="/contact" className={getMobileMenuLinkStyle("/contact")}>
+          <Link href="/contact" className={getMobileMenuLinkStyle('/contact')}>
             Contact Me
           </Link>
-          <Link href="/faq" className={getMobileMenuLinkStyle("/faq")}>
+          <Link href="/faq" className={getMobileMenuLinkStyle('/faq')}>
             FAQ
           </Link>
           <div className="relative cursor-pointer bg-white text-black py-2 px-3 rounded font-semibold">
-            <div onClick={() => setShowDropdown(!showDropdown)}>
-              {selectedCategory}
-            </div>
+            <div onClick={() => setShowDropdown(!showDropdown)}>{selectedCategory}</div>
             {showDropdown && (
               <div className="absolute top-full left-0 bg-white text-black min-w-full shadow-lg z-10">
                 <Link
                   href="#"
-                  onClick={() => handleSelectCategory("Professor")}
+                  onClick={() => handleSelectCategory('Professor')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   Professor
                 </Link>
                 <Link
                   href="#"
-                  onClick={() => handleSelectCategory("Course")}
+                  onClick={() => handleSelectCategory('Course')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   Course
                 </Link>
                 <Link
                   href="#"
-                  onClick={() => handleSelectCategory("Skill")}
+                  onClick={() => handleSelectCategory('Skill')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   Skill
                 </Link>
                 <Link
                   href="#"
-                  onClick={() => handleSelectCategory("Program/Category")}
+                  onClick={() => handleSelectCategory('Program/Category')}
                   className="block px-4 py-2 hover:bg-gray-200"
                 >
                   Program/Category
@@ -124,14 +114,8 @@ const NavBar: React.FC = () => {
 
           {/* Search Bar */}
           <div className="flex items-center mt-3">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="p-2 border rounded mr-3 w-full"
-            />
-            <button className="bg-gray-600 text-white p-2 rounded">
-              Search
-            </button>
+            <input type="text" placeholder="Search..." className="p-2 border rounded mr-3 w-full" />
+            <button className="bg-gray-600 text-white p-2 rounded">Search</button>
           </div>
           {!user && (
             <Link href="/api/auth/login" className={mobileMenuLinkStyles}>
@@ -144,7 +128,7 @@ const NavBar: React.FC = () => {
   };
 
   const userMenu = () => {
-    const menuLinkStyles = "block px-4 py-2 text-sm text-gray-700";
+    const menuLinkStyles = 'block px-4 py-2 text-sm text-gray-700';
 
     return (
       <div
@@ -154,12 +138,7 @@ const NavBar: React.FC = () => {
         aria-orientation="vertical"
         aria-labelledby="user-menu-button"
       >
-        <Link
-          href="/profile"
-          className={menuLinkStyles}
-          role="menuitem"
-          id="user-menu-item-0"
-        >
+        <Link href="/profile" className={menuLinkStyles} role="menuitem" id="user-menu-item-0">
           Profile
         </Link>
         <div>
@@ -209,12 +188,7 @@ const NavBar: React.FC = () => {
         >
           Bookmarks
         </Link>
-        <Link
-          href="/profile"
-          className={menuLinkStyles}
-          role="menuitem"
-          id="user-menu-item-0"
-        >
+        <Link href="/profile" className={menuLinkStyles} role="menuitem" id="user-menu-item-0">
           Settings & Privacy
         </Link>
         <hr></hr>
@@ -323,35 +297,33 @@ const NavBar: React.FC = () => {
 
             {/* Desktop Dropdown Menu */}
             <div className="relative cursor-pointer w-52 bg-white text-black py-2 px-3 rounded hidden md:block ml-4">
-              <div onClick={() => setShowDropdown(!showDropdown)}>
-                {selectedCategory}
-              </div>
+              <div onClick={() => setShowDropdown(!showDropdown)}>{selectedCategory}</div>
               {showDropdown && (
                 <div className="absolute top-full left-0 bg-white text-black min-w-full shadow-lg z-10">
                   <Link
                     href="#"
-                    onClick={() => handleSelectCategory("Professor")}
+                    onClick={() => handleSelectCategory('Professor')}
                     className="block px-4 py-2 hover:bg-gray-200"
                   >
                     Professor
                   </Link>
                   <Link
                     href="#"
-                    onClick={() => handleSelectCategory("Course")}
+                    onClick={() => handleSelectCategory('Course')}
                     className="block px-4 py-2 hover:bg-gray-200"
                   >
                     Course
                   </Link>
                   <Link
                     href="#"
-                    onClick={() => handleSelectCategory("Skill")}
+                    onClick={() => handleSelectCategory('Skill')}
                     className="block px-4 py-2 hover:bg-gray-200"
                   >
                     Skill
                   </Link>
                   <Link
                     href="#"
-                    onClick={() => handleSelectCategory("Program/Category")}
+                    onClick={() => handleSelectCategory('Program/Category')}
                     className="block px-4 py-2 hover:bg-gray-200"
                   >
                     Program/Category
@@ -367,9 +339,7 @@ const NavBar: React.FC = () => {
                 placeholder="Search..."
                 className="p-2 border rounded mr-3 text-black"
               />
-              <button className="bg-[#0B2027] text-white px-4 py-2 rounded">
-                Search
-              </button>
+              <button className="bg-[#0B2027] text-white px-4 py-2 rounded">Search</button>
             </div>
           </div>
 
@@ -379,19 +349,16 @@ const NavBar: React.FC = () => {
             <div className="hidden md:ml-6 md:block">
               <div className="flex space-x-2">
                 {/* Links */}
-                <Link href="/" className={desktopMenuLinkStyle("/")}>
+                <Link href="/" className={desktopMenuLinkStyle('/')}>
                   Home
                 </Link>
-                <Link href="/about" className={desktopMenuLinkStyle("/about")}>
+                <Link href="/about" className={desktopMenuLinkStyle('/about')}>
                   About
                 </Link>
-                <Link
-                  href="/contact"
-                  className={desktopMenuLinkStyle("/contact")}
-                >
+                <Link href="/contact" className={desktopMenuLinkStyle('/contact')}>
                   Contact Me
                 </Link>
-                <Link href="/faq" className={desktopMenuLinkStyle("/faq")}>
+                <Link href="/faq" className={desktopMenuLinkStyle('/faq')}>
                   FAQ
                 </Link>
               </div>

@@ -1,7 +1,7 @@
 // app/courses/page.tsx
 
-"use client";
-import useSWR from "swr";
+'use client';
+import useSWR from 'swr';
 
 /*
 
@@ -15,7 +15,7 @@ const fetcher = async (uri: string) => {
 };
 
 export default function Courses() {
-  const { data, error } = useSWR("/api/courses?page=1&limit=10", fetcher);
+  const { data, error } = useSWR('/api/courses?page=1&limit=10', fetcher);
 
   console.log(data);
   if (error) return <div>oops... {error.message}</div>;

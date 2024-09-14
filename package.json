@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "npx prettier --write \"**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
