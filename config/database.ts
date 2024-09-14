@@ -1,16 +1,16 @@
 // config/database.ts
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 let connected: Boolean = false;
 
 // When you work with the Mongoose object, it's asynchronous as it will return a promise
 const connectDB = async (): Promise<void> => {
   // This ensures that only the fields that are specified in our schema will be saved in our database
-  mongoose.set('strictQuery', true);
+  mongoose.set("strictQuery", true);
 
   // If the database is already connected, don't connect again
   if (connected) {
-    console.log('MongoDB is already connected...');
+    console.log("MongoDB is already connected...");
     return;
   }
 
@@ -18,7 +18,7 @@ const connectDB = async (): Promise<void> => {
   try {
     await mongoose.connect(process.env.MONGODB_URI as string);
     connected = true;
-    console.log('MongoDB connected.');
+    console.log("MongoDB connected.");
   } catch (error) {
     console.log(error);
   }
