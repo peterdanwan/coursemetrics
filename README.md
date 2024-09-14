@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Coursemetrics
 
-## Getting Started
+Coursemetrics is a dedicated platform specifically designed for providing detailed information about college and university courses.
 
-First, run the development server:
+<div align="center">
+  <img src="./assets/images/CourseMetricsLogo.png" alt="Logo" style="width: 30%; height: auto;">
+</div>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Table of Contents
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. [Introduction][1-intro]
+2. [Dependencies][2-dependencies]
+3. [How to run][3-how-to-run]
+4. [Contributing][4-contributing]
+5. [Authors][5-authors]
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 1. Introduction
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+CourseMetrics is blah. If you haven't done so already, read this [section on how to install][2-dependencies]
 
-## Learn More
+## 2. Dependencies
 
-To learn more about Next.js, take a look at the following resources:
+To run this project, you need to have [Node installed](https://nodejs.org/en/download/package-manager).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 3. How to run
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+For information on how to run this project locally, check out the [developer's guide](./_documents/local-setup/guide.md).
 
-## Deploy on Vercel
+## 4. Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+When working on this project, please create separate feature branches to work on. When you're ready to merge these changes to the `main` branch,
+make a `pull request` to merge your changes and have at least 1 other member approve your changes.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 5. Authors
+
+- Peter Wan
+- Mimi Dang
+- Aryan Khurana
+- Jeremy Lee
+- Tomas Rochwerger
+- Vinh Nhan
+
+[Back to top][top]
+
+[1-intro]: #1-introduction
+[2-dependencies]: #2-dependencies
+[3-how-to-run]: #3-how-to-run
+[4-contributing]: #4-contributing
+[5-authors]: #5-authors
+[top]: #coursemetrics
