@@ -48,6 +48,14 @@ export default function MainNav() {
   console.log('User:', user?.name);
   const pathname = usePathname();
 
+  // useColorModeValue is a hook, and cannot be called in the returned component itself:
+  // https://stackoverflow.com/questions/71245216/how-to-conditional-render-in-chakra-ui
+  const flexStyle = {
+    bgColor: useColorModeValue('white', 'gray.800'),
+    color: useColorModeValue('gray.600', 'white'),
+    borderColor: useColorModeValue('gray.200', 'gray.900'),
+  };
+
   // Boilerplate code for useUser (from Auth0)
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -61,14 +69,14 @@ export default function MainNav() {
   return (
     <Box className="sticky z-50 top-0">
       <Flex
-        bg={useColorModeValue('white', 'gray.800')}
-        color={useColorModeValue('gray.600', 'white')}
+        bg={flexStyle.bgColor}
+        color={flexStyle.color}
         minH={'60px'}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        borderColor={flexStyle.borderColor}
         align={'center'}
       >
         <Flex

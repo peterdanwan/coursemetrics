@@ -157,7 +157,6 @@ const NavBar: React.FC = () => {
                 className={menuLinkStyles}
                 role="menuitem"
                 id="user-menu-item-1-1"
-                aria-orientation="vertical"
               >
                 Course
               </Link>
