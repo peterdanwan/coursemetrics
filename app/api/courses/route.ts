@@ -22,7 +22,8 @@ export const GET = withApiAuthRequired(async function get_courses(
       limit: url.searchParams.get('limit') || '10',
     };
 
-    const pageNumber: number = parseInt(queryParams.page, 1);
+    // Ref Doc: https://www.shecodes.io/athena/60744-what-is-parseint-in-javascript#
+    const pageNumber: number = parseInt(queryParams.page, 10);
     const limitNumber: number = parseInt(queryParams.limit, 10);
 
     // Validate pagination parameters
