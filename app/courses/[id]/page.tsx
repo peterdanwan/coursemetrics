@@ -9,12 +9,12 @@ Here is an example of how you would call the API to get a course by ID
 
 */
 
-const fetcher = async (uri) => {
+const fetcher = async (uri: string) => {
   const response = await fetch(uri);
   return response.json();
 };
 
-export default function Products({ params }: { params: { id: string } }) {
+export default function CoursePage({ params }: { params: { id: string } }) {
   const { data, error } = useSWR(`/api/courses/${params.id}`, fetcher);
   console.log(data);
   if (error) return <div>oops... {error.message}</div>;
