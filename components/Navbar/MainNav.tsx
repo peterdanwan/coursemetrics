@@ -57,7 +57,7 @@ export default function MainNav() {
   };
 
   // Boilerplate code for useUser (from Auth0)
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div></div>;
   if (error) return <div>{error.message}</div>;
 
   // Applies the base style + an optional black background depending if we are on the corresponding link

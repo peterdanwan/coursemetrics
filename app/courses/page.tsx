@@ -2,6 +2,7 @@
 
 'use client';
 import useSWR from 'swr';
+import { Spinner } from '@nextui-org/react';
 
 /*
 
@@ -19,6 +20,14 @@ export default function Courses() {
 
   console.log(data);
   if (error) return <div>oops... {error.message}</div>;
-  if (data === undefined) return <div>Loading...</div>;
-  return <div></div>;
+
+  // Have a better loading message or spinner that's different than the navbar's loading message
+  if (data === undefined)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp;Loading the different courses...
+      </div>
+    );
+  return <div>Hello World</div>;
 }
