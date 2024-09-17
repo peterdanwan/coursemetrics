@@ -11,6 +11,14 @@ import Loading from './loading';
 export const metadata: Metadata = {
   title: 'CourseMetrics',
   description: 'PRJ666 Final Project',
+  authors: [
+    { name: 'Jeremy Lee' },
+    { name: 'Peter Wan' },
+    { name: 'Tomas Rochwerger' },
+    { name: 'Mimi Dang' },
+    { name: 'Vinh Nhan' },
+    { name: 'Aryan Khurana' },
+  ],
 };
 
 export default function RootLayout({
