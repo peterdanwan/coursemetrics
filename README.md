@@ -28,7 +28,10 @@ For information on how to run this project locally, check out the [developer's g
 
 ## 4. Contributing
 
-When working on this project, please create separate feature branches to work on. When you're ready to merge these changes to the `main` branch,
+When working on this project, please create separate feature branches to work on.  
+`git checkout -b branch_name`
+
+When you're ready to merge these changes to the `main` branch,
 make a `pull request` to merge your changes and have at least 1 other member approve your changes.
 
 ## 5. Authors
