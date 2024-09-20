@@ -1,5 +1,5 @@
 // app/layout.tsx
-import React, { Suspense } from 'react';
+import React from 'react';
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
@@ -7,7 +7,7 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import MainNav from '@/components/Navbar/MainNav';
 import Footer from '@/components/Footer/MainFooter';
 import { Container } from '@chakra-ui/react';
-import Loading from './loading';
+import { getSession } from '@auth0/nextjs-auth0';
 
 export const metadata: Metadata = {
   title: 'CourseMetrics',
@@ -22,25 +22,25 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get the user information from Auth0 and set it to global state so that we can access it from anywhere
+  const { user }: any = await getSession();
+
   return (
     <html lang="en">
       <UserProvider>
-        <Suspense fallback={<Loading />}>
-          <body className="bg-ourBG text-white min-h-screen">
-            <Providers>
-              <MainNav />
-              <Container maxW="container.4xl" minHeight={'90vh'}>
-                {children}
-              </Container>
-              <Footer />
-            </Providers>
-          </body>
-        </Suspense>
+        <body className="bg-ourBG text-white min-h-screen">
+          <Providers>
+            <MainNav user={user} />
+            <Container maxW="container.4xl" minHeight={'90vh'}>
+              {children}
+            </Container>
+          </Providers>
+        </body>
       </UserProvider>
     </html>
   );

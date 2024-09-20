@@ -14,3 +14,20 @@ export interface ICourseDetail extends Document {
   courseName: string;
   courseDescription: string;
 }
+
+export interface IUser {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: Types.ObjectId;
+}
+
+export interface IUserProfile {
+  userId: Types.ObjectId;
+  biography?: string;
+}
+
+export interface IUserRole {
+  roleId: number;
+  roleName: string;
+}

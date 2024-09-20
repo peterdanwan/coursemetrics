@@ -1,2 +1,8 @@
 export { type ISuccessResponse, type IErrorResponse } from './utils';
-export { type ICourse, type ICourseDetail } from './models';
+export {
+  type IUserRole,
+  type ICourse,
+  type ICourseDetail,
+  type IUser,
+  type IUserProfile,
+} from './models';

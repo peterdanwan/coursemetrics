@@ -26,40 +26,37 @@ import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@ch
 
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useFlexStyle } from '@/styles/styles';
 
-const handleSearch = (searchQuery: string) => {
-  if (searchQuery === '') {
-    console.log('Please enter a search query');
-    return;
-  }
-  console.log('Searching for:', searchQuery);
-};
-
-const handleSignIn = () => {
-  console.log('Sign In');
-};
-
-export default function MainNav() {
+export default function MainNav({ user }) {
   const { isOpen, onToggle } = useDisclosure();
-  const { user, error, isLoading }: any = useUser();
-  console.log('User:', user?.name);
+
+  // If the user is not stored in the database, store all details
+  useEffect(() => {
+    if (user) {
+      registerUserInDB();
+    }
+  }, [user]);
+
+  const registerUserInDB = async () => {
+    try {
+      await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Error registering user:', error);
+    }
+  };
+  
   const pathname = usePathname();
   const flexStyle = useFlexStyle();
-
-  // Boilerplate code for useUser (from Auth0)
-  if (isLoading) return <div></div>;
-  if (error) return <div>{error.message}</div>;
-
-  // Applies the base style + an optional black background depending if we are on the corresponding link
-  const desktopMenuLinkStyle = (linkPath: string) => {
-    const baseStyle = 'text-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2';
-    return `${pathname === linkPath && 'bg-gray-600 text-white'} ${baseStyle} `;
-  };
 
   return (
     <Box className="sticky z-50 top-0">
@@ -101,8 +98,6 @@ export default function MainNav() {
 
         <Stack flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} spacing={6}>
           <Divider orientation="vertical" height="30px" mx={3} />
-          {/* console.log("User Picture:", user.picture);  */}
-          {/* <Image src={user?.picture} alt="User Avatar" width={30} height={30} /> */}
           <Menu>
             <MenuButton
               as={IconButton}
@@ -130,6 +125,14 @@ export default function MainNav() {
     </Box>
   );
 }
+
+const handleSearch = (searchQuery: string) => {
+  if (searchQuery === '') {
+    console.log('Please enter a search query');
+    return;
+  }
+  console.log('Searching for:', searchQuery);
+};
 
 const DesktopNav = ({ position }: { position: string }) => {
   const pathname = usePathname();
