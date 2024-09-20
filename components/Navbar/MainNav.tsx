@@ -1,3 +1,4 @@
+// components/Navbar/MainNav.tsx
 'use client';
 import {
   Box,
@@ -29,6 +30,7 @@ import React, { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useFlexStyle } from '@/styles/styles';
 
 const handleSearch = (searchQuery: string) => {
   if (searchQuery === '') {
@@ -47,14 +49,7 @@ export default function MainNav() {
   const { user, error, isLoading }: any = useUser();
   console.log('User:', user?.name);
   const pathname = usePathname();
-
-  // useColorModeValue is a hook, and cannot be called in the returned component itself:
-  // https://stackoverflow.com/questions/71245216/how-to-conditional-render-in-chakra-ui
-  const flexStyle = {
-    bgColor: useColorModeValue('white', 'gray.800'),
-    color: useColorModeValue('gray.600', 'white'),
-    borderColor: useColorModeValue('gray.200', 'gray.900'),
-  };
+  const flexStyle = useFlexStyle();
 
   // Boilerplate code for useUser (from Auth0)
   if (isLoading) return <div></div>;
