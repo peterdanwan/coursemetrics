@@ -54,7 +54,7 @@ export default function MainNav(props: { user: any }) {
       console.error('Error registering user:', error);
     }
   };
-  
+
   const pathname = usePathname();
   const flexStyle = useFlexStyle();
 
