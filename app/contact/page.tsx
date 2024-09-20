@@ -1,42 +1,11 @@
 // app/contact/page.tsx
 'use client';
-import {
-  Box,
-  Flex,
-  Text,
-  Heading,
-  Link,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
+import { Box, Flex, Text, Heading, Link } from '@chakra-ui/react';
+import React from 'react';
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
 
 export default function About() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  });
-
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    // Implement your email sending logic here
-    console.log('Form submitted:', formData);
-  };
-
   return (
     <Flex
       direction={{ base: 'column', md: 'row' }}
@@ -77,54 +46,7 @@ export default function About() {
         justifyContent="center"
       >
         {/* Need another image and not the logo */}
-        {/* Background Image */}
-        <Image
-          src={logo}
-          alt="CourseMetrics Logo"
-          // objectFit="cover"
-          width={300}
-          height={300}
-          // z-index={-1}
-        />
-        {/* Form */}
-        {/* <Box as="form" onSubmit={handleSubmit} width="100%">
-          <FormControl id="name" isRequired mb={4}>
-            <FormLabel>Name</FormLabel>
-            <Input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              width={{ base: '100%', md: '80%', lg: '90%' }}
-              size="lg"
-            />
-          </FormControl>
-          <FormControl id="email" isRequired mb={4}>
-            <FormLabel>Email</FormLabel>
-            <Input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              width={{ base: '100%', md: '80%', lg: '90%' }}
-              size="lg"
-            />
-          </FormControl>
-          <FormControl id="message" isRequired mb={4}>
-            <FormLabel>Message</FormLabel>
-            <Textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              width={{ base: '100%', md: '80%', lg: '90%' }}
-              height={{ base: '150px', md: '200px' }}
-              size="lg"
-            />
-          </FormControl>
-          <Button type="submit" colorScheme="teal" width={{ base: '100%', md: 'auto' }}>
-            Send
-          </Button>
-        </Box> */}
+        <Image src={logo} alt="CourseMetrics Logo" width={300} height={300} />
       </Box>
     </Flex>
   );
