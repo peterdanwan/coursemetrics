@@ -1,12 +1,17 @@
 // models/ReviewAnswer.ts
 
 import mongoose from 'mongoose';
+import { IReviewAnswer } from '@/interfaces';
+import { ReviewQuestion } from './ReviewQuestion';
 
-const ReviewAnswerSchema = new mongoose.Schema({
-  reviewAnswerID: { type: Number, required: true },
-  reviewID: {
+/**
+ * A Review answer is tied to a specific ReviewQuestion ID.
+ */
+
+const ReviewAnswerSchema: mongoose.Schema<IReviewAnswer> = new mongoose.Schema({
+  reviewQuestionID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'review',
+    ref: ReviewQuestion,
     required: true,
   },
   answer: { type: String, required: true },
@@ -14,5 +19,6 @@ const ReviewAnswerSchema = new mongoose.Schema({
 
 // Use ReviewAnswer model if already created, otherwise create a new one
 // Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
+
 export const ReviewAnswer =
-  mongoose.models.ReviewAnswer || mongoose.model('ReviewAnswer', ReviewAnswerSchema);
+  mongoose.models.ReviewAnswer || mongoose.model<IReviewAnswer>('ReviewAnswer', ReviewAnswerSchema);
