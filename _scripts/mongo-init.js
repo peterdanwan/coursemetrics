@@ -46,7 +46,7 @@ const courseDetails = [
       'Focuses on fundamental data structures, their implementations, and algorithms...',
   },
 ];
-const insertedCourseDetails = db.coursedetails.insertMany(courseDetails);
+const insertedCourseDetails = db.courseDetails.insertMany(courseDetails);
 
 // Insert sample data into the courses collection
 const courses = [
@@ -101,38 +101,38 @@ const professorCourses = [
 db.professorCourses.insertMany(professorCourses);
 
 // Insert sample data into the users collection
-const users = [
-  {
-    firstName: 'Alice',
-    lastName: 'Brown',
-    email: 'alice.brown@example.com',
-  },
-  {
-    firstName: 'Bob',
-    lastName: 'White',
-    email: 'bob.white@example.com',
-  },
-];
-const insertedUsers = db.users.insertMany(users);
+// const users = [
+//   {
+//     firstName: 'Alice',
+//     lastName: 'Brown',
+//     email: 'alice.brown@example.com',
+//   },
+//   {
+//     firstName: 'Bob',
+//     lastName: 'White',
+//     email: 'bob.white@example.com',
+//   },
+// ];
+// const insertedUsers = db.users.insertMany(users);
 
-// Insert sample data into the userProfiles collection
-const userProfiles = [
-  {
-    userId: insertedUsers.insertedIds[0],
-    biography: 'Alice is a software engineer specializing in cloud computing.',
-  },
-  {
-    userId: insertedUsers.insertedIds[1],
-    biography: 'Bob is a data analyst with a passion for machine learning.',
-  },
-];
-db.userProfiles.insertMany(userProfiles);
+// // Insert sample data into the userProfiles collection
+// const userProfiles = [
+//   {
+//     userId: insertedUsers.insertedIds[0],
+//     biography: 'Alice is a software engineer specializing in cloud computing.',
+//   },
+//   {
+//     userId: insertedUsers.insertedIds[1],
+//     biography: 'Bob is a data analyst with a passion for machine learning.',
+//   },
+// ];
+// db.userProfiles.insertMany(userProfiles);
 
 // Insert sample data into the userRoles collection
 const userRoles = [
-  { roleId: 1, roleName: 'Admin' },
-  { roleId: 2, roleName: 'Student' },
-  { roleId: 3, roleName: 'Professor' },
+  { roleId: 1, roleName: 'admin' },
+  { roleId: 2, roleName: 'student' },
+  { roleId: 3, roleName: 'professor' },
 ];
 db.userRoles.insertMany(userRoles);
 
