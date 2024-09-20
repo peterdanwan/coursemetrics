@@ -2,10 +2,6 @@
 
 import mongoose from 'mongoose';
 
-/**
- *
- */
-
 const ActionTypeSchema = new mongoose.Schema({
   actionTypeName: { type: String, required: true },
 });
