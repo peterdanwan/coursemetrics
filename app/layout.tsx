@@ -5,6 +5,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import MainNav from '@/components/Navbar/MainNav';
+import Footer from '@/components/Footer/MainFooter';
 import { Container } from '@chakra-ui/react';
 import Loading from './loading';
 
@@ -36,6 +37,7 @@ export default function RootLayout({
               <Container maxW="container.4xl" minHeight={'90vh'}>
                 {children}
               </Container>
+              <Footer />
             </Providers>
           </body>
         </Suspense>

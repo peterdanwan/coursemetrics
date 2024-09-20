@@ -1,3 +1,4 @@
+// components/Footer/MainFooter.tsx
 'use client';
 import { Box, Container, Text, Flex, Link, IconButton, useColorModeValue } from '@chakra-ui/react';
 import { FaFacebook, FaGithub, FaXTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa6';
@@ -63,7 +64,7 @@ export default function MainFooter() {
               variant="ghost"
               size="lg"
               isRound
-              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              _hover={{ bg: flexStyle.bgColor }}
               mx={3}
               mb={{ base: 2, md: 0 }} // Adjust spacing for small screens
             />
@@ -75,7 +76,7 @@ export default function MainFooter() {
               variant="ghost"
               size="lg"
               isRound
-              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              _hover={{ bg: flexStyle.bgColor }}
               mx={3}
               mb={{ base: 2, md: 0 }}
             />
@@ -87,7 +88,7 @@ export default function MainFooter() {
               variant="ghost"
               size="lg"
               isRound
-              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              _hover={{ bg: flexStyle.bgColor }}
               mx={3}
               mb={{ base: 2, md: 0 }}
             />
@@ -99,7 +100,7 @@ export default function MainFooter() {
               variant="ghost"
               size="lg"
               isRound
-              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              _hover={{ bg: flexStyle.bgColor }}
               mx={3}
               mb={{ base: 2, md: 0 }}
             />
@@ -111,7 +112,7 @@ export default function MainFooter() {
               variant="ghost"
               size="lg"
               isRound
-              _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }}
+              _hover={{ bg: flexStyle.bgColor }}
               mx={3}
               mb={{ base: 2, md: 0 }}
             />

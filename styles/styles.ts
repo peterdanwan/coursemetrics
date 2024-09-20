@@ -6,5 +6,6 @@ export const useFlexStyle = () => {
     bgColor: useColorModeValue('white', 'gray.800'),
     color: useColorModeValue('gray.600', 'white'),
     borderColor: useColorModeValue('gray.200', 'gray.900'),
+    hoverBg: useColorModeValue('gray.200', 'gray.700'),
   };
 };
