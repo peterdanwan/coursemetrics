@@ -5,4 +5,8 @@ export {
   type ICourseDetail,
   type IUser,
   type IUserProfile,
+  type IReview,
+  type IReviewAnswer,
+  type IReviewQuestion,
+  type IQuestion,
 } from './models';

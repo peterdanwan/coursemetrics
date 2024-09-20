@@ -37,7 +37,7 @@ export default function MainNav(props: { user: any }) {
 
   // If the user is not stored in the database, store all details
   useEffect(() => {
-    if (props.user) {
+    if (props.user.sub) {
       registerUserInDB();
     }
   }, [props.user]);

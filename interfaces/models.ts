@@ -31,3 +31,28 @@ export interface IUserRole {
   roleId: number;
   roleName: string;
 }
+
+export interface IReview extends Document {
+  reviewTypeId: Types.ObjectId;
+  statusId: number;
+  userId: Types.ObjectId;
+  professorId: Types.ObjectId;
+  courseId: Types.ObjectId;
+  rating: number;
+  comment: string;
+}
+
+export interface IReviewAnswer extends Document {
+  reviewQuestionID: Types.ObjectId;
+  answer: string;
+}
+
+export interface IReviewQuestion extends Document {
+  reviewID: Types.ObjectId;
+  questionID: Types.ObjectId;
+}
+
+export interface IQuestion extends Document {
+  questionText: string;
+  reviewTypeID: Types.ObjectId;
+}

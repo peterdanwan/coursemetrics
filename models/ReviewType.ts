@@ -2,10 +2,15 @@
 
 import mongoose from 'mongoose';
 
-const ReviewTypeSchema = new mongoose.Schema({
-  reviewTypeID: { type: Number, required: true },
-  reviewTypeName: { type: String, required: true },
-});
+const ReviewTypeSchema = new mongoose.Schema(
+  {
+    reviewTypeID: { type: Number, required: true },
+    reviewTypeName: { type: String, required: true },
+  },
+  {
+    collection: 'reviewTypes',
+  }
+);
 
 // Use ReviewType model if already created, otherwise create a new one
 // Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
