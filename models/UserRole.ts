@@ -1,12 +1,18 @@
 // models/UserRole.ts
 
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+import { IUserRole } from '@/interfaces';
 
-const UserRoleSchema = new mongoose.Schema({
-  roleId: { type: Number, required: true },
-  roleName: { type: String, required: true },
-});
+const UserRoleSchema = new mongoose.Schema<IUserRole>(
+  {
+    roleId: { type: Number, required: true },
+    roleName: { type: String, required: true },
+  },
+  {
+    collection: 'userRoles',
+  }
+);
 
 // Use UserRole model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const UserRole = mongoose.models.UserRole || mongoose.model('UserRole', UserRoleSchema);
+export const UserRole =
+  mongoose.models.UserRole || mongoose.model<IUserRole>('UserRole', UserRoleSchema);
