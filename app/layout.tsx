@@ -28,7 +28,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Get the user information from Auth0 and set it to global state so that we can access it from anywhere
-  const { user }: any = await getSession();
+  const session = await getSession();
+  const user = session?.user || null;
 
   return (
     <html lang="en">

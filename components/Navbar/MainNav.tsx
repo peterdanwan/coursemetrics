@@ -32,15 +32,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useFlexStyle } from '@/styles/styles';
 
-export default function MainNav({ user }) {
+export default function MainNav(props: { user: any }) {
   const { isOpen, onToggle } = useDisclosure();
 
   // If the user is not stored in the database, store all details
   useEffect(() => {
-    if (user) {
+    if (props.user) {
       registerUserInDB();
     }
-  }, [user]);
+  }, [props.user]);
 
   const registerUserInDB = async () => {
     try {
@@ -102,7 +102,7 @@ export default function MainNav({ user }) {
             <MenuButton
               as={IconButton}
               // icon={<Avatar size={"sm"} />}
-              icon={<Avatar size={'sm'} src={user?.picture} />}
+              icon={<Avatar size={'sm'} src={props.user?.picture} />}
               variant={'link'}
               cursor={'pointer'}
               minW={0}
