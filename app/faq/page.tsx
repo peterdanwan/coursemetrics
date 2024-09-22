@@ -71,7 +71,7 @@ export default function Faq() {
                     <Text as="span" color="#E0E0E0" mr={2}>
                       ●
                     </Text>
-                    Click on the "Add" button.
+                    Click on the &quot;Add&quot; button.
                   </ListItem>
                   <ListItem>
                     <Text as="span" color="#E0E0E0" mr={2}>
@@ -92,7 +92,7 @@ export default function Faq() {
                     <Text as="span" color="#E0E0E0" mr={2}>
                       ●
                     </Text>
-                    Go to the "Reviews" menu in your Profile Menu.
+                    Go to the &quot;Reviews&quot; menu in your Profile Menu.
                   </ListItem>
                   <ListItem>
                     <Text as="span" color="#E0E0E0" mr={2}>
@@ -104,7 +104,7 @@ export default function Faq() {
                     <Text as="span" color="#E0E0E0" mr={2}>
                       ●
                     </Text>
-                    Click the 'Add' button.
+                    Click the &quot;Add&quot; button.
                   </ListItem>
                   <ListItem>
                     <Text as="span" color="#E0E0E0" mr={2}>
