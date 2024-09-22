@@ -40,6 +40,7 @@ export default async function RootLayout({
             <Container maxW="container.4xl" minHeight={'90vh'}>
               {children}
             </Container>
+            <Footer />
           </Providers>
         </body>
       </UserProvider>
