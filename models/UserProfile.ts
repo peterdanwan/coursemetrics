@@ -1,20 +1,42 @@
 // models/UserProfile.ts
 
-import mongoose from 'mongoose';
-import { User } from './User';
-import { type IUserProfile } from '@/interfaces';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import User from './User';
 
-const UserProfileSchema: mongoose.Schema = new mongoose.Schema(
+class UserProfile extends Model {}
+
+UserProfile.init(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: User, required: true },
-    biography: { type: String },
+    profile_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      field: 'profile_id',
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'user_id',
+      },
+      field: 'user_id',
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
-    collection: 'userProfiles',
+    sequelize,
+    tableName: 'user_profiles',
+    timestamps: false,
   }
 );
 
-// Use UserProfile model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const UserProfile =
-  mongoose.models.UserProfile || mongoose.model<IUserProfile>('UserProfile', UserProfileSchema);
+// Associations
+UserProfile.belongsTo(User, { foreignKey: 'user_id' });
+User.hasOne(UserProfile, { foreignKey: 'user_id' });
+
+export default UserProfile;
