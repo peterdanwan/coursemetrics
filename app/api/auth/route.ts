@@ -2,11 +2,11 @@
 
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
-import connectDB from '@/config/database';
+import { connectDB } from '@/config/database';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
-import { User } from '@/models/User';
-import { UserProfile } from '@/models/UserProfile';
-import { UserRole } from '@/models/UserRole';
+import User from '@/models/User';
+import UserProfile from '@/models/UserProfile';
+import UserRole from '@/models/UserRole';
 import { logger } from '@/utils';
 
 // ===== API ROUTE TO CREATE A NEW USER IF THEY DON'T EXIST ALREADY =====
@@ -18,8 +18,7 @@ export const POST = withApiAuthRequired(async function create_user(
   try {
     await connectDB();
 
-    const res = new NextResponse();
-    const { user }: any = await getSession(req, res);
+    const { user }: any = await getSession();
 
     if (!user) {
       log.warn('User not authenticated');
@@ -27,45 +26,43 @@ export const POST = withApiAuthRequired(async function create_user(
     }
 
     const userEmail = user.email;
-    log.info('Checking for existing user', { email: userEmail });
-    let existingUser = await User.findOne({ email: userEmail });
+    const userName = user.name;
+    log.info('Checking for existing user or creating a new one', { email: userEmail });
 
-    // Create new user if they don't exist
-    if (!existingUser) {
-      log.info('Creating new user', { email: userEmail });
-
-      // Fetch the default role (student)
-      const defaultRole = await UserRole.findOne({ roleName: 'student' });
-
-      const newUser = new User({
-        firstName: user.given_name,
-        lastName: user.family_name,
+    // Use findOrCreate to find or create the user
+    const [newUser, created] = await User.findOrCreate({
+      where: { email: userEmail },
+      defaults: {
+        full_name: userName,
         email: userEmail,
-        role: defaultRole ? defaultRole._id : null,
-      });
+        role_id: 2, // role_id 2 is for the 'student' role
+      },
+    });
 
-      existingUser = await newUser.save();
+    if (created) {
+      log.info('New user created', { email: userEmail });
+
+      let newUserJson = newUser.toJSON();
+
+      console.log(newUserJson);
 
       // Create associated user profile
-      const newUserProfile = new UserProfile({
-        userId: existingUser._id,
-        biography: '',
+      await UserProfile.create({
+        userId: newUserJson.user_id,
+        bio: '',
       });
 
-      await newUserProfile.save();
-      log.info('New user and profile created', { email: userEmail });
+      log.info('User profile created for new user', { email: userEmail });
+      return NextResponse.json(createSuccessResponse({ message: 'User processed successfully' }), {
+        status: 200,
+      });
     } else {
       log.info('User already exists', { email: userEmail });
       return NextResponse.json(createErrorResponse(409, 'User already exists'), { status: 409 });
     }
-
-    log.info('User processed successfully', { email: userEmail });
-    return NextResponse.json(createSuccessResponse({ message: 'User processed successfully' }), {
-      status: 200,
-    });
   } catch (error: unknown) {
     console.error(error);
-    log.error('Error creating user', { error });
+    log.error('Error processing user', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }
