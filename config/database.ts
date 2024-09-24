@@ -1,26 +1,40 @@
 // config/database.ts
-import mongoose from 'mongoose';
 
-let connected: Boolean = false;
+import { Sequelize } from 'sequelize';
+import pg from 'pg'; // Ref: https://node-postgres.com
+import { logger } from '@/utils';
 
-// When you work with the Mongoose object, it's asynchronous as it will return a promise
-const connectDB = async (): Promise<void> => {
-  // This ensures that only the fields that are specified in our schema will be saved in our database
-  mongoose.set('strictQuery', true);
+let sequelize: Sequelize | null = null;
+let connected: boolean = false;
+const log = logger.child({ module: 'config/database.ts' });
 
-  // If the database is already connected, don't connect again
-  if (connected) {
-    console.log('MongoDB is already connected...');
-    return;
+const connectDB = async (): Promise<Sequelize> => {
+  // If already connected, return the existing connection
+  if (connected && sequelize) {
+    log.info('Sequelize is already connected...');
+    return sequelize;
   }
 
-  // Connect to MongoDB
   try {
-    await mongoose.connect(process.env.MONGODB_URI as string);
+    // Ref: https://www.youtube.com/watch?v=vFENJpe6eJU
+    sequelize = new Sequelize({
+      host: 'localhost',
+      username: 'postgres',
+      password: 'postgres',
+      database: 'coursemetricsDB',
+      dialect: 'postgres',
+      dialectModule: pg,
+      benchmark: true,
+    });
+
+    await sequelize.authenticate();
+    log.info('Sequelize connected successfully.');
     connected = true;
-    console.log('MongoDB connected.');
-  } catch (error) {
-    console.log(error);
+
+    return sequelize; // Return the Sequelize instance
+  } catch (error: any) {
+    log.error('Unable to connect to the database', { error: error.message });
+    throw new Error(`Database connection failed: ${error.message}`);
   }
 };
 

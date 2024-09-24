@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: coursemetricsDB
     ports:
-      - 5433:5432 # Exposes the database on localhost:5433
+      - 5432:5432 # Exposes the database on localhost:5432
     volumes:
       - ./_db-scripts:/docker-entrypoint-initdb.d # Volume for initializing database with scripts
     networks:
