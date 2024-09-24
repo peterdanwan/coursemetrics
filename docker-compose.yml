@@ -1,12 +1,15 @@
-# Sets up local environment for testing
-version: '3.9'
+# Docker Compose configuration for setting up a local testing environment.
+# This includes a PostgreSQL database and Adminer for database management.
+
+version: '3.1'
 
 networks:
   development-network:
     driver: bridge
 
 services:
-  # PostgreSQL database
+  # PostgreSQL database service
+  # https://hub.docker.com/_/postgres
   postgresql-database:
     container_name: postgresql-database
     image: postgres:16.4-alpine3.20@sha256:492898505cb45f9835acc327e98711eaa9298ed804e0bb36f29e08394229550d
@@ -16,18 +19,20 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: coursemetricsDB
     ports:
-      - 5433:5432
+      - 5433:5432 # Exposes the database on localhost:5433
     volumes:
-      - ./_db-scripts:/docker-entrypoint-initdb.d
+      - ./_db-scripts:/docker-entrypoint-initdb.d # Volume for initializing database with scripts
     networks:
       - development-network
 
-  # Adminer
+  # Adminer service for database management
+  # Adminer provides a simple web UI for interacting with the PostgreSQL database.
+  # https://hub.docker.com/_/adminer
   adminer:
     container_name: adminer
     image: adminer@sha256:34d37131366c5aa84e1693dbed48593ed6f95fb450b576c1a7a59d3a9c9e8802
     restart: always
     ports:
-      - 8080:8080
+      - 8080:8080 # Exposes Adminer UI on localhost:8080
     networks:
       - development-network
