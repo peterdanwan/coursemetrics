@@ -2,6 +2,17 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // This will ignore the warnings related to Sequelize
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.ignoreWarnings = [
+        {
+          module: /sequelize/,
+        },
+      ];
+    }
+    return config;
+  },
   // Ref Doc: https://blog.arcjet.com/structured-logging-in-json-for-next-js/
   experimental: {
     serverComponentsExternalPackages: ['pino', 'pino-pretty'],
