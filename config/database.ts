@@ -4,41 +4,41 @@ import { Sequelize } from 'sequelize';
 import pg from 'pg'; // Ref: https://node-postgres.com
 import { logger } from '@/utils';
 
-let sequelize: Sequelize | null = null;
-let connected: boolean = false;
 const log = logger.child({ module: 'config/database.ts' });
 
-const connectDB = async (): Promise<Sequelize> => {
-  // If already connected, return the existing connection
-  if (connected && sequelize) {
+// Explicitly type the Sequelize instance
+const sequelize: any = new Sequelize({
+  host: 'localhost',
+  username: 'postgres',
+  password: 'postgres',
+  database: 'coursemetricsDB',
+  dialect: 'postgres',
+  dialectModule: pg,
+  benchmark: true,
+});
+
+// Connection function
+export const connectDB = async (): Promise<Sequelize> => {
+  if (sequelize) {
     log.info('Sequelize is already connected...');
-    return sequelize;
+    return sequelize; // Return the sequelize instance
   }
 
   try {
-    // Ref: https://www.youtube.com/watch?v=vFENJpe6eJU
-    sequelize = new Sequelize({
-      host: 'localhost',
-      username: 'postgres',
-      password: 'postgres',
-      database: 'coursemetricsDB',
-      dialect: 'postgres',
-      dialectModule: pg,
-      benchmark: true,
-    });
-
-    await sequelize.authenticate();
+    await sequelize.authenticate(); // This should now work
     log.info('Sequelize connected successfully.');
-    connected = true;
 
-    return sequelize; // Return the Sequelize instance
+    sequelize.sync({ force: false, alter: false });
+
+    return sequelize; // Return the sequelize instance
   } catch (error: any) {
     log.error('Unable to connect to the database', { error: error.message });
     throw new Error(`Database connection failed: ${error.message}`);
   }
 };
 
-export default connectDB;
+// Export the sequelize instance for use in models
+export { sequelize };
 
 /**
  * BACKGROUND:
