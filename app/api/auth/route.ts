@@ -1,5 +1,3 @@
-// app/api/auth/route.ts
-
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { connectDB } from '@/config/database';
@@ -16,10 +14,11 @@ export const POST = withApiAuthRequired(async function create_user(
   const log = logger.child({ module: 'api/auth' });
 
   try {
+    // Connect to the database
     await connectDB();
 
+    // Get the user session from Auth0
     const { user }: any = await getSession();
-
     if (!user) {
       log.warn('User not authenticated');
       return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
@@ -27,39 +26,47 @@ export const POST = withApiAuthRequired(async function create_user(
 
     const userEmail = user.email;
     const userName = user.name;
-    log.info('Checking for existing user or creating a new one', { email: userEmail });
+    log.info(`Checking for existing user or creating a new one, email: ${userEmail}`);
+
+    // Fetch the 'student' role from the database (adjust the role name as needed)
+    const studentRole = await UserRole.findOne({ where: { role_name: 'student' } });
+    if (!studentRole) {
+      log.error('Student role not found');
+      return NextResponse.json(createErrorResponse(404, 'Student role not found'), { status: 404 });
+    }
+
+    let studentRoleJSON = await studentRole.toJSON();
 
     // Use findOrCreate to find or create the user
-    const [newUser, created] = await User.findOrCreate({
+    const [userInstance, created] = await User.findOrCreate({
       where: { email: userEmail },
       defaults: {
         full_name: userName,
         email: userEmail,
-        role_id: 2, // role_id 2 is for the 'student' role
+        role_id: studentRoleJSON.id, // Use the role fetched from the database
       },
     });
 
-    if (created) {
-      log.info('New user created', { email: userEmail });
+    log.info(`User ${created ? 'created for new user' : 'already exists'}`, {
+      email: userEmail,
+    });
 
-      let newUserJson = newUser.toJSON();
+    let userInstanceJSON = await userInstance.toJSON();
 
-      console.log(newUserJson);
-
-      // Create associated user profile
-      await UserProfile.create({
-        userId: newUserJson.user_id,
+    await UserProfile.findOrCreate({
+      where: { user_id: userInstanceJSON.user_id },
+      defaults: {
+        user_id: userInstanceJSON.id,
         bio: '',
-      });
+      },
+    });
+    log.info(`User profile ${created ? 'created for new user' : 'already exists'}`, {
+      email: userEmail,
+    });
 
-      log.info('User profile created for new user', { email: userEmail });
-      return NextResponse.json(createSuccessResponse({ message: 'User processed successfully' }), {
-        status: 200,
-      });
-    } else {
-      log.info('User already exists', { email: userEmail });
-      return NextResponse.json(createErrorResponse(409, 'User already exists'), { status: 409 });
-    }
+    return NextResponse.json(createSuccessResponse({ message: 'User processed successfully' }), {
+      status: 200,
+    });
   } catch (error: unknown) {
     console.error(error);
     log.error('Error processing user', { error });

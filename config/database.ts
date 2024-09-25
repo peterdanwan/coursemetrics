@@ -13,6 +13,7 @@ const sequelize: any = new Sequelize({
   password: 'postgres',
   database: 'coursemetricsDB',
   dialect: 'postgres',
+  port: 5433,
   dialectModule: pg,
   benchmark: true,
 });
