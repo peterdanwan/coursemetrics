@@ -1,18 +1,27 @@
 // models/UserRole.ts
 
-import mongoose, { Document } from 'mongoose';
-import { IUserRole } from '@/interfaces';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
 
-const UserRoleSchema = new mongoose.Schema<IUserRole>(
+class UserRole extends Model {}
+
+UserRole.init(
   {
-    roleId: { type: Number, required: true },
-    roleName: { type: String, required: true },
+    role_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    role_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
-    collection: 'userRoles',
+    sequelize,
+    tableName: 'user_roles',
+    timestamps: false,
   }
 );
 
-// Use UserRole model if already created, otherwise create a new one
-export const UserRole =
-  mongoose.models.UserRole || mongoose.model<IUserRole>('UserRole', UserRoleSchema);
+export default UserRole;

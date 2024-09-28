@@ -1,21 +1,39 @@
-// models/User.ts
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import UserRole from './UserRole';
 
-import mongoose from 'mongoose';
-import { type IUser } from '@/interfaces';
-import { UserRole } from './UserRole';
+class User extends Model {}
 
-const UserSchema: mongoose.Schema = new mongoose.Schema(
+User.init(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    role: { type: mongoose.Schema.Types.ObjectId, ref: UserRole },
+    user_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    full_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: UserRole,
+        key: 'role_id',
+      },
+    },
   },
   {
-    collection: 'users',
+    sequelize,
+    tableName: 'users',
+    timestamps: false,
   }
 );
 
-// Use User model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+export default User;
