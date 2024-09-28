@@ -42,7 +42,7 @@ export default function MainFooter() {
             <Link href="/contact" mb={{ base: 2, md: 0 }}>
               Contact Us
             </Link>
-            <Link href="/FAQ" mb={{ base: 2, md: 0 }}>
+            <Link href="/faq" mb={{ base: 2, md: 0 }}>
               FAQ
             </Link>
             <Link href="/terms" mb={{ base: 2, md: 0 }}>
