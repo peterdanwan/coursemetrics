@@ -108,12 +108,15 @@ export default function MainNav(props: { user: any }) {
               minW={0}
             />
             <MenuList>
-              <MenuItem as="a" href="/api/auth/login">
-                Sign In
-              </MenuItem>
-              <MenuItem as="a" href="/api/auth/logout">
-                Sign out
-              </MenuItem>
+              {props.user ? (
+                <MenuItem as="a" href="/api/auth/logout">
+                  Sign out
+                </MenuItem>
+              ) : (
+                <MenuItem as="a" href="/api/auth/login">
+                  Sign In
+                </MenuItem>
+              )}
             </MenuList>
           </Menu>
         </Stack>
@@ -170,12 +173,12 @@ const DesktopNav = ({ position }: { position: string }) => {
         }
 
         return (
-          <Box key={navItem.label}>
+          <Box key={navItem.label} className="px-2 whitespace-nowrap">
             <Popover trigger={'hover'} placement={'bottom-start'}>
               <PopoverTrigger>
                 <Link href={navItem.href ?? '#'}>
                   <Text
-                    fontSize={'sm'}
+                    fontSize={'md'}
                     fontWeight={500}
                     color={linkColor}
                     _hover={{
