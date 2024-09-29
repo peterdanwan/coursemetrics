@@ -108,12 +108,15 @@ export default function MainNav(props: { user: any }) {
               minW={0}
             />
             <MenuList>
-              <MenuItem as="a" href="/api/auth/login">
-                Sign In
-              </MenuItem>
-              <MenuItem as="a" href="/api/auth/logout">
-                Sign out
-              </MenuItem>
+              {props.user ? (
+                <MenuItem as="a" href="/api/auth/logout">
+                  Sign out
+                </MenuItem>
+              ) : (
+                <MenuItem as="a" href="/api/auth/login">
+                  Sign In
+                </MenuItem>
+              )}
             </MenuList>
           </Menu>
         </Stack>
