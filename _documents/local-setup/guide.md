@@ -15,6 +15,11 @@ To run this project locally, you will need the following dependencies/environmen
 To run this project locally, you will run the following commands:
 
 ```sh
+# Ensure you have the most recent node_modules installed (may or may not update package* files)
+npm i
+```
+
+```sh
 # Rebuilds the mock MongoDB server from scratch, and hosts on port 8081
 docker compose up --build
 ```
