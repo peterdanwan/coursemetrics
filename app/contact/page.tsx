@@ -38,8 +38,8 @@ export default function Contact() {
             We’re here to help!
           </Text>
           <Text mt={4}>
-            If you have any questions, concerns, or feedback, please don't hesitate to reach out to
-            us. Your input is invaluable to us.
+            If you have any questions, concerns, or feedback, please don&apos;t hesitate to reach
+            out to us. Your input is invaluable to us.
           </Text>
           <Text mt={4}>
             Email us at{' '}
