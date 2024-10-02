@@ -35,7 +35,7 @@ export default function Contact() {
             Contact Us
           </Heading>
           <Text fontSize="lg" mt={2}>
-            We're here to help!
+            We&apos;re here to help!
           </Text>
           <Text mt={4}>
             If you have any questions, concerns, or feedback, please don&apos;t hesitate to reach
