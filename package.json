@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "full-dev": "concurrently \"next dev\" \"docker compose up --build\"",
+    "stop": "docker compose down",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
