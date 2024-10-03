@@ -8,7 +8,7 @@ import { Professor } from '@/models/Professor';
 import { logger } from '@/utils';
 import { createReadStream } from 'fs';
 
-// ===== API ROUTE TO FETCH ALL COURSES =====
+// ===== API ROUTE TO FETCH ALL PROFESSORS =====
 export const GET = withApiAuthRequired(async function get_professors(
   req: NextRequest
 ): Promise<NextResponse> {
