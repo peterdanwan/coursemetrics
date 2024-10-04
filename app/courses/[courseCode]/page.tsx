@@ -18,6 +18,7 @@ import {
   List,
   ListItem,
   Button,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 
@@ -25,21 +26,37 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const courseCode = params.courseCode;
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
 
+  // Define the gridColumn property dynamically based on screen size
+  const gridColumnValue = useBreakpointValue({ base: 'span 3', md: 'span 8' });
+
   // Toggle expanded review
   const toggleExpandedReview = (reviewId: number) => {
     setExpandedReviewId(expandedReviewId === reviewId ? -1 : reviewId);
   };
 
   return (
-    <Grid templateColumns="2fr 1fr" gap={6} p={5}>
+    <Grid
+      // gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+      gridTemplateColumns="repeat(12, 1fr)"
+      gap={6}
+      p={5}
+      width="100%"
+      maxWidth={1800}
+      margin="0 auto"
+    >
       {/* Course Details Section*/}
-      <GridItem>
+      {/* span 80% on medium screens, span 3 columns on small screens */}
+      <GridItem gridColumn={gridColumnValue}>
         <Card>
           <CardHeader>
-            <Flex align="center">
+            <Flex align="center" wrap="wrap">
               <Box>
-                <Heading>CCP555</Heading>
-                <Heading>Cloud Computing for Programmers</Heading>
+                <Heading as="h1" color="teal">
+                  CCP555
+                </Heading>
+                <Heading as="h2" size="lg" color="teal">
+                  Cloud Computing for Programmers
+                </Heading>
               </Box>
               <Spacer />
               <Box>
@@ -60,10 +77,10 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Skills Section */}
-      <GridItem>
+      <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
         <Card>
           <CardHeader>
-            <Heading>Skills</Heading>
+            <Heading color="teal">Skills</Heading>
           </CardHeader>
           <CardBody>
             <List listStyleType="none">
@@ -86,11 +103,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Course Reviews Section: make it scrollable too see more reviews */}
-      <GridItem>
+      <GridItem gridColumn={gridColumnValue} gridRow="span 4">
         <Card>
           <CardHeader>
             <Flex align="center">
-              <Heading as="h2">Reviews</Heading>
+              <Heading as="h2" color="teal">
+                Reviews
+              </Heading>
               <Spacer />
               <Box>
                 <Text>
@@ -102,15 +121,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           <CardBody>
             <Flex direction="column" gap={5}>
               {/* Course Review Component: "key" is to store review id */}
-              <Card key={1}>
+              <Card key={1} bg="gray.50">
                 <CardHeader>
-                  <Heading as="h3" size="lg">
+                  <Heading as="h3" size="lg" color="blackAlpha.600">
                     Great Course
                   </Heading>
                 </CardHeader>
                 <CardBody>
-                  <Grid templateColumns="repeat(5, 1fr)" gap={3}>
-                    <GridItem colSpan={4}>
+                  <Grid templateColumns="repeat(5, 1fr)" gap={2}>
+                    <GridItem gridColumn="span 4">
                       <Text noOfLines={expandedReviewId === 1 ? 0 : 3}>
                         <span>
                           CCP555 offers a comprehensive introduction to cloud computing for
@@ -132,21 +151,20 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                           cloud technologies.{' '}
                         </span>
                       </Text>
-                      <Button
-                        variant="link"
-                        onClick={() => toggleExpandedReview(1)}
-                        textAlign="right"
-                      >
-                        {expandedReviewId === 1 ? 'See Less' : 'See More'}
-                      </Button>
                     </GridItem>
+
                     <GridItem textAlign="right">
                       <p>Would take again: Yes</p>
                       <p>Difficulty: 3/5</p>
                       <p>Course Load: 4/5</p>
                       <p>Grade: A+</p>
                     </GridItem>
-                    <GridItem colSpan={4}>
+                    <GridItem gridColumn={4} justifySelf="end">
+                      <Button variant="link" onClick={() => toggleExpandedReview(1)} color="teal">
+                        {expandedReviewId === 1 ? 'See Less' : 'See More'}
+                      </Button>
+                    </GridItem>
+                    <GridItem gridColumn="span 4">
                       <p>Professor: David Humphrey</p>
                     </GridItem>
                     <GridItem textAlign="right">Bookmark</GridItem>
@@ -154,15 +172,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 </CardBody>
               </Card>
               {/* Course Review Component */}
-              <Card key={2}>
+              <Card key={2} bg="gray.50">
                 <CardHeader>
-                  <Heading as="h3" size="lg">
+                  <Heading as="h3" size="lg" color="blackAlpha.600">
                     Too much course load
                   </Heading>
                 </CardHeader>
                 <CardBody>
-                  <Grid templateColumns="repeat(5, 1fr)" gap={3}>
-                    <GridItem colSpan={4}>
+                  <Grid templateColumns="repeat(5, 1fr)" gap={2}>
+                    <GridItem gridColumn="span 4">
                       <Text noOfLines={expandedReviewId === 2 ? 0 : 3}>
                         <span>
                           CCP555 is a well-rounded course for programmers interested in cloud
@@ -183,13 +201,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                           technologies.{' '}
                         </span>
                       </Text>
-                      <Button
-                        variant="link"
-                        onClick={() => toggleExpandedReview(2)}
-                        textAlign="right"
-                      >
-                        {expandedReviewId === 2 ? 'See Less' : 'See More'}
-                      </Button>
                     </GridItem>
                     <GridItem textAlign="right">
                       <p>Would take again: No</p>
@@ -197,29 +208,43 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                       <p>Course Load: 5/5</p>
                       <p>Grade: C+</p>
                     </GridItem>
-                    <GridItem colSpan={4}>
+                    <GridItem gridColumn={4} justifySelf="end">
+                      <Button variant="link" onClick={() => toggleExpandedReview(1)} color="teal">
+                        {expandedReviewId === 1 ? 'See Less' : 'See More'}
+                      </Button>
+                    </GridItem>
+                    <GridItem gridColumn="span 4">
                       <p>Professor: Havey Dumfred</p>
                     </GridItem>
                     <GridItem textAlign="right">Bookmarked</GridItem>
                   </Grid>
                 </CardBody>
               </Card>
+              <Button
+                colorScheme="teal"
+                variant="solid"
+                size="lg"
+                width="200px"
+                alignSelf="flex-end"
+              >
+                Add Review
+              </Button>
             </Flex>
           </CardBody>
         </Card>
       </GridItem>
       {/* Quick Stats Section */}
-      <GridItem>
+      <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
         <Card>
           <CardHeader>
-            <Heading>Quick Stats</Heading>
+            <Heading color="teal">Quick Stats</Heading>
           </CardHeader>
           <CardBody>
-            <Grid templateColumns="repeat(3, 1fr)">
+            <Grid templateColumns="repeat(2, 1fr)" gap={2}>
               <GridItem>
                 <Text>Difficulty:</Text>
               </GridItem>
-              <GridItem colSpan={2}>
+              <GridItem>
                 <StarIcon />
                 <StarIcon />
                 <StarIcon />
@@ -228,7 +253,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </GridItem>
 
               <GridItem>Course Load:</GridItem>
-              <GridItem colSpan={2}>
+              <GridItem>
                 <StarIcon />
                 <StarIcon />
                 <StarIcon />
@@ -237,7 +262,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </GridItem>
 
               <GridItem>Average Grade:</GridItem>
-              <GridItem colSpan={2}>
+              <GridItem>
                 <StarIcon />
                 <StarIcon />
                 <StarIcon />
@@ -246,7 +271,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </GridItem>
 
               <GridItem>Would Take Again:</GridItem>
-              <GridItem colSpan={2}>
+              <GridItem>
                 <StarIcon />
                 <StarIcon />
                 <StarIcon />
@@ -258,27 +283,27 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Prerequisites Section */}
-      <GridItem>
+      <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
         <Card>
           <CardHeader>
-            <Heading>Prerequisites</Heading>
+            <Heading color="teal">Prerequisites</Heading>
           </CardHeader>
           <CardBody>
             <Box>
-              <Text>WEB422</Text>
-              <Text>Web Programming for Apps and Services</Text>
+              <Text>WEB422 - Web Programming for Apps and Services</Text>
             </Box>
             <Box>
-              <Text>BTI425</Text>
-              <Text>Web Programming for Apps and Services</Text>
+              <Text>BTI425 - Web Programming for Apps and Services</Text>
             </Box>
           </CardBody>
         </Card>
       </GridItem>
-      {/* Add Review Button */}
-      <Button colorScheme="teal" variant="solid">
-        Add Review
-      </Button>
+      {/* Add Review Button
+      <GridItem>
+        <Button colorScheme="teal" variant="solid">
+          Add Review
+        </Button>
+      </GridItem> */}
     </Grid>
   );
 }
