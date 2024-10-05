@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { sequelize, connectDB } from '@/config/database';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
-import { Professor } from '@/models/Professor';
+import Professor from '@/models/Professor';
 import { logger } from '@/utils';
 import { createReadStream } from 'fs';
 
@@ -15,6 +15,7 @@ export const GET = withApiAuthRequired(async function get_professors(
   const log = logger.child({ module: 'app/api/professors/route.ts' });
 
   try {
+    // Connect to the database
     await connectDB();
     const url = new URL(req.url);
 
@@ -41,18 +42,22 @@ export const GET = withApiAuthRequired(async function get_professors(
     }
 
     // Calculate the number of documents to skip
-    const skip: number = (pageNumber - 1) * limitNumber;
+    const offsetNumber: number = (pageNumber - 1) * limitNumber;
 
     log.info('Fetching professors', { pageNumber, limitNumber });
 
     // Fetch the professors and count the total number of records
-    const professors = await Professor.find()
-      .skip(skip)
-      .limit(limitNumber)
-      .populate('professorId')
-      .exec();
+    const professors = await Professor.findAll({ limit: limitNumber, offset: offsetNumber });
+    // .skip(skip)
+    // .limit(limitNumber)
+    // .populate('professorId')
+    // .exec();
 
-    const totalProfessors: number = await Professor.countDocuments();
+    console.log(professors.every((professor) => professor instanceof Professor));
+
+    console.log(professors);
+
+    const totalProfessors: number = await Professor.count();
     const totalPages: number = Math.ceil(totalProfessors / limitNumber);
 
     log.debug(
