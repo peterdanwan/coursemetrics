@@ -3,17 +3,10 @@
 import { Box, Container, Text, Flex, Link, IconButton, useColorModeValue } from '@chakra-ui/react';
 import { FaFacebook, FaGithub, FaXTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa6';
 import React from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { useFlexStyle } from '@/styles/styles';
 
 export default function MainFooter() {
-  const { user, error, isLoading }: any = useUser();
-  console.log('User: ', user?.name);
   const flexStyle = useFlexStyle();
-
-  // Boilerplate code for useUser (from Auth0)
-  if (isLoading) return <div></div>;
-  if (error) return <div>{error.message}</div>;
 
   return (
     <Box
@@ -32,9 +25,9 @@ export default function MainFooter() {
             justify="space-between"
             mb={4}
             px={6}
-            direction={{ base: 'column', md: 'row' }} // Stack links vertically on small screens
-            align={{ base: 'center', md: 'flex-start' }} // Center links on small screens
-            textAlign={{ base: 'center', md: 'left' }} // Center text on small screens
+            direction={{ base: 'column', md: 'row' }}
+            align={{ base: 'center', md: 'flex-start' }}
+            textAlign={{ base: 'center', md: 'left' }}
           >
             <Link href="/about" mb={{ base: 2, md: 0 }}>
               About
@@ -51,11 +44,7 @@ export default function MainFooter() {
           </Flex>
 
           {/* Social Media Icons Section */}
-          <Flex
-            justify="center"
-            mb={4}
-            wrap="wrap" // Allow wrapping on small screens
-          >
+          <Flex justify="center" mb={4} wrap="wrap">
             <IconButton
               as="a"
               href="https://facebook.com"
@@ -66,7 +55,7 @@ export default function MainFooter() {
               isRound
               _hover={{ bg: flexStyle.bgColor }}
               mx={3}
-              mb={{ base: 2, md: 0 }} // Adjust spacing for small screens
+              mb={{ base: 2, md: 0 }}
             />
             <IconButton
               as="a"
