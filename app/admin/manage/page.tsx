@@ -123,7 +123,7 @@ export default function Manage() {
             />
           </FormControl>
         </Stack>
-        <Button colorScheme="green" color="white" px={6}>
+        <Button colorScheme="teal" color="white" px={6}>
           Add
         </Button>
       </Flex>

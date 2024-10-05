@@ -19,7 +19,7 @@ const CoursesTable: React.FC<CoursesTableProps> = ({ courses }) => {
     <>
       {/* Table Header */}
       <Flex
-        bg="#f0f0f0"
+        bg="gray.50"
         p={2}
         borderRadius="md"
         justify="space-between"
@@ -68,7 +68,7 @@ const CoursesTable: React.FC<CoursesTableProps> = ({ courses }) => {
       >
         <Stack spacing={4}>
           {courses.map((course, index) => (
-            <Box key={index} borderWidth="1px" borderRadius="lg" padding={4} bg="white">
+            <Box key={index} borderWidth="1px" borderRadius="lg" padding={4} bg="gray.50">
               <Flex justify="space-between" align="center">
                 <Text flex="1" color="black" m={1}>
                   {course.name}
@@ -90,15 +90,15 @@ const CoursesTable: React.FC<CoursesTableProps> = ({ courses }) => {
                   flex="1"
                 >
                   <Button
-                    colorScheme="blue"
-                    color="black"
+                    colorScheme="teal"
+                    color="white"
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
                   >
                     Edit
                   </Button>
-                  <Button colorScheme="blue" color="black" flex="1" ml={{ base: 0, md: 1 }}>
+                  <Button colorScheme="teal" color="white" flex="1" ml={{ base: 0, md: 1 }}>
                     Remove
                   </Button>
                 </Flex>
