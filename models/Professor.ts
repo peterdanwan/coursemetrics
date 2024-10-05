@@ -3,6 +3,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '@/config/database';
 
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class Professor extends Model {}
 
 Professor.init(
