@@ -34,10 +34,10 @@ export default function Admin() {
         <Box p={4} flexBasis={{ base: '100%', md: '100%', lg: '23%' }} marginX={2}>
           <Link as={NextLink} href="/admin/manage/courses" _hover={{ textDecoration: 'none' }}>
             <Card
-              bg="teal.600"
+              bg="gray.700"
               boxShadow="lg"
               borderRadius="md"
-              _hover={{ cursor: 'pointer', bg: 'teal.500' }}
+              _hover={{ cursor: 'pointer', bg: 'teal.600' }}
             >
               <CardHeader>
                 <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
@@ -45,7 +45,7 @@ export default function Admin() {
                 </Text>
               </CardHeader>
               <CardBody>
-                <Heading size="md" color="white" textAlign="center">
+                <Heading size="md" color="gray.200" textAlign="center">
                   Courses
                 </Heading>
               </CardBody>
@@ -56,10 +56,10 @@ export default function Admin() {
         <Box p={4} flexBasis={{ base: '100%', md: '100%', lg: '23%' }} marginX={2}>
           <Link as={NextLink} href="/admin/manage/professors" _hover={{ textDecoration: 'none' }}>
             <Card
-              bg="teal.600"
+              bg="gray.700"
               boxShadow="lg"
               borderRadius="md"
-              _hover={{ cursor: 'pointer', bg: 'teal.500' }}
+              _hover={{ cursor: 'pointer', bg: 'teal.600' }}
             >
               <CardHeader>
                 <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
@@ -67,7 +67,7 @@ export default function Admin() {
                 </Text>
               </CardHeader>
               <CardBody>
-                <Heading size="md" color="white" textAlign="center">
+                <Heading size="md" color="gray.200" textAlign="center">
                   Professors
                 </Heading>
               </CardBody>
@@ -78,10 +78,10 @@ export default function Admin() {
         <Box p={4} flexBasis={{ base: '100%', md: '100%', lg: '23%' }} marginX={2}>
           <Link as={NextLink} href="/admin/manage/reviews" _hover={{ textDecoration: 'none' }}>
             <Card
-              bg="teal.600"
+              bg="gray.700"
               boxShadow="lg"
               borderRadius="md"
-              _hover={{ cursor: 'pointer', bg: 'teal.500' }}
+              _hover={{ cursor: 'pointer', bg: 'teal.600' }}
             >
               <CardHeader>
                 <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
@@ -89,7 +89,7 @@ export default function Admin() {
                 </Text>
               </CardHeader>
               <CardBody>
-                <Heading size="md" color="white" textAlign="center">
+                <Heading size="md" color="gray.200" textAlign="center">
                   In Progress Reviews
                 </Heading>
               </CardBody>
