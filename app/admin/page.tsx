@@ -1,4 +1,5 @@
 // app/admin/page.tsx
+'use client';
 import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Link } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
