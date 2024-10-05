@@ -12,8 +12,10 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import CoursesTable from '@/components/CoursesTable'; // Import the new component
+import ProfessorsTable from '@/components/ProfessorsTable'; // Import the new component
+import ReviewsTable from '@/components/ReviewsTable'; // Import the new component
 
-// Sample data for courses
+// ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
 const courses = [
   {
     name: 'Course 1',
@@ -59,8 +61,110 @@ const courses = [
     description:
       'Data Structures and Algorithms. This course will cover advanced topics and practical applications.',
   },
-  // Add more courses as needed
 ];
+
+const professors = [
+  {
+    first_name: 'John',
+    last_name: 'Doe',
+  },
+  {
+    first_name: 'Jane',
+    last_name: 'Smith',
+  },
+  {
+    first_name: 'Emily',
+    last_name: 'Johnson',
+  },
+  {
+    first_name: 'Michael',
+    last_name: 'Brown',
+  },
+  {
+    first_name: 'Sarah',
+    last_name: 'Davis',
+  },
+  {
+    first_name: 'John',
+    last_name: 'Doe',
+  },
+  {
+    first_name: 'Jane',
+    last_name: 'Smith',
+  },
+  {
+    first_name: 'Emily',
+    last_name: 'Johnson',
+  },
+  {
+    first_name: 'Michael',
+    last_name: 'Brown',
+  },
+  {
+    first_name: 'Sarah',
+    last_name: 'Davis',
+  },
+];
+
+const reviews = [
+  {
+    category: 'Course Review',
+    course_code: 'CSC101',
+    review_text:
+      'This course provides a solid introduction to computer science, with a focus on programming fundamentals. Highly recommended for beginners!',
+    average_rate: 4.5,
+    status: 'approved',
+  },
+  {
+    category: 'Course Review',
+    course_code: 'MTH202',
+    review_text:
+      'The content was quite challenging, but the professor was very helpful. I struggled with some concepts, but overall, it was a good learning experience.',
+    average_rate: 3.8,
+    status: 'pending',
+  },
+  {
+    category: 'Professor Review',
+    course_code: 'PHY303',
+    review_text:
+      'Professor Smith explains difficult concepts clearly and is always available to answer questions. However, the exams were much harder than expected.',
+    average_rate: 4.2,
+    status: 'approved',
+  },
+  {
+    category: 'Course Review',
+    course_code: 'ENG104',
+    review_text:
+      'I didn’t enjoy the lectures, but the assignments were interesting. The course material felt outdated, and there was little class interaction.',
+    average_rate: 2.5,
+    status: 'rejected',
+  },
+  {
+    category: 'Professor Review',
+    course_code: 'CHE201',
+    review_text:
+      'Dr. Thompson is a brilliant professor but can be very strict. If you want to succeed in this class, you need to work hard and follow all the guidelines.',
+    average_rate: 4.0,
+    status: 'pending',
+  },
+  {
+    category: 'Course Review',
+    course_code: 'CSC101',
+    review_text:
+      'This course provides a solid introduction to computer science, with a focus on programming fundamentals. Highly recommended for beginners!',
+    average_rate: 4.5,
+    status: 'approved',
+  },
+  {
+    category: 'Course Review',
+    course_code: 'MTH202',
+    review_text:
+      'The content was quite challenging, but the professor was very helpful. I struggled with some concepts, but overall, it was a good learning experience.',
+    average_rate: 3.8,
+    status: 'pending',
+  },
+];
+// ******************************************************************************************************************************************************************
 
 export default function Manage() {
   const [selectedOption, setSelectedOption] = useState<string>('');
@@ -74,14 +178,39 @@ export default function Manage() {
     setSearchValue(event.target.value);
   };
 
+  // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
+
   // Function to filter courses based on search value
   const filteredCourses = courses.filter(
     (course) =>
-      course.name.toLowerCase().includes(searchValue.toLowerCase()) || // Search by course name
-      course.section.toLowerCase().includes(searchValue.toLowerCase()) || // Search by section
-      course.term.toLowerCase().includes(searchValue.toLowerCase()) || // Search by term
-      course.description.toLowerCase().includes(searchValue.toLowerCase()) // Search by description
+      course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
+      course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
+      course.description.toLowerCase().includes(searchValue.toLowerCase())
   );
+
+  const filteredProfessors = professors.filter((professor) => {
+    const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
+    return (
+      professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      fullName.includes(searchValue.toLowerCase())
+    );
+  });
+
+  // Function to filter reviews based on search value
+  const filteredReviews = reviews.filter((review) => {
+    const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
+    return (
+      review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
+      normalizedRate.includes(searchValue)
+    );
+  });
+
+  // ******************************************************************************************************************************************************************
 
   return (
     <Box p={4}>
@@ -129,8 +258,10 @@ export default function Manage() {
       </Flex>
 
       <Divider mb={4} />
-      {/* Conditionally render the CoursesTable when "courses" is selected */}
-      {selectedOption === 'courses' && <CoursesTable courses={courses} />}
+      {/* Conditionally render appropriate category when it is selected */}
+      {selectedOption === 'courses' && <CoursesTable courses={filteredCourses} />}
+      {selectedOption === 'professors' && <ProfessorsTable professors={filteredProfessors} />}
+      {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
     </Box>
   );
 }
