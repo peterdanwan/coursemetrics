@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '@/config/database';
 import UserRole from './UserRole';
 
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class User extends Model {}
 
 User.init(
@@ -35,5 +36,10 @@ User.init(
     timestamps: false,
   }
 );
+
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
+
+// TODO: Add associations
 
 export default User;

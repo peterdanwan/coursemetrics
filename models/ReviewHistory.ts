@@ -1,22 +1,53 @@
 // models/ReviewHistory.ts
 
-import mongoose from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import Review from './Review';
+import ReviewStatus from './ReviewStatus';
+import User from './User';
 
-const ReviewHistorySchema = new mongoose.Schema({
-  historyID: { type: Number, required: true },
-  reviewID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'review',
-    required: true,
-  },
-  changeBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true,
-  },
-});
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ReviewHistory extends Model {}
 
-// Use ReviewHistory model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const ReviewHistory =
-  mongoose.models.ReviewHistory || mongoose.model('ReviewHistory', ReviewHistorySchema);
+ReviewHistory.init(
+  {
+    review_history_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    review_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Review,
+        key: 'review_id',
+      },
+    },
+    review_status_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: ReviewStatus,
+        key: 'review_status_id',
+      },
+    },
+    changed_by: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'user_id',
+      },
+      field: 'changed_by',
+    },
+  },
+  { sequelize, tableName: 'review_history', timestamps: false }
+);
+
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
+
+// TODO: Add associations
+
+export default ReviewHistory;

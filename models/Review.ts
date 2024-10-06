@@ -1,32 +1,60 @@
 // models/Review.ts
 
-import mongoose from 'mongoose';
-import { IReview } from '@/interfaces';
-import { ReviewType } from './ReviewType';
-import { User } from './User';
-import { Professor } from './Professor';
-import { Course } from './Course';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import ReviewType from './ReviewType';
+import ReviewStatus from './ReviewStatus';
+import ProfessorCourse from './ProfessorCourse';
+import User from './User';
 
-const ReviewSchema: mongoose.Schema<IReview> = new mongoose.Schema(
+class Review extends Model {}
+
+Review.init(
   {
-    reviewTypeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: ReviewType,
-      required: true,
+    review_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    statusId: { type: Number, required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: User },
-    professorId: { type: mongoose.Schema.Types.ObjectId, ref: Professor },
-    courseId: { type: mongoose.Schema.Types.ObjectId, ref: Course },
-    rating: { type: Number, required: true, min: 1, max: 5 },
-    comment: { type: String, required: false },
+    review_type_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: ReviewType,
+        key: 'review_type_id',
+      },
+    },
+    review_status_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: ReviewStatus,
+        key: 'review_status_id',
+      },
+    },
+    professor_course_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: ProfessorCourse,
+        key: 'professor_course_id',
+      },
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'user_id',
+      },
+    },
   },
-  {
-    collection: 'reviews',
-  }
+  { sequelize, tableName: 'reviews', timestamps: false }
 );
 
-// Use Review model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
 
-export const Review = mongoose.models.Review || mongoose.model<IReview>('Review', ReviewSchema);
+// TODO: Add associations
+
+export default Review;

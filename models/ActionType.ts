@@ -1,12 +1,25 @@
 // models/ActionType.ts
 
-import mongoose from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
 
-const ActionTypeSchema = new mongoose.Schema({
-  actionTypeName: { type: String, required: true },
-});
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ActionType extends Model {}
 
-// Use ActionType model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const ActionType =
-  mongoose.models.ActionType || mongoose.model('ActionType', ActionTypeSchema);
+ActionType.init(
+  {
+    action_type_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    action_type_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+  },
+  { sequelize, tableName: 'action_types', timestamps: false }
+);
+
+export default ActionType;

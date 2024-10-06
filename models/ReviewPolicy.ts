@@ -1,19 +1,48 @@
 // models/ReviewPolicy.ts
 
-import mongoose from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import Policy from './Policy';
+import Review from './Review';
 
-const ReviewPolicySchema = new mongoose.Schema({
-  reviewPolicyID: { type: Number, required: true },
-  reviewID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'review',
-    required: true,
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ReviewPolicy extends Model {}
+
+ReviewPolicy.init(
+  {
+    review_policy: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    review_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Review,
+        key: 'review_id',
+      },
+    },
+    policy_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Policy,
+        key: 'policy_id',
+      },
+      field: 'policy_id',
+    },
+    policy_violated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
   },
-  policyID: { type: Number, required: true },
-  policyIsEnabled: { type: Boolean, required: true },
-});
+  { sequelize, tableName: 'review_policies', timestamps: false }
+);
 
-// Use ReviewPolicy model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const ReviewPolicy =
-  mongoose.models.ReviewPolicy || mongoose.model('ReviewPolicy', ReviewPolicySchema);
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
+
+// TODO: add associations
+
+export default ReviewPolicy;

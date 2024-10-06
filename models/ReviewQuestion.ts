@@ -1,36 +1,47 @@
-// models/CourseQuestion.ts
+// models/ReviewQuestion.ts
 
-import mongoose from 'mongoose';
-import { IReviewQuestion } from '@/interfaces';
-import { Review } from './Review';
-import { Question } from './Question';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import Review from './Review';
+import Question from './Question';
+
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ReviewQuestion extends Model {}
 
 /**
  * A ReviewQuestion contains the verbiage from the Question model.$
  * Each ReviewQuestion is tied to a specific Review through the reviewID.
  */
-
-const ReviewQuestionSchema: mongoose.Schema<IReviewQuestion> = new mongoose.Schema(
+ReviewQuestion.init(
   {
-    reviewID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: Review,
-      required: true,
+    review_question_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    questionID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: Question,
-      required: true,
+    review_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Review,
+        key: 'review_id',
+      },
+    },
+    question_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Question,
+        key: 'question_id',
+      },
     },
   },
-  {
-    collection: 'reviewQuestions',
-  }
+  { sequelize, tableName: 'review_questions', timestamps: false }
 );
 
-// Use ReviewQuestion model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
 
-export const ReviewQuestion =
-  mongoose.models.ReviewQuestion ||
-  mongoose.model<IReviewQuestion>('ReviewQuestion', ReviewQuestionSchema);
+// TODO: Add associations for Review and Question
+
+export default ReviewQuestion;

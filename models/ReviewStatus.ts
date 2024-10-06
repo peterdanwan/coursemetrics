@@ -1,13 +1,28 @@
 // models/ReviewStatus.ts
 
-import mongoose from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
 
-const ReviewStatusSchema = new mongoose.Schema({
-  statusId: { type: Number, required: true },
-  statusName: { type: String, required: true },
-});
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ReviewStatus extends Model {}
 
-// Use ReviewStatus model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const ReviewStatus =
-  mongoose.models.ReviewStatus || mongoose.model('ReviewStatus', ReviewStatusSchema);
+ReviewStatus.init(
+  {
+    review_status_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    status_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'review_status',
+    timestamps: false,
+  }
+);
+
+export default ReviewStatus;
