@@ -23,7 +23,6 @@ AdminAction.init(
         model: Review,
         key: 'review_id',
       },
-      field: 'review_id',
     },
     admin_id: {
       type: DataTypes.INTEGER,
@@ -32,7 +31,6 @@ AdminAction.init(
         model: User,
         key: 'user_id',
       },
-      field: 'admin_id',
     },
     action_type_id: {
       type: DataTypes.INTEGER,
@@ -41,7 +39,6 @@ AdminAction.init(
         model: ActionType,
         key: 'action_type_id',
       },
-      field: 'action_type_id',
     },
     action_date: {
       type: DataTypes.DATE,

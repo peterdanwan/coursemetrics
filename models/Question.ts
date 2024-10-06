@@ -36,7 +36,7 @@ Question.init(
       },
     },
   },
-  { sequelize, tableName: 'questions', timestamps: false }
+  { sequelize, tableName: 'questions' }
 );
 
 // Associations
