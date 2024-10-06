@@ -41,7 +41,7 @@ Course.init(
       allowNull: false,
     },
   },
-  { sequelize, tableName: 'courses', timestamps: false }
+  { sequelize, tableName: 'courses' }
 );
 
 // Associations

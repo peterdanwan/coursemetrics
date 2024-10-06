@@ -48,7 +48,7 @@ AdminAction.init(
       allowNull: false,
     },
   },
-  { sequelize, tableName: 'admin_actions', timestamps: false }
+  { sequelize, tableName: 'admin_actions' }
 );
 
 // Associations

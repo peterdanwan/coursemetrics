@@ -12,7 +12,7 @@ CourseDetail.init(
     course_name: { type: DataTypes.STRING, allowNull: false },
     course_description: { type: DataTypes.STRING, allowNull: false },
   },
-  { sequelize, tableName: 'course_details', timestamps: false }
+  { sequelize, tableName: 'course_details' }
 );
 
 export default CourseDetail;

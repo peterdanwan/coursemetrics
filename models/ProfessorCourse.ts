@@ -31,7 +31,6 @@ ProfessorCourse.init(
   {
     sequelize,
     tableName: 'professor_course',
-    timestamps: false,
   }
 );
 

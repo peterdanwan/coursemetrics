@@ -20,13 +20,11 @@ Professor.init(
     last_name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
   },
   {
     sequelize,
     tableName: 'professors',
-    timestamps: false,
   }
 );
 

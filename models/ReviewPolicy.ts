@@ -37,7 +37,7 @@ ReviewPolicy.init(
       allowNull: false,
     },
   },
-  { sequelize, tableName: 'review_policies', timestamps: false }
+  { sequelize, tableName: 'review_policies' }
 );
 
 // Associations

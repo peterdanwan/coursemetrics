@@ -19,7 +19,7 @@ ActionType.init(
       unique: true,
     },
   },
-  { sequelize, tableName: 'action_types', timestamps: false }
+  { sequelize, tableName: 'action_types' }
 );
 
 export default ActionType;
