@@ -2,7 +2,7 @@
 
 import { NextResponse, NextRequest } from 'next/server';
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
-import connectDB from '@/config/database';
+import { connectDB } from '@/config/database';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
 import { Course } from '@/models/Course';
 import { logger } from '@/utils';
@@ -11,7 +11,7 @@ import { logger } from '@/utils';
 export const GET = withApiAuthRequired(async function get_courses(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'api/courses' });
+  const log = logger.child({ module: 'app/api/courses/route.ts' });
 
   try {
     await connectDB();
