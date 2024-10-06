@@ -1,11 +1,33 @@
 // models/Professor.ts
 
-import mongoose from 'mongoose';
-const ProfessorSchema = new mongoose.Schema({
-  professorFirstName: { type: String, required: true },
-  professorLastName: { type: String, required: true },
-});
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
 
-// Use Professor model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const Professor = mongoose.models.Professor || mongoose.model('Professor', ProfessorSchema);
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class Professor extends Model {}
+
+Professor.init(
+  {
+    professor_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    first_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    last_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'professors',
+    timestamps: false,
+  }
+);
+
+export default Professor;
