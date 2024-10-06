@@ -1,3 +1,5 @@
+// app/api/auth/route.ts
+
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { connectDB } from '@/config/database';
@@ -11,7 +13,7 @@ import { logger } from '@/utils';
 export const POST = withApiAuthRequired(async function create_user(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'api/auth' });
+  const log = logger.child({ module: 'app/api/auth/route.ts' });
 
   try {
     // Connect to the database
