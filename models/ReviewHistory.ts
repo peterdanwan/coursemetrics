@@ -42,7 +42,7 @@ ReviewHistory.init(
       field: 'changed_by',
     },
   },
-  { sequelize, tableName: 'review_history', timestamps: false }
+  { sequelize, tableName: 'review_history' }
 );
 
 // Associations

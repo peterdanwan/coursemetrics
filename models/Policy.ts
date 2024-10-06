@@ -12,7 +12,7 @@ Policy.init(
     policy_name: { type: DataTypes.STRING, allowNull: false },
     policy_description: { type: DataTypes.STRING, allowNull: false },
   },
-  { sequelize, tableName: 'policies', timestamps: false }
+  { sequelize, tableName: 'policies' }
 );
 
 export default Policy;

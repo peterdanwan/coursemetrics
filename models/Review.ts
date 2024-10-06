@@ -49,7 +49,7 @@ Review.init(
       },
     },
   },
-  { sequelize, tableName: 'reviews', timestamps: false }
+  { sequelize, tableName: 'reviews' }
 );
 
 // Associations

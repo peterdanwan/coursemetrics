@@ -36,7 +36,7 @@ ReviewQuestion.init(
       },
     },
   },
-  { sequelize, tableName: 'review_questions', timestamps: false }
+  { sequelize, tableName: 'review_questions' }
 );
 
 // Associations

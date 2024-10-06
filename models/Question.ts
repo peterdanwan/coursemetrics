@@ -34,7 +34,6 @@ Question.init(
         model: ReviewType,
         key: 'review_type_id',
       },
-      field: 'review_type_id',
     },
   },
   { sequelize, tableName: 'questions', timestamps: false }

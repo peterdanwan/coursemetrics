@@ -21,7 +21,6 @@ ReviewStatus.init(
   {
     sequelize,
     tableName: 'review_status',
-    timestamps: false,
   }
 );
 

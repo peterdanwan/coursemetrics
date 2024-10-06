@@ -20,7 +20,7 @@ ReviewAnswer.init(
       type: DataTypes.STRING,
     },
   },
-  { sequelize, tableName: 'review_answer', timestamps: false }
+  { sequelize, tableName: 'review_answer' }
 );
 
 // Associations

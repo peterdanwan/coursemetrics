@@ -21,7 +21,6 @@ ReviewType.init(
   {
     sequelize,
     tableName: 'review_type',
-    timestamps: false,
   }
 );
 
