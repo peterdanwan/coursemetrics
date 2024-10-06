@@ -4,6 +4,7 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '@/config/database';
 import User from './User';
 
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class UserProfile extends Model {}
 
 UserProfile.init(
@@ -36,6 +37,7 @@ UserProfile.init(
 );
 
 // Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
 UserProfile.belongsTo(User, { foreignKey: 'user_id' });
 User.hasOne(UserProfile, { foreignKey: 'user_id' });
 

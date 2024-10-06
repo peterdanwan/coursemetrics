@@ -13,7 +13,7 @@ export const GET = withApiAuthRequired(async function get_course_reviews(
   req: NextRequest,
   { params }: { params: { courseCode: string } }
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/courses/[courseCode]/reviews/route.ts' });
+  const log = logger.child({ module: 'app/api/courses/[course_code]/reviews/route.ts' });
 
   // try {
   console.log(await connectDB());

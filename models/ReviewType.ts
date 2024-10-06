@@ -1,18 +1,28 @@
 // models/ReviewType.ts
 
-import mongoose from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
 
-const ReviewTypeSchema = new mongoose.Schema(
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ReviewType extends Model {}
+
+ReviewType.init(
   {
-    reviewTypeID: { type: Number, required: true },
-    reviewTypeName: { type: String, required: true },
+    review_type_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    review_type_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
-    collection: 'reviewTypes',
+    sequelize,
+    tableName: 'review_type',
+    timestamps: false,
   }
 );
 
-// Use ReviewType model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const ReviewType =
-  mongoose.models.ReviewType || mongoose.model('ReviewType', ReviewTypeSchema);
+export default ReviewType;

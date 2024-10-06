@@ -1,12 +1,18 @@
 // models/Policy.ts
 
-import mongoose from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
 
-const PolicySchema = new mongoose.Schema({
-  policyName: { type: String, required: true },
-  policyDescription: { type: String, required: true },
-});
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class Policy extends Model {}
 
-// Use Policy model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const Policy = mongoose.models.Policy || mongoose.model('Policy', PolicySchema);
+Policy.init(
+  {
+    policy_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    policy_name: { type: DataTypes.STRING, allowNull: false },
+    policy_description: { type: DataTypes.STRING, allowNull: false },
+  },
+  { sequelize, tableName: 'policies', timestamps: false }
+);
+
+export default Policy;

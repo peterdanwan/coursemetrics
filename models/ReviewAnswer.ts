@@ -1,29 +1,31 @@
 // models/ReviewAnswer.ts
 
-import mongoose from 'mongoose';
-import { IReviewAnswer } from '@/interfaces';
-import { ReviewQuestion } from './ReviewQuestion';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import ReviewQuestion from './ReviewQuestion';
 
-/**
- * A Review answer is tied to a specific ReviewQuestion ID.
- */
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ReviewAnswer extends Model {}
 
-const ReviewAnswerSchema: mongoose.Schema<IReviewAnswer> = new mongoose.Schema(
+// A Review answer is tied to a specific ReviewQuestion ID (contrary to what is shown in the Database_Diagram_updated.svg)
+ReviewAnswer.init(
   {
-    reviewQuestionID: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: ReviewQuestion,
-      required: true,
+    review_answer_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    review_question_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: ReviewQuestion, key: 'review_question_id' },
     },
-    answer: { type: String, required: true },
+    answer: {
+      type: DataTypes.STRING,
+    },
   },
-  {
-    collection: 'reviewAnswers',
-  }
+  { sequelize, tableName: 'review_answer', timestamps: false }
 );
 
-// Use ReviewAnswer model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
 
-export const ReviewAnswer =
-  mongoose.models.ReviewAnswer || mongoose.model<IReviewAnswer>('ReviewAnswer', ReviewAnswerSchema);
+// TODO: Add associations
+
+export default ReviewAnswer;

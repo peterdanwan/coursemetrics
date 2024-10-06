@@ -1,20 +1,43 @@
 // models/ProfessorCourse.ts
 
-import mongoose from 'mongoose';
-const ProfessorCourseSchema = new mongoose.Schema({
-  professorId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'professor',
-    required: true,
-  },
-  courseId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'course',
-    required: true,
-  },
-});
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import Professor from './Professor';
+import Course from './Course';
 
-// Use ProfessorCourse model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const ProfessorCourse =
-  mongoose.models.ProfessorCourse || mongoose.model('ProfessorCourse', ProfessorCourseSchema);
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class ProfessorCourse extends Model {}
+
+ProfessorCourse.init(
+  {
+    professor_course_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    professor_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Professor,
+        key: 'professor_id',
+      },
+    },
+    course_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Course,
+        key: 'course_id',
+      },
+    },
+  },
+  {
+    sequelize,
+    tableName: 'professor_course',
+    timestamps: false,
+  }
+);
+
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
+
+// TODO: Add associations
+
+export default ProfessorCourse;

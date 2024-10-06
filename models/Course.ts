@@ -1,27 +1,52 @@
 // models/Course.ts
 
-import mongoose from 'mongoose';
-import { CourseDetail } from './CourseDetail';
-import { type ICourse } from '@/interfaces';
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/config/database';
+import CourseDetail from './CourseDetail';
 
-const CourseSchema: mongoose.Schema = new mongoose.Schema(
+// Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
+class Course extends Model {}
+
+Course.init(
   {
-    courseCode: { type: String, required: true },
-    courseDetailId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: CourseDetail,
-      required: true,
+    course_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    courseTerms: [{ type: String }],
-    // Online Async, Online Sync, In-person
-    courseDeliveryFormats: [{ type: String }],
-    courseSections: [{ type: String }],
+    course_code: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    course_detail_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: CourseDetail,
+        key: 'course_detail_id',
+      },
+    },
+    // E.g., summer, fall, winter
+    course_term: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    course_section: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    // E.g., Online Async, Online Sync, In-person
+    course_delivery_format: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
-  {
-    collection: 'courses',
-  }
+  { sequelize, tableName: 'courses', timestamps: false }
 );
 
-// Use Course model if already created, otherwise create a new one
-// Ref Doc: https://nesin.io/blog/fix-mongoose-cannot-overwrite-model-once-compiled-error
-export const Course = mongoose.models.Course || mongoose.model<ICourse>('Course', CourseSchema);
+// Associations
+// Ref: https://sequelize.org/docs/v7/category/associations/
+
+// TODO: Add associations for Review and Question
+
+export default Course;
