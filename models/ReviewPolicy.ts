@@ -30,7 +30,6 @@ ReviewPolicy.init(
         model: Policy,
         key: 'policy_id',
       },
-      field: 'policy_id',
     },
     policy_violated: {
       type: DataTypes.BOOLEAN,

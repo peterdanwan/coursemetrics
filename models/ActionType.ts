@@ -13,6 +13,7 @@ ActionType.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    // Approved | Rejected
     action_type_name: {
       type: DataTypes.STRING,
       allowNull: false,

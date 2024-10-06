@@ -13,7 +13,6 @@ UserProfile.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-      field: 'profile_id',
     },
     user_id: {
       type: DataTypes.INTEGER,
@@ -22,7 +21,6 @@ UserProfile.init(
         model: User,
         key: 'user_id',
       },
-      field: 'user_id',
     },
     bio: {
       type: DataTypes.TEXT,
