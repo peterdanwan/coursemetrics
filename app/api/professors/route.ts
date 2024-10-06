@@ -1,16 +1,13 @@
 // app/api/professors/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
-import { withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { connectDB } from '@/config/database';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
 import Professor from '@/models/Professor';
 import { logger } from '@/utils';
 
-// ===== API ROUTE TO FETCH ALL PROFESSORS =====
-export const GET = withApiAuthRequired(async function get_professors(
-  req: NextRequest
-): Promise<NextResponse> {
+// ===== API ROUTE TO FETCH ALL PROFESSORS (available to all users) =====
+export const GET = async function get_professors(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/professors/route.ts' });
 
   try {
@@ -92,4 +89,4 @@ export const GET = withApiAuthRequired(async function get_professors(
       { status: 500 }
     );
   }
-});
+};
