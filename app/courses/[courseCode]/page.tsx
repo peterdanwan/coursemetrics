@@ -299,6 +299,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Quick Stats Section */}
+      {/* TODO: Componentize QuickStats */}
       <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
         <Card>
           <CardHeader>
