@@ -354,6 +354,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Prerequisites Section */}
+      {/* TODO: Componentize Prerequisite */}
       <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
         <Card>
           <CardHeader>
