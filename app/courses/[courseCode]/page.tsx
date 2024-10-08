@@ -18,7 +18,6 @@ import {
   List,
   ListItem,
   Button,
-  useBreakpointValue,
   Stack,
   StackDivider,
 } from '@chakra-ui/react';
@@ -176,7 +175,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
 
   // Define the gridColumn property dynamically based on screen size
-  const gridColumnValue = useBreakpointValue({ base: 'span 3', md: 'span 8' });
+  // const gridColumnValue = useBreakpointValue({ base: 'span 8', md: 'span 8' });
 
   // Toggle expanded review
   const toggleExpandedReview = (reviewId: number) => {
@@ -188,30 +187,33 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   return (
     <Grid
-      // gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
       gridTemplateColumns="repeat(12, 1fr)"
-      gap={6}
-      p={5}
-      width="100%"
-      maxWidth={1800}
+      gap={{ base: '3', md: '3', lg: '6' }}
+      p={{ base: '3', md: '3', lg: '5' }}
       margin="0 auto"
+      w={{ base: '100%', '2xl': '80%' }}
+      bgColor={'gray.100'}
     >
       {/* Course Details Section*/}
-      {/* span 80% on medium screens, span 3 columns on small screens */}
-      <GridItem gridColumn={gridColumnValue}>
+      <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
         <Card>
-          <CardHeader>
-            <Flex align="center" wrap="wrap">
-              <Box>
-                <Heading as="h1" color="teal">
+          <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+            <Flex align="center" gap={2} wrap="wrap">
+              <Box order={{ base: '1', sm: '1', md: '1', lg: '1' }}>
+                <Heading
+                  as="h1"
+                  color="teal"
+                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                  mb={2}
+                >
                   CCP555
                 </Heading>
-                <Heading as="h2" size="lg" color="teal">
+                <Heading as="h2" color="teal" fontSize={{ md: '20' }}>
                   Cloud Computing for Programmers
                 </Heading>
               </Box>
-              <Spacer />
-              <Box>
+              <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
+              <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                 <Flex gap={5}>
                   <Text>Bookmark</Text>
                   <Text>4.5/5</Text>
@@ -219,8 +221,8 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </Box>
             </Flex>
           </CardHeader>
-          <CardBody>
-            <Text>
+          <CardBody p={{ base: '3', sm: '3', md: '3' }}>
+            <Text fontSize={{ md: '14' }}>
               Explore modern cloud application development through hands-on labs and projects,
               focusing on technologies, patterns, tools, and best practices for building
               distributed, reliable, and scalable applications on platforms like AWS and Azure
@@ -229,12 +231,14 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Skills Section */}
-      <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
+      <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
         <Card>
-          <CardHeader>
-            <Heading color="teal">Skills</Heading>
+          <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+            <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+              Skills
+            </Heading>
           </CardHeader>
-          <CardBody>
+          <CardBody p={{ base: '3', sm: '3', md: '3' }}>
             <List listStyleType="none">
               <Flex wrap="wrap" gap={5}>
                 <ListItem>
@@ -255,22 +259,29 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Course Reviews Section: make it scrollable too see more reviews */}
-      <GridItem gridColumn={gridColumnValue} gridRow="span 4">
+      <GridItem
+        gridColumn={{ base: 'span 12', md: 'span 8' }}
+        gridRow={{ base: '2', md: 'span 4' }}
+      >
         <Card>
-          <CardHeader>
-            <Flex align="center">
-              <Heading as="h2" color="teal">
+          <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+            <Flex align="center" wrap="wrap" gap={2}>
+              <Heading
+                color="teal"
+                fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                order={{ base: '1', sm: '1', md: '1', lg: '1' }}
+              >
                 Reviews
               </Heading>
-              <Spacer />
-              <Box>
+              <Spacer order={{ base: '2', sm: '2', md: '2', lg: '2' }} />
+              <Box order={{ base: '3', sm: '3', md: '3', lg: '3' }}>
                 <Text>
                   Filter by: <span>[Professor]</span>
                 </Text>
               </Box>
             </Flex>
           </CardHeader>
-          <CardBody>
+          <CardBody p={{ base: '3', sm: '3', md: '3' }}>
             <Flex direction="column" gap={5}>
               <Stack divider={<StackDivider />} height="700px" overflowY="scroll" spacing="4">
                 {/**** Course Review Component starts here ****/}
@@ -288,7 +299,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 colorScheme="teal"
                 variant="solid"
                 size="lg"
-                width="200px"
+                // width="200px"
                 alignSelf="flex-end"
                 mt={5}
               >
@@ -299,12 +310,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Quick Stats Section */}
-      <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
+      {/* TODO: Componentize QuickStats */}
+      <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
         <Card>
-          <CardHeader>
-            <Heading color="teal">Quick Stats</Heading>
+          <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+            <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+              Quick Stats
+            </Heading>
           </CardHeader>
-          <CardBody>
+          <CardBody p={{ base: '3', sm: '3', md: '3' }}>
             <Grid templateColumns="repeat(2, 1fr)" gap={2}>
               <GridItem>
                 <Text as="b">Difficulty:</Text>
@@ -354,12 +368,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         </Card>
       </GridItem>
       {/* Prerequisites Section */}
-      <GridItem gridColumn={{ base: 'span 9', md: 'span 4' }}>
+      {/* TODO: Componentize Prerequisite */}
+      <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
         <Card>
-          <CardHeader>
-            <Heading color="teal">Prerequisites</Heading>
+          <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+            <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+              Prerequisites
+            </Heading>
           </CardHeader>
-          <CardBody>
+          <CardBody p={{ base: '3', sm: '3', md: '3' }}>
             <Box>
               <Text>WEB422 - Web Programming for Apps and Services</Text>
             </Box>
