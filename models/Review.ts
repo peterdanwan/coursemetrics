@@ -9,6 +9,11 @@ import User from './User';
 
 class Review extends Model {}
 
+/**
+ *
+ *
+ */
+
 Review.init(
   {
     review_id: {
