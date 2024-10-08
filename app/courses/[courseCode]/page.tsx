@@ -23,6 +23,7 @@ import {
   StackDivider,
 } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
+import CourseReview from '@/components/CourseReview';
 
 // Dummy data for testing
 const res = {
@@ -52,21 +53,119 @@ const res = {
       difficulty: 5,
       courseLoad: 5,
       grade: 'C+',
-      professor: 'Havey Dumfred',
+      professor: 'Harvey Dumfred',
       bookmark: true,
     },
     {
       id: 3,
-      title: 'Course is too hard',
+      title: 'Challenging but worth it',
       content: [
-        'CCP555 is a well-rounded course for programmers interested in cloud computing. The curriculum is well-structured, beginning with cloud fundamentals and gradually moving towards more complex topics like microservices and DevOps practices. The hands-on labs were a highlight, allowing us to work directly with AWS and Docker, making the learning experience very practical. One of the strengths of the course is its focus on scalability and security in cloud environments, which are critical in real-world applications.',
-        'The instructor’s explanations were clear, although the pacing was sometimes too fast, particularly in the sections on serverless computing. Despite that, the course provided ample resources to catch up. I highly recommend CCP555 to anyone looking to expand their skill set in cloud technologies.',
+        'The CCP555 course was tough but incredibly valuable. The instructor emphasized practical skills like cloud deployment and security, and the hands-on labs made everything stick. AWS and Azure were challenging at first, but with the course’s resources and assignments, I managed to get a good grasp by the end. The topics on scaling and security were especially helpful.',
+        'The workload was a bit intense, and balancing the projects with other courses was difficult. That said, I’m much more comfortable with cloud technologies now and would recommend this course to others.',
+      ],
+      wouldTakeAgain: 'Yes',
+      difficulty: 4,
+      courseLoad: 5,
+      grade: 'B+',
+      professor: 'Sara Lee',
+      bookmark: false,
+    },
+    {
+      id: 4,
+      title: 'Too fast-paced',
+      content: [
+        'I found CCP555 to be an interesting course but extremely fast-paced. We covered AWS, Azure, and Kubernetes all within a few weeks, and the labs sometimes felt rushed. Although the course content was solid, I often struggled to keep up with the pace of the lectures. However, the professor was very knowledgeable and tried to accommodate students.',
+        'If you’re willing to put in extra time to review and study, this course can be very rewarding. The projects were well-designed, but the workload was overwhelming at times.',
+      ],
+      wouldTakeAgain: 'No',
+      difficulty: 4,
+      courseLoad: 5,
+      grade: 'B-',
+      professor: 'David Humphrey',
+      bookmark: true,
+    },
+    {
+      id: 5,
+      title: 'Very practical and insightful',
+      content: [
+        'CCP555 was a great course, offering deep dives into cloud computing with a focus on real-world applications. The labs were practical and engaging, particularly those covering Docker and Kubernetes. I appreciated the emphasis on cloud security and scaling strategies, which are highly relevant in today’s job market.',
+        'The lectures were clear, and the professor’s examples from industry experience were insightful. The only downside was the occasional overload of information. I would have liked more time on Kubernetes. Overall, a great course!',
+      ],
+      wouldTakeAgain: 'Yes',
+      difficulty: 3,
+      courseLoad: 4,
+      grade: 'A',
+      professor: 'Sarah Williams',
+      bookmark: false,
+    },
+    {
+      id: 6,
+      title: 'Overwhelming workload',
+      content: [
+        'While the content in CCP555 is important for cloud computing, the workload is incredibly high. Each week felt like a marathon with tons of labs, reading, and projects. Even though the labs were helpful, the pace made it hard to absorb everything. I feel like I need to review the material again after the course is over to fully grasp it.',
+        'The professor was helpful, but there wasn’t enough time to really dive deep into the cloud platforms. Overall, I wouldn’t take it again unless the workload was reduced.',
       ],
       wouldTakeAgain: 'No',
       difficulty: 5,
       courseLoad: 5,
-      grade: 'C+',
-      professor: 'Havey Dumfred',
+      grade: 'C',
+      professor: 'Harvey Dumfred',
+      bookmark: false,
+    },
+    {
+      id: 7,
+      title: 'Insightful and engaging',
+      content: [
+        'I thoroughly enjoyed CCP555. The content was engaging, and the hands-on labs provided a real sense of working in a cloud environment. Learning about Infrastructure as a Service and Platform as a Service was very useful, and the AWS labs helped solidify the concepts. I now feel much more prepared for working with cloud infrastructure.',
+        'I would recommend this course to anyone interested in cloud computing. It was well-balanced between theory and practice, though more time on certain complex topics would have been helpful.',
+      ],
+      wouldTakeAgain: 'Yes',
+      difficulty: 3,
+      courseLoad: 3,
+      grade: 'A-',
+      professor: 'David Humphrey',
+      bookmark: true,
+    },
+    {
+      id: 8,
+      title: 'Too much content crammed into one course',
+      content: [
+        'CCP555 covers a lot of ground, and it’s easy to feel overwhelmed by the amount of material. AWS, Docker, Kubernetes—it’s all there, but we moved so quickly that it was hard to keep up. The labs were useful but sometimes didn’t give enough time to really experiment with the cloud environments.',
+        'I wish we had focused more deeply on fewer topics instead of rushing through so many. Despite this, the course gave me a broad understanding of cloud computing, though I’ll need to review the material after the course ends.',
+      ],
+      wouldTakeAgain: 'No',
+      difficulty: 5,
+      courseLoad: 5,
+      grade: 'B',
+      professor: 'Harvey Dumfred',
+      bookmark: false,
+    },
+    {
+      id: 9,
+      title: 'Well-structured and informative',
+      content: [
+        'CCP555 was a fantastic course. The content was well-structured, and the focus on both AWS and Azure provided a comprehensive view of cloud technologies. I really enjoyed the practical aspects, especially the labs where we deployed applications and worked with databases in the cloud.',
+        'The course load was manageable, but some of the lectures felt rushed, particularly towards the end when we covered Kubernetes. Overall, a solid course that I would recommend to anyone looking to enhance their cloud computing skills.',
+      ],
+      wouldTakeAgain: 'Yes',
+      difficulty: 4,
+      courseLoad: 4,
+      grade: 'A',
+      professor: 'Sarah Lee',
+      bookmark: true,
+    },
+    {
+      id: 10,
+      title: 'Great hands-on experience',
+      content: [
+        'CCP555 provided a great balance of theory and hands-on experience. I really enjoyed the labs, especially those focused on Docker and cloud deployment. The assignments were challenging but definitely worth it, as I now feel much more comfortable working with cloud infrastructure.',
+        'My only complaint is that the course could have spent more time on security in cloud environments. Other than that, it was a fantastic learning experience.',
+      ],
+      wouldTakeAgain: 'Yes',
+      difficulty: 3,
+      courseLoad: 4,
+      grade: 'A-',
+      professor: 'David Humphrey',
       bookmark: true,
     },
   ],
@@ -80,9 +179,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const gridColumnValue = useBreakpointValue({ base: 'span 3', md: 'span 8' });
 
   // Toggle expanded review
-  // const toggleExpandedReview = (reviewId: number) => {
-  //   setExpandedReviewId(expandedReviewId === reviewId ? -1 : reviewId);
-  // };
   const toggleExpandedReview = (reviewId: number) => {
     setExpandedReviewId((prevId) => (prevId === reviewId ? -1 : reviewId));
   };
@@ -140,18 +236,18 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </CardHeader>
           <CardBody>
             <List listStyleType="none">
-              <Flex wrap="wrap">
+              <Flex wrap="wrap" gap={5}>
                 <ListItem>
-                  <Tag>AWS</Tag>
+                  <Tag colorScheme="cyan">AWS</Tag>
                 </ListItem>
                 <ListItem>
-                  <Tag>Cloud Computing</Tag>
+                  <Tag colorScheme="cyan">Cloud Computing</Tag>
                 </ListItem>
                 <ListItem>
-                  <Tag>JavaScript</Tag>
+                  <Tag colorScheme="cyan">JavaScript</Tag>
                 </ListItem>
                 <ListItem>
-                  <Tag>HTML</Tag>
+                  <Tag colorScheme="cyan">HTML</Tag>
                 </ListItem>
               </Flex>
             </List>
@@ -176,173 +272,17 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </CardHeader>
           <CardBody>
             <Flex direction="column" gap={5}>
-              {/* Course Review Component: "key" is to store review id */}
-              <Stack
-                divider={<StackDivider />}
-                height="700px"
-                overflowY="scroll"
-                spacing="4"
-                css={{
-                  // For Chrome, Safari, and other WebKit browsers
-                  '&::-webkit-scrollbar': {
-                    width: '12px', // Width of the scrollbar
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    background: '#f1f1f1', // Background of the scrollbar track
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: '#cdcdcd', // Color of the scrollbar thumb
-                    borderRadius: '6px', // Rounded corners for the thumb
-                  },
-                  '&::-webkit-scrollbar-thumb:hover': {
-                    background: '#555', // Color when hovering over the scrollbar
-                  },
-
-                  // For Firefox
-                  'scrollbar-width': 'thin', // Makes the scrollbar thinner
-                  'scrollbar-color': '#cdcdcd #f1f1f1', // Thumb and track color
-                }}
-              >
-                <Box key={1} p={5}>
-                  {/* <CardHeader> */}
-                  <Heading as="h3" size="lg" color="blackAlpha.600" pb={5}>
-                    Great Course
-                  </Heading>
-                  {/* </CardHeader> */}
-                  {/* <CardBody> */}
-                  <Grid templateColumns="repeat(5, 1fr)" gap={2}>
-                    <GridItem gridColumn="span 4">
-                      <Text noOfLines={expandedReviewId === 1 ? 0 : 3}>
-                        <span>
-                          CCP555 offers a comprehensive introduction to cloud computing for
-                          programmers. The course dives deep into popular cloud platforms like AWS
-                          and Microsoft Azure, providing hands-on labs that help reinforce key
-                          concepts like virtual machines, containers, and cloud storage. I
-                          appreciated the real-world examples, as they gave context to abstract
-                          topics like Infrastructure as a Service (IaaS) and Platform as a Service
-                          (PaaS).{' '}
-                        </span>
-                        <br />
-                        <span>
-                          The assignments were challenging but rewarding, especially those that
-                          involved setting up scalable cloud solutions. By the end of the course, I
-                          felt comfortable deploying web applications and databases in a cloud
-                          environment. However, some modules felt rushed, and I think the course
-                          could benefit from a bit more time spent on Kubernetes. Overall, CCP555 is
-                          a solid course that equips you with the skills necessary to work with
-                          cloud technologies.{' '}
-                        </span>
-                      </Text>
-                    </GridItem>
-
-                    <GridItem textAlign="right">
-                      <p>Would take again: Yes</p>
-                      <p>Difficulty: 3/5</p>
-                      <p>Course Load: 4/5</p>
-                      <p>Grade: A+</p>
-                    </GridItem>
-                    <GridItem gridColumn={4} justifySelf="end">
-                      <Button variant="link" onClick={() => toggleExpandedReview(1)} color="teal">
-                        {expandedReviewId === 1 ? 'See Less' : 'See More'}
-                      </Button>
-                    </GridItem>
-                    <GridItem gridColumn="span 4">
-                      <p>Professor: David Humphrey</p>
-                    </GridItem>
-                    <GridItem textAlign="right">Bookmark</GridItem>
-                  </Grid>
-                  {/* </CardBody> */}
-                </Box>
-                {/* Course Review Component */}
-                <Box key={2} p={5}>
-                  <Heading as="h3" size="lg" color="blackAlpha.600" pb={5}>
-                    Too much course load
-                  </Heading>
-                  <Grid templateColumns="repeat(5, 1fr)" gap={2}>
-                    <GridItem gridColumn="span 4">
-                      <Text noOfLines={expandedReviewId === 2 ? 0 : 3}>
-                        <span>
-                          CCP555 is a well-rounded course for programmers interested in cloud
-                          computing. The curriculum is well-structured, beginning with cloud
-                          fundamentals and gradually moving towards more complex topics like
-                          microservices and DevOps practices. The hands-on labs were a highlight,
-                          allowing us to work directly with AWS and Docker, making the learning
-                          experience very practical. One of the strengths of the course is its focus
-                          on scalability and security in cloud environments, which are critical in
-                          real-world applications.{' '}
-                        </span>
-                        <br />
-                        <span>
-                          The instructor’s explanations were clear, although the pacing was
-                          sometimes too fast, particularly in the sections on serverless computing.
-                          Despite that, the course provided ample resources to catch up. I highly
-                          recommend CCP555 to anyone looking to expand their skill set in cloud
-                          technologies.{' '}
-                        </span>
-                      </Text>
-                    </GridItem>
-                    <GridItem textAlign="right">
-                      <p>Would take again: No</p>
-                      <p>Difficulty: 5/5</p>
-                      <p>Course Load: 5/5</p>
-                      <p>Grade: C+</p>
-                    </GridItem>
-                    <GridItem gridColumn={4} justifySelf="end">
-                      <Button variant="link" onClick={() => toggleExpandedReview(1)} color="teal">
-                        {expandedReviewId === 2 ? 'See Less' : 'See More'}
-                      </Button>
-                    </GridItem>
-                    <GridItem gridColumn="span 4">
-                      <p>Professor: Havey Dumfred</p>
-                    </GridItem>
-                    <GridItem textAlign="right">Bookmarked</GridItem>
-                  </Grid>
-                </Box>
-                {/* Course Review Component */}
-                <Box key={3} p={5}>
-                  <Heading as="h3" size="lg" color="blackAlpha.600" pb={5}>
-                    Course is too hard
-                  </Heading>
-                  <Grid templateColumns="repeat(5, 1fr)" gap={2}>
-                    <GridItem gridColumn="span 4">
-                      <Text noOfLines={expandedReviewId === 2 ? 0 : 3}>
-                        <span>
-                          CCP555 is a well-rounded course for programmers interested in cloud
-                          computing. The curriculum is well-structured, beginning with cloud
-                          fundamentals and gradually moving towards more complex topics like
-                          microservices and DevOps practices. The hands-on labs were a highlight,
-                          allowing us to work directly with AWS and Docker, making the learning
-                          experience very practical. One of the strengths of the course is its focus
-                          on scalability and security in cloud environments, which are critical in
-                          real-world applications.{' '}
-                        </span>
-                        <br />
-                        <span>
-                          The instructor’s explanations were clear, although the pacing was
-                          sometimes too fast, particularly in the sections on serverless computing.
-                          Despite that, the course provided ample resources to catch up. I highly
-                          recommend CCP555 to anyone looking to expand their skill set in cloud
-                          technologies.{' '}
-                        </span>
-                      </Text>
-                    </GridItem>
-                    <GridItem textAlign="right">
-                      <p>Would take again: No</p>
-                      <p>Difficulty: 5/5</p>
-                      <p>Course Load: 5/5</p>
-                      <p>Grade: C+</p>
-                    </GridItem>
-                    <GridItem gridColumn={4} justifySelf="end">
-                      <Button variant="link" onClick={() => toggleExpandedReview(1)} color="teal">
-                        {expandedReviewId === 3 ? 'See Less' : 'See More'}
-                      </Button>
-                    </GridItem>
-                    <GridItem gridColumn="span 4">
-                      <p>Professor: Havey Dumfred</p>
-                    </GridItem>
-                    <GridItem textAlign="right">Bookmarked</GridItem>
-                  </Grid>
-                </Box>
+              <Stack divider={<StackDivider />} height="700px" overflowY="scroll" spacing="4">
+                {/**** Course Review Component starts here ****/}
+                {courseReviews.map((review, index) => (
+                  <CourseReview
+                    key={index}
+                    review={review}
+                    expandedReviewId={expandedReviewId}
+                    toggleExpandedReview={toggleExpandedReview}
+                  />
+                ))}
+                {/**** Course Review Component ends here ****/}
               </Stack>
               <Button
                 colorScheme="teal"
@@ -367,7 +307,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           <CardBody>
             <Grid templateColumns="repeat(2, 1fr)" gap={2}>
               <GridItem>
-                <Text>Difficulty:</Text>
+                <Text as="b">Difficulty:</Text>
               </GridItem>
               <GridItem>
                 <StarIcon />
@@ -377,7 +317,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 <StarIcon />
               </GridItem>
 
-              <GridItem>Course Load:</GridItem>
+              <GridItem>
+                <Text as="b">Course Load:</Text>
+              </GridItem>
               <GridItem>
                 <StarIcon />
                 <StarIcon />
@@ -386,7 +328,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 <StarIcon />
               </GridItem>
 
-              <GridItem>Average Grade:</GridItem>
+              <GridItem>
+                <Text as="b">Average Grade:</Text>
+              </GridItem>
               <GridItem>
                 <StarIcon />
                 <StarIcon />
@@ -395,7 +339,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 <StarIcon />
               </GridItem>
 
-              <GridItem>Would Take Again:</GridItem>
+              <GridItem>
+                <Text as="b">Would Take Again:</Text>
+              </GridItem>
               <GridItem>
                 <StarIcon />
                 <StarIcon />
@@ -423,69 +369,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </CardBody>
         </Card>
       </GridItem>
-      {/* Add Review Button
-      <GridItem>
-        <Button colorScheme="teal" variant="solid">
-          Add Review
-        </Button>
-      </GridItem> */}
     </Grid>
-  );
-}
-
-interface Review {
-  id: number;
-  title: string;
-  content: string[];
-  wouldTakeAgain: string;
-  difficulty: number;
-  courseLoad: number;
-  grade: string;
-  professor: string;
-  bookmark: boolean;
-}
-
-function CourseReview({ key, review, expanded }: { key: number; review: Review; expanded: number;  }) {
-  return (
-    <div>
-      <Box key={review.id} p={5}>
-        {/* <CardHeader> */}
-        <Heading as="h3" size="lg" color="blackAlpha.600" pb={5}>
-          {review.title}
-        </Heading>
-        {/* </CardHeader> */}
-        {/* <CardBody> */}
-        <Grid templateColumns="repeat(5, 1fr)" gap={2}>
-          <GridItem gridColumn="span 4">
-            <Text noOfLines={expandedReviewId === 1 ? 0 : 3}>{review.content}</Text>
-          </GridItem>
-
-          <GridItem textAlign="right">
-            <p>
-              <span>Would take again:</span> {review.wouldTakeAgain}
-            </p>
-            <p>
-              <span>Difficulty:</span> {review.difficulty}/5
-            </p>
-            <p>
-              <span>Course Load:</span> {review.courseLoad}/5
-            </p>
-            <p>
-              <span>Grade:</span> {review.grade}
-            </p>
-          </GridItem>
-          <GridItem gridColumn={4} justifySelf="end">
-            <Button variant="link" onClick={() => toggleExpandedReview(1)} color="teal">
-              {expandedReviewId === 1 ? 'See Less' : 'See More'}
-            </Button>
-          </GridItem>
-          <GridItem gridColumn="span 4">
-            <p>Professor: David Humphrey</p>
-          </GridItem>
-          <GridItem textAlign="right">{review.bookmark ? 'Bookmarked' : 'Bookmark'}</GridItem>
-        </Grid>
-        {/* </CardBody> */}
-      </Box>
-    </div>
   );
 }
