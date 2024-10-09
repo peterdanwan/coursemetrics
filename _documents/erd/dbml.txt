@@ -18,9 +18,15 @@ Table Course {
   course_id integer [primary key]
   course_code varchar
   course_detail_id integer
-  course_term varchar
+  course_term_id varchar
   course_section varchar
   course_delivery_format varchar
+}
+
+Table CourseTerm {
+  course_term_id integer [primary key]
+  course_season varchar
+  course_year integer
 }
 
 Table CourseDetail {
@@ -135,4 +141,5 @@ Ref: ReviewPolicy.review_id > Review.review_id
 Ref: ReviewQuestion.question_id > Question.question_id
 Ref: ReviewQuestion.review_id > Review.review_id
 Ref: User.role_id > UserRole.role_id
-Ref: UserProfile.user_id > User.user_id
+Ref: UserProfile.user_id - User.user_id
+Ref: Course.course_term_id > CourseTerm.course_term_id
