@@ -9,6 +9,27 @@ import User from './User';
 // Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class AdminAction extends Model {}
 
+/**
+ * An AdminAction is performed on a Review with a review_status_id of "pending".
+ * An AdminAction determines whether a "pending" review is posted or not.
+ *
+ * A given AdminAction belongs to one User, with the role_id of `1` for `admin`. (role_id of 2 is `student`)
+ *
+ * One can determine the "type" of AdminAction through the ActionType.
+ * The ActionType indicates whether the review was accepted or rejected.
+ *
+ * A sample AdminAction record would look like this:
+ *
+ * {
+ *  admin_action_id:  23
+ *  review_id: 2 // -> retrieve data like this:
+ *  admin_id:
+ *  action_type_id:
+ *  action_date:
+ * }
+ *
+ */
+
 AdminAction.init(
   {
     admin_action_id: {
