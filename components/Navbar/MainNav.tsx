@@ -392,12 +392,7 @@ const MobileNavItem = ({
                 }}
                 _hover={{ textDecoration: 'none' }}
               >
-                <Text
-                  color={
-                    child.isClearOption ? 'red.500' : useColorModeValue('gray.600', 'gray.200')
-                  }
-                  fontWeight={500}
-                >
+                <Text color={child.isClearOption ? 'red.500' : 'gray.600'} fontWeight={500}>
                   {child.label}
                 </Text>
               </Box>
