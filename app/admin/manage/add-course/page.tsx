@@ -149,6 +149,8 @@ export default function AdminAddCourse() {
   );
 }
 
+// These customStyles would be similar in this page, add-professor, edit-course and edit-professor pages
+// After all the page is complete, I will return and refactor the customStyles to a separate file.
 const customStyles = {
   control: (provided: any, { isFocused }: any) => ({
     ...provided,
