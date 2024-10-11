@@ -1,5 +1,4 @@
-// app/admin/courses/add.tsx
-
+// app/admin/manage/add-course.tsx
 export default function AdminAddCourse() {
   return (
     <div>
