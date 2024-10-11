@@ -9,8 +9,10 @@ import {
   Button,
   Flex,
   Divider,
+  Link,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import CoursesTable from '@/components/CoursesTable'; // Import the new component
 import ProfessorsTable from '@/components/ProfessorsTable'; // Import the new component
 import ReviewsTable from '@/components/ReviewsTable'; // Import the new component
@@ -252,9 +254,21 @@ export default function Manage() {
             />
           </FormControl>
         </Stack>
-        <Button colorScheme="teal" color="white" px={6}>
-          Add
-        </Button>
+        {/* Conditionally render Add button only for 'courses' and 'professors' */}
+        {selectedOption === 'courses' && (
+          <Link href="/admin/manage/course/add">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
+        {selectedOption === 'professors' && (
+          <Link href="/admin/manage/professor/add">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
       </Flex>
 
       <Divider mb={4} />
