@@ -256,14 +256,14 @@ export default function Manage() {
         </Stack>
         {/* Conditionally render Add button only for 'courses' and 'professors' */}
         {selectedOption === 'courses' && (
-          <Link href="/admin/manage/course/add">
+          <Link href="/admin/manage/add-course">
             <Button as="a" colorScheme="teal" color="white" px={6}>
               Add
             </Button>
           </Link>
         )}
         {selectedOption === 'professors' && (
-          <Link href="/admin/manage/professor/add">
+          <Link href="/admin/manage/add-professor">
             <Button as="a" colorScheme="teal" color="white" px={6}>
               Add
             </Button>
