@@ -11,12 +11,12 @@ import {
   Divider,
 } from '@chakra-ui/react';
 import { useState } from 'react';
-import CoursesTable from '@/components/CoursesTable'; // Import the new component
-import ProfessorsTable from '@/components/ProfessorsTable'; // Import the new component
-import ReviewsTable from '@/components/ReviewsTable'; // Import the new component
+import CoursesTable from '@/components/CoursesTable';
+import ProfessorsTable from '@/components/ProfessorsTable';
+import ReviewsTable from '@/components/ReviewsTable';
 
 // ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const courses = [
+const initialCourses = [
   {
     name: 'Course 1',
     section: 'A',
@@ -169,6 +169,7 @@ const reviews = [
 export default function Manage() {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [searchValue, setSearchValue] = useState<string>('');
+  const [courses, setCourses] = useState(initialCourses);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -176,6 +177,11 @@ export default function Manage() {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
+  };
+
+  const removeCourse = (index: number) => {
+    // More logic would need to be added here to remove the course from the database
+    setCourses((prevCourses) => prevCourses.filter((_, i) => i !== index));
   };
 
   // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
@@ -259,7 +265,9 @@ export default function Manage() {
 
       <Divider mb={4} />
       {/* Conditionally render appropriate category when it is selected */}
-      {selectedOption === 'courses' && <CoursesTable courses={filteredCourses} />}
+      {selectedOption === 'courses' && (
+        <CoursesTable courses={filteredCourses} onRemove={removeCourse} />
+      )}
       {selectedOption === 'professors' && <ProfessorsTable professors={filteredProfessors} />}
       {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
     </Box>
