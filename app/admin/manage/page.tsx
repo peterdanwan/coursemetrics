@@ -65,42 +65,52 @@ const courses = [
 
 const professors = [
   {
+    id: 1,
     first_name: 'John',
     last_name: 'Doe',
   },
   {
+    id: 2,
     first_name: 'Jane',
     last_name: 'Smith',
   },
   {
+    id: 3,
     first_name: 'Emily',
     last_name: 'Johnson',
   },
   {
+    id: 4,
     first_name: 'Michael',
     last_name: 'Brown',
   },
   {
+    id: 5,
     first_name: 'Sarah',
     last_name: 'Davis',
   },
   {
+    id: 6,
     first_name: 'John',
     last_name: 'Doe',
   },
   {
+    id: 7,
     first_name: 'Jane',
     last_name: 'Smith',
   },
   {
+    id: 8,
     first_name: 'Emily',
     last_name: 'Johnson',
   },
   {
+    id: 9,
     first_name: 'Michael',
     last_name: 'Brown',
   },
   {
+    id: 10,
     first_name: 'Sarah',
     last_name: 'Davis',
   },

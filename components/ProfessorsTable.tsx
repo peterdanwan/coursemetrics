@@ -1,7 +1,10 @@
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
+import { use } from 'react';
 
 // Define the Professor type
 type Professor = {
+  id: number;
   first_name: string;
   last_name: string;
 };
@@ -12,6 +15,12 @@ interface ProfessorsTableProps {
 }
 
 const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors }) => {
+  const router = useRouter();
+
+  const handleEditClick = (professorId: number) => {
+    router.push(`/admin/manage/edit-professor/${professorId}`);
+  };
+
   return (
     <>
       {/* Table Header */}
@@ -75,8 +84,9 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors }) => {
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
+                    onClick={() => handleEditClick(professor.id)}
                   >
-                    View Details
+                    Edit
                   </Button>
                   <Button colorScheme="teal" color="white" flex="1" ml={{ base: 0, md: 1 }}>
                     Remove
