@@ -2,11 +2,10 @@
 
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
-import { connectDB } from '@/config/database';
+import { connectDB } from '@/database/connectDB';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
-import User from '@/models/User';
-import UserProfile from '@/models/UserProfile';
-import UserRole from '@/models/UserRole';
+import User from '@/database/models/User';
+import UserProfile from '@/database/models/UserProfile';
 import { logger } from '@/utils';
 
 // ===== API ROUTE TO CREATE A NEW USER IF THEY DON'T EXIST ALREADY =====
@@ -18,6 +17,7 @@ export const POST = withApiAuthRequired(async function create_user(
   try {
     // Connect to the database
     await connectDB();
+    console.log('Dfss');
 
     // Get the user session from Auth0
     const { user }: any = await getSession();
@@ -30,22 +30,12 @@ export const POST = withApiAuthRequired(async function create_user(
     const userName = user.name;
     log.info(`Checking for existing user or creating a new one, email: ${userEmail}`);
 
-    // Fetch the 'student' role from the database (adjust the role name as needed)
-    const studentRole = await UserRole.findOne({ where: { role_name: 'student' } });
-    if (!studentRole) {
-      log.error('Student role not found');
-      return NextResponse.json(createErrorResponse(404, 'Student role not found'), { status: 404 });
-    }
-
-    let studentRoleJSON = await studentRole.toJSON();
-
     // Use findOrCreate to find or create the user
     const [userInstance, created] = await User.findOrCreate({
       where: { email: userEmail },
       defaults: {
         full_name: userName,
         email: userEmail,
-        role_id: studentRoleJSON.id, // Use the role fetched from the database
       },
     });
 
@@ -59,7 +49,6 @@ export const POST = withApiAuthRequired(async function create_user(
       where: { user_id: userInstanceJSON.user_id },
       defaults: {
         user_id: userInstanceJSON.id,
-        bio: '',
       },
     });
     log.info(`User profile ${created ? 'created for new user' : 'already exists'}`, {

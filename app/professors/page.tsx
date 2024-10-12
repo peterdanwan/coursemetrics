@@ -6,7 +6,7 @@ import { Spinner } from '@nextui-org/react';
 
 /*
 
-Here is an example of how you would call the API to get all courses
+Here is an example of how you would call the API to get all professors
 
 */
 
@@ -17,7 +17,7 @@ const fetcher = async (uri: string) => {
   return response.json();
 };
 
-export default function Courses() {
+export default function Professors() {
   const { data, error } = useSWR('/api/professors', fetcher);
 
   console.log(data);
@@ -28,7 +28,7 @@ export default function Courses() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Spinner />
-        &nbsp;&nbsp;Loading the different courses...
+        &nbsp;&nbsp;Loading the different professors...
       </div>
     );
   return <div>Hello World</div>;
