@@ -99,7 +99,7 @@ export default function EditCourse() {
     <Flex direction="column" align="center" justify="center" minHeight="100vh" bg="gray.50" p={5}>
       <Box width={{ base: '90%', sm: '500px' }} borderRadius="lg" shadow="md" bg="white" p={8}>
         <Heading as="h1" size="lg" mb={6} textAlign="center" color="teal">
-          Edit Course
+          Edit Professor
         </Heading>
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
