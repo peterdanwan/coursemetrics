@@ -9,9 +9,11 @@ type Professor = {
 // Props interface
 interface ProfessorsTableProps {
   professors: Professor[];
+  onRemove: (index: number) => void;
 }
 
-const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors }) => {
+const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove }) => {
+  // More logic would need to be added here to remove the course from the database
   return (
     <>
       {/* Table Header */}
@@ -78,7 +80,13 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors }) => {
                   >
                     View Details
                   </Button>
-                  <Button colorScheme="teal" color="white" flex="1" ml={{ base: 0, md: 1 }}>
+                  <Button
+                    colorScheme="teal"
+                    color="white"
+                    flex="1"
+                    ml={{ base: 0, md: 1 }}
+                    onClick={() => onRemove(index)}
+                  >
                     Remove
                   </Button>
                 </Flex>
