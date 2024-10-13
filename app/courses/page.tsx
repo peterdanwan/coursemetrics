@@ -16,7 +16,7 @@ const fetcher = async (uri: string) => {
 };
 
 export default function Courses() {
-  const { data, error } = useSWR('/api/courses?page=1&limit=10', fetcher);
+  const { data, error } = useSWR('/api/courses?page=1&limit=20', fetcher);
 
   console.log(data);
   if (error) return <div>oops... {error.message}</div>;

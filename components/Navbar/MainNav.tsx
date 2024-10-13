@@ -35,16 +35,9 @@ export default function MainNav(props: { user: any }) {
   const { isOpen, onToggle } = useDisclosure();
   const [selectedCategory, setSelectedCategory] = useState('Select Category');
 
-  // If the user is not stored in the database, store all details
-  useEffect(() => {
-    if (props.user) {
-      registerUserInDB();
-    }
-  }, [props.user]);
-
   const registerUserInDB = async () => {
     try {
-      await fetch('/api/auth', {
+      await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +48,13 @@ export default function MainNav(props: { user: any }) {
     }
   };
 
-  const pathname = usePathname();
+  // If the user is not stored in the database, store all details
+  useEffect(() => {
+    if (props.user) {
+      registerUserInDB();
+    }
+  }, [props.user]);
+
   const flexStyle = useFlexStyle();
 
   return (

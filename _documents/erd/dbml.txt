@@ -1,5 +1,6 @@
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
+// Edit the script here: https://dbdiagram.io/d
 
 Table AdminAction {
   admin_action_id integer [primary key]
