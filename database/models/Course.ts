@@ -79,6 +79,4 @@ Course.init(
 // Associations
 // Ref: https://sequelize.org/docs/v7/category/associations/
 
-// TODO: Add associations for Review and Question
-
 export default Course;

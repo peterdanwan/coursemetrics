@@ -2,9 +2,9 @@
 
 import { NextResponse, NextRequest } from 'next/server';
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
-import { connectDB } from '@/config/database';
+import { connectDB } from '@/database/connectDB';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
-import { Course } from '@/models/Course';
+import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 
 // ===== API ROUTE TO FETCH A COURSE BY CODE =====
