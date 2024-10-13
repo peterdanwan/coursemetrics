@@ -16,10 +16,9 @@ const connectDB = (() => {
 
     try {
       log.info('Initializing database connection...');
-
       await sequelizeInstance.authenticate();
-      log.info('Sequelize connected successfully.');
 
+      log.info('Sequelize connected successfully.');
       // This will create the TABLES based on the MODELS that were created
       await sequelizeInstance.sync({ force: false });
       log.info('Database tables synchronized successfully.');
