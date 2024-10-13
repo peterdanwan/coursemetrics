@@ -17,7 +17,6 @@ export const POST = withApiAuthRequired(async function create_user(
   try {
     // Connect to the database
     await connectDB();
-    console.log('Dfss');
 
     // Get the user session from Auth0
     const { user }: any = await getSession();
