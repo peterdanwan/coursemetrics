@@ -1,3 +1,5 @@
+// database/models/User.ts
+
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';
 import UserRole from './UserRole';

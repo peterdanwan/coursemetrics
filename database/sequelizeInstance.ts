@@ -1,3 +1,5 @@
+// database/sequelizeInstance.ts
+
 import { Sequelize } from 'sequelize';
 import pg from 'pg'; // Ref: https://node-postgres.com
 

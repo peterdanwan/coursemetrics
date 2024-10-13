@@ -1,4 +1,4 @@
-// models/ActionType.ts
+// database/models/ActionType.ts
 
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';

@@ -1,4 +1,4 @@
-// models/Policy.ts
+// database/models/Policy.ts
 
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';

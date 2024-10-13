@@ -1,4 +1,4 @@
-// models/ReviewType.ts
+// database/models/ReviewType.ts
 
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';

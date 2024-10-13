@@ -1,0 +1,1 @@
+// database/seedDB/seedProfessorCourse.ts

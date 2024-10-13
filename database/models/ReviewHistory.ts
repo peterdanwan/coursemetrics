@@ -1,4 +1,4 @@
-// models/ReviewHistory.ts
+// database/models/ReviewHistory.ts
 
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';

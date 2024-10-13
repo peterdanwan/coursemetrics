@@ -1,4 +1,4 @@
-// models/Course.ts
+// database/models/Course.ts
 
 import { DataTypes, Model } from 'sequelize';
 import CourseDetail from './CourseDetail';

@@ -1,4 +1,4 @@
-// models/Question.ts
+// database/models/Question.ts
 
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';

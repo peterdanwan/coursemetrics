@@ -1,4 +1,4 @@
-// database/seedDB/seedUserProfile.ts
+// database/seedDB/seedUserProfiles.ts
 import UserProfile from '../models/UserProfile';
 
 const seedUserProfiles = async () => {

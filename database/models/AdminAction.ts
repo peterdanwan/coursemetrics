@@ -1,4 +1,4 @@
-// models/AdminAction.ts
+// database/models/AdminAction.ts
 
 import { DataTypes, Model } from 'sequelize';
 import ActionType from './ActionType';

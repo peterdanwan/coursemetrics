@@ -1,4 +1,4 @@
-// database/seed/seedUsers.js
+// database/seedDB/seedUsers.ts
 import User from '../models/User';
 
 const seedUsers = async () => {
