@@ -4,6 +4,7 @@ import { DataTypes, Model } from 'sequelize';
 import CourseDetail from './CourseDetail';
 import CourseTerm from './CourseTerm';
 import { sequelizeInstance } from '../sequelizeInstance';
+import CourseDeliveryFormat from './CourseDeliveryFormat';
 
 // Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class Course extends Model {}
@@ -37,7 +38,7 @@ Course.init(
       primaryKey: true,
     },
     course_code: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     course_detail_id: {
@@ -48,8 +49,8 @@ Course.init(
         key: 'course_detail_id',
       },
     },
-    course_term: {
-      type: DataTypes.STRING,
+    course_term_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: CourseTerm,
@@ -57,12 +58,16 @@ Course.init(
       },
     },
     course_section: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
-    course_delivery_format: {
-      type: DataTypes.STRING,
+    course_delivery_format_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: CourseDeliveryFormat,
+        key: 'course_delivery_format_id',
+      },
     },
   },
   {

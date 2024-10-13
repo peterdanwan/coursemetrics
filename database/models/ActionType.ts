@@ -24,7 +24,7 @@ ActionType.init(
       primaryKey: true,
     },
     action_type_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
       unique: true,
     },

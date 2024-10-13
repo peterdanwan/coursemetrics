@@ -10,8 +10,6 @@ const seedUserRoles = async () => {
       role_name: 'student',
     },
   ]);
-
-  await UserRole.create();
 };
 
 export { seedUserRoles };

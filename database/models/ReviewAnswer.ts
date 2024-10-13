@@ -17,7 +17,7 @@ ReviewAnswer.init(
       references: { model: ReviewQuestion, key: 'review_question_id' },
     },
     answer: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
   },
   {

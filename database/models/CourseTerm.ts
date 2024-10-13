@@ -27,7 +27,7 @@ CourseTerm.init(
       primaryKey: true,
     },
     season: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     year: {

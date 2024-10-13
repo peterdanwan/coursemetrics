@@ -14,7 +14,7 @@ ReviewStatus.init(
       primaryKey: true,
     },
     status_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },

@@ -24,7 +24,7 @@ Question.init(
       primaryKey: true,
     },
     question_text: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     review_type_id: {

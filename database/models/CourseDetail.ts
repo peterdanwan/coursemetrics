@@ -24,8 +24,8 @@ class CourseDetail extends Model {}
 CourseDetail.init(
   {
     course_detail_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    course_name: { type: DataTypes.STRING, allowNull: false },
-    course_description: { type: DataTypes.STRING, allowNull: false },
+    course_name: { type: DataTypes.TEXT, allowNull: false },
+    course_description: { type: DataTypes.TEXT, allowNull: false },
   },
   {
     sequelize: sequelizeInstance,

@@ -14,7 +14,7 @@ ReviewType.init(
       primaryKey: true,
     },
     review_type_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },
