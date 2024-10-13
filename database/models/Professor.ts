@@ -1,4 +1,5 @@
 // database/models/Professor.ts
+
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';
 
