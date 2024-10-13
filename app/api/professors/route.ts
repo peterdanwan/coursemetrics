@@ -49,8 +49,6 @@ export const GET = async function get_professors(req: NextRequest): Promise<Next
     // .populate('professorId')
     // .exec();
 
-    console.log(professors.every((professor) => professor instanceof Professor));
-
     console.log(professors);
 
     const totalProfessors: number = await Professor.count();
