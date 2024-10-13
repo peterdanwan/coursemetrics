@@ -61,10 +61,11 @@ AdminAction.init(
         key: 'action_type_id',
       },
     },
-    action_date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    // instead of action_date, can we just use updatedAt?
+    // action_date: {
+    //   type: DataTypes.DATE,
+    //   allowNull: false,
+    // },
   },
   {
     sequelize: sequelizeInstance,
