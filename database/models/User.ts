@@ -39,9 +39,4 @@ User.init(
   }
 );
 
-// Associations
-// Ref: https://sequelize.org/docs/v7/category/associations/
-
-// TODO: Add associations
-
 export default User;

@@ -42,9 +42,4 @@ ReviewPolicy.init(
   }
 );
 
-// Associations
-// Ref: https://sequelize.org/docs/v7/category/associations/
-
-// TODO: add associations
-
 export default ReviewPolicy;

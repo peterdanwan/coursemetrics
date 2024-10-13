@@ -6,6 +6,9 @@ import { connectDB } from '@/database/connectDB';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
 import Course from '@/database/models/Course';
 import { logger } from '@/utils';
+import CourseDetail from '@/database/models/CourseDetail';
+import CourseTerm from '@/database/models/CourseTerm';
+import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
 
 // ===== API ROUTE TO FETCH ALL COURSES =====
 export const GET = withApiAuthRequired(async function get_courses(
@@ -24,30 +27,39 @@ export const GET = withApiAuthRequired(async function get_courses(
 
     // Ref Doc: https://www.shecodes.io/athena/60744-what-is-parseint-in-javascript#
     const pageNumber: number = parseInt(queryParams.page, 10);
-    const limitNumber: number = parseInt(queryParams.limit, 10);
+    const limit: number = parseInt(queryParams.limit, 10);
 
     // Validate pagination parameters
-    if (isNaN(pageNumber) || isNaN(limitNumber) || pageNumber < 1 || limitNumber < 1) {
-      log.error('Invalid pagination parameters', { pageNumber, limitNumber });
+    if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 1 || limit < 1) {
+      log.error('Invalid pagination parameters', { pageNumber, limit });
       return NextResponse.json(createErrorResponse(400, 'Invalid pagination parameters'), {
         status: 400,
       });
     }
 
-    // Calculate the number of documents to skip
-    const skip: number = (pageNumber - 1) * limitNumber;
+    log.info('Fetching courses', { pageNumber, limit });
 
-    log.info('Fetching courses', { pageNumber, limitNumber });
+    const { count: totalCourses, rows: courses } = await Course.findAndCountAll({
+      offset: (pageNumber - 1) * limit,
+      limit,
+      order: [['course_code', 'ASC']],
+      include: [
+        {
+          model: CourseDetail,
+          attributes: ['course_name', 'course_description'],
+        },
+        {
+          model: CourseTerm,
+          attributes: ['season', 'year'],
+        },
+        {
+          model: CourseDeliveryFormat,
+          attributes: ['format', 'description'],
+        },
+      ],
+    });
 
-    // Fetch the courses and count the total number of documents
-    const courses = await Course.find()
-      .skip(skip)
-      .limit(limitNumber)
-      .populate('courseDetailId')
-      .exec();
-
-    const totalCourses: number = await Course.countDocuments();
-    const totalPages: number = Math.ceil(totalCourses / limitNumber);
+    const totalPages = Math.ceil(totalCourses / limit);
 
     log.debug(
       {
@@ -59,11 +71,7 @@ export const GET = withApiAuthRequired(async function get_courses(
       'Courses fetched from DB'
     );
 
-    log.info('Courses fetched successfully', {
-      totalPages,
-      currentPage: pageNumber,
-      totalCourses,
-    });
+    log.info('Courses fetched successfully');
 
     return NextResponse.json(
       createSuccessResponse({
