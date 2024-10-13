@@ -2,7 +2,6 @@
 
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeInstance } from '../sequelizeInstance';
-import Course from './Course';
 
 // Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class CourseDeliveryFormat extends Model {}

@@ -9,9 +9,7 @@ import UserProfile from '@/database/models/UserProfile';
 import { logger } from '@/utils';
 
 // ===== API ROUTE TO CREATE A NEW USER IF THEY DON'T EXIST ALREADY =====
-export const POST = withApiAuthRequired(async function create_user(
-  req: NextRequest
-): Promise<NextResponse> {
+export const POST = async function create_user(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/auth/route.ts' });
 
   try {
@@ -50,6 +48,7 @@ export const POST = withApiAuthRequired(async function create_user(
         user_id: userInstanceJSON.id,
       },
     });
+
     log.info(`User profile ${created ? 'created for new user' : 'already exists'}`, {
       email: userEmail,
     });
@@ -65,4 +64,4 @@ export const POST = withApiAuthRequired(async function create_user(
       { status: 500 }
     );
   }
-});
+};

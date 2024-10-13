@@ -7,22 +7,29 @@ import { seedCourse } from './seedCourses';
 import { seedCourseTerms } from './seedCourseTerms';
 import { seedCourseDetails } from './seedCourseDetails';
 import { seedCourseDeliveryFormats } from './seedCourseDeliveryFormats';
-import { setupAssociations } from '../models';
-// import { seedProfessors } from './seedProfessors';
-// import { seedCourses } from './seedCourses';
+import User from '../models/User';
+
+const dataExists = async () => {
+  try {
+    const user = await User.findOne();
+    return user ? true : false;
+  } catch (error) {
+    return false;
+  }
+};
 
 const seedDB = async () => {
-  // Setup associations before seeding the models
-  setupAssociations();
+  let result = await dataExists();
 
-  // Seed models
-  await seedUserRoles();
-  await seedUsers();
-  await seedUserProfiles();
-  await seedCourseDetails();
-  await seedCourseTerms();
-  await seedCourseDeliveryFormats();
-  await seedCourse();
+  if (!result) {
+    await seedUserRoles();
+    await seedUsers();
+    await seedUserProfiles();
+    await seedCourseDetails();
+    await seedCourseTerms();
+    await seedCourseDeliveryFormats();
+    await seedCourse();
+  }
 };
 
 export { seedDB };
