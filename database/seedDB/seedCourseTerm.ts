@@ -1,1 +1,0 @@
-// database/seedDB/seedCourseTerm.ts

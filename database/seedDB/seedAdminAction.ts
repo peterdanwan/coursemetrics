@@ -1,1 +1,0 @@
-// database/seedDB/seedAdminAction.ts

@@ -1,1 +1,0 @@
-// database/seedDB/seedQuestion.ts

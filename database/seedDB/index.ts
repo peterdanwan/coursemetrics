@@ -1,4 +1,5 @@
 // database/seedDB/index.ts
+
 import { seedUserRoles } from './seedUserRoles';
 import { seedUserProfiles } from './seedUserProfiles';
 import { seedUsers } from './seedUsers';
