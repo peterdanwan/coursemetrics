@@ -1,10 +1,10 @@
-// components/ReviewsTable.tsx
-
-import { Box, Flex, Stack, Text, Button, Icon } from '@chakra-ui/react';
-import { FaCheckCircle, FaTimesCircle, FaExclamationCircle } from 'react-icons/fa';
+import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
+import ReviewsStatusIcon from './ReviewsStatusIcon';
 
 // Define the Review type
 type Review = {
+  id: string;
   category: string;
   course_code: string;
   review_text: string;
@@ -18,6 +18,7 @@ interface ReviewsTableProps {
 }
 
 const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
+  const router = useRouter();
   // Sort reviews by status ('pending' first)
   const sortedReviews = [...reviews].sort((a, b) => {
     if (a.status === 'pending' && b.status !== 'pending') return -1;
@@ -27,18 +28,8 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
     return b.average_rate - a.average_rate;
   });
 
-  // Function to get the correct status icon
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <Icon as={FaCheckCircle} color="green.500" boxSize="8" />;
-      case 'pending':
-        return <Icon as={FaExclamationCircle} color="yellow.500" boxSize="8" />;
-      case 'rejected':
-        return <Icon as={FaTimesCircle} color="red.500" boxSize="8" />;
-      default:
-        return null;
-    }
+  const handleViewDetailsClick = (reviewId: string) => {
+    router.push(`/admin/manage/get-review/${reviewId}`);
   };
 
   return (
@@ -133,14 +124,17 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
+                    onClick={() => handleViewDetailsClick(review.id)}
                   >
                     View Details
                   </Button>
                 </Flex>
 
                 {/* Status Icon */}
-                <Text flex="1" textAlign="center" m={1}>
-                  {getStatusIcon(review.status)}
+                <Text flex="1" textAlign="center" ml={5}>
+                  <ReviewsStatusIcon
+                    status={review.status as 'approved' | 'pending' | 'rejected'}
+                  />
                 </Text>
               </Flex>
             </Box>
