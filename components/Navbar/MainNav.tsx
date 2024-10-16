@@ -21,6 +21,8 @@ import {
   MenuItem,
   Divider,
   Text,
+  Toast,
+  useToast,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 
@@ -36,6 +38,7 @@ export default function MainNav(props: { user: any }) {
   const { isOpen, onToggle } = useDisclosure();
   const [selectedCategory, setSelectedCategory] = useState('Select Category');
   const router = useRouter();
+  const toast = useToast();
 
   const registerUserInDB = async () => {
     try {
@@ -60,22 +63,40 @@ export default function MainNav(props: { user: any }) {
   const flexStyle = useFlexStyle();
   const handleSearch = (searchQuery: string, category: string) => {
     if (searchQuery === '') {
-      console.log('Please enter a search query');
-      return;
-    }
-    if (category == 'Course Reviews') {
-      // go to course page
-      router.push(`/courses/${searchQuery}`);
-      category = 'courses';
-    } else if (category == 'Professor Reviews') {
-      // go to professor page
-      router.push(`/professors/${searchQuery}`);
-      category = 'professors';
+      if (category === 'Select Category') {
+        toast({
+          title: 'Invalid Search',
+          description: 'Please select a category before searching',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      } else if (category == 'Course Reviews') {
+        router.push('/courses');
+      } else if (category == 'Professor Reviews') {
+        router.push('/professors');
+      }
     } else {
-      // general search, based on current implementation, category will show "Select Category", so default to a better value
-      category = 'General';
+      if (category == 'Course Reviews') {
+        // go to course page
+        router.push(`/courses/${searchQuery}`);
+        category = 'courses';
+      } else if (category == 'Professor Reviews') {
+        // go to professor page
+        router.push(`/professors/${searchQuery}`);
+        category = 'professors';
+      } else if (category == 'Select Category') {
+        toast({
+          title: 'Invalid Search',
+          description: 'Please select a category before searching',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
     }
-    console.log('Searching for:', searchQuery, ' in :', category);
   };
 
   return (
@@ -96,12 +117,14 @@ export default function MainNav(props: { user: any }) {
           ml={{ base: -2 }}
           display={{ base: 'flex', md: 'none' }}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-            variant={'ghost'}
-            aria-label={'Toggle Navigation'}
-          />
+          <Link href="/">
+            <IconButton
+              onClick={onToggle}
+              icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+              variant={'ghost'}
+              aria-label={'Toggle Navigation'}
+            />
+          </Link>
         </Flex>
 
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
@@ -443,16 +466,13 @@ const NAV_ITEMS: Array<NavItem> = [
       {
         label: 'Course Reviews',
         subLabel: 'Browse Course Reviews',
-        href: '#',
       },
       {
         label: 'Professor Reviews',
         subLabel: 'Browse Professor Reviews',
-        href: '#',
       },
       {
         label: 'Clear',
-        href: '#',
         isClearOption: true,
       },
     ],
