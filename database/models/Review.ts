@@ -9,11 +9,6 @@ import User from './User';
 
 class Review extends Model {}
 
-/**
- *
- *
- */
-
 Review.init(
   {
     review_id: {
@@ -52,6 +47,18 @@ Review.init(
         model: User,
         key: 'user_id',
       },
+    },
+    rating: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1,
+        max: 5,
+      },
+    },
+    comment: {
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
   },
   {

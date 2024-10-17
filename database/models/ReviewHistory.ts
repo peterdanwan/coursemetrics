@@ -39,7 +39,6 @@ ReviewHistory.init(
         model: User,
         key: 'user_id',
       },
-      field: 'changed_by',
     },
   },
   {

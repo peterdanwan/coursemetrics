@@ -61,18 +61,11 @@ AdminAction.init(
         key: 'action_type_id',
       },
     },
-    // instead of action_date, can we just use updatedAt?
-    // action_date: {
-    //   type: DataTypes.DATE,
-    //   allowNull: false,
-    // },
   },
   {
     sequelize: sequelizeInstance,
     tableName: 'admin_actions',
   }
 );
-
-// TODO: Add associations for Review and Question
 
 export default AdminAction;

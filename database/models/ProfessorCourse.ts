@@ -11,7 +11,11 @@ class ProfessorCourse extends Model {}
 
 ProfessorCourse.init(
   {
-    professor_course_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    professor_course_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     professor_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -31,7 +35,7 @@ ProfessorCourse.init(
   },
   {
     sequelize: sequelizeInstance,
-    tableName: 'professor_course',
+    tableName: 'professor_courses',
   }
 );
 
