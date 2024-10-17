@@ -13,10 +13,10 @@ import ReviewStatus from './ReviewStatus';
 import ProfessorCourse from './ProfessorCourse';
 import ReviewQuestion from './ReviewQuestion';
 import ReviewPolicyViolationLog from './ReviewPolicyViolationLog';
+import Professor from './Professor';
 
 // Ref: https://sequelize.org/docs/v7/category/associations/
 const setupAssociations = () => {
-  // Course-related associations
   Course.belongsTo(CourseDetail, { foreignKey: 'course_detail_id' });
   Course.belongsTo(CourseTerm, { foreignKey: 'course_term_id' });
   Course.belongsTo(CourseDeliveryFormat, { foreignKey: 'course_delivery_format_id' });
@@ -43,6 +43,10 @@ const setupAssociations = () => {
   ReviewPolicyViolationLog.belongsTo(Review, { foreignKey: 'review_id' });
   Policy.hasMany(ReviewPolicyViolationLog, { foreignKey: 'policy_id' });
   ReviewPolicyViolationLog.belongsTo(Policy, { foreignKey: 'policy_id' });
+  Professor.hasMany(ProfessorCourse, { foreignKey: 'professor_id' });
+  ProfessorCourse.belongsTo(Professor, { foreignKey: 'professor_id' });
+  ProfessorCourse.belongsTo(Course, { foreignKey: 'course_id' });
+  Course.hasMany(ProfessorCourse, { foreignKey: 'course_id' });
 };
 
 export { setupAssociations };

@@ -1,5 +1,6 @@
 // database/seedDB/index.ts
 
+import Course from '../models/Course';
 import { seedUserRoles } from './seedUserRoles';
 import { seedUserProfiles } from './seedUserProfiles';
 import { seedUsers } from './seedUsers';
@@ -7,7 +8,6 @@ import { seedCourse } from './seedCourses';
 import { seedCourseTerms } from './seedCourseTerms';
 import { seedCourseDetails } from './seedCourseDetails';
 import { seedCourseDeliveryFormats } from './seedCourseDeliveryFormats';
-import Course from '../models/Course';
 import { seedProfessors } from './seedProfessors';
 import { seedProfessorCourses } from './seedProfessorCourses';
 import { seedReviewTypes } from './seedReviewTypes';
