@@ -23,6 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import CourseReview from '@/components/CourseReview';
+import { FaStar, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
 
 // Dummy data for testing
 const res = {
@@ -214,8 +215,10 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </Box>
               <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
               <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
-                <Flex gap={5}>
-                  <Text>Bookmark</Text>
+                <Flex gap={5} alignItems="center">
+                  <Box color="pink.400">
+                    <FaHeart size={25} />
+                  </Box>
                   <Text>4.5/5</Text>
                 </Flex>
               </Box>
@@ -324,44 +327,92 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 <Text as="b">Difficulty:</Text>
               </GridItem>
               <GridItem>
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
+                <Flex color="yellow.300">
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                </Flex>
               </GridItem>
 
               <GridItem>
                 <Text as="b">Course Load:</Text>
               </GridItem>
               <GridItem>
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
+                <Flex color="yellow.300">
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                </Flex>
               </GridItem>
 
               <GridItem>
                 <Text as="b">Average Grade:</Text>
               </GridItem>
               <GridItem>
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
+                <Flex color="yellow.300">
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                </Flex>
               </GridItem>
 
               <GridItem>
                 <Text as="b">Would Take Again:</Text>
               </GridItem>
               <GridItem>
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
-                <StarIcon />
+                <Flex color="yellow.300">
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                  <Box>
+                    <FaRegStar />
+                  </Box>
+                </Flex>
               </GridItem>
             </Grid>
           </CardBody>
