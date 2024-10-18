@@ -1,4 +1,6 @@
-import { Grid, GridItem, Heading, Box, Text, Button } from '@chakra-ui/react';
+import { useState, useEffect, useRef } from 'react';
+import { Grid, GridItem, Heading, Box, Text, Button, Flex } from '@chakra-ui/react';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 
 interface CourseReview {
   id: number;
@@ -21,16 +23,53 @@ export default function CourseReview({
   expandedReviewId: number;
   toggleExpandedReview: (id: number) => void;
 }) {
+  const [isTruncated, setIsTruncated] = useState(false); // Track whether the text is truncated
+  const textRef = useRef<HTMLParagraphElement>(null); // Reference to the Text element
+
+  // Check if the text is visually truncated (ellipsis rendered)
+  useEffect(() => {
+    if (textRef.current) {
+      // Set to `true` if scrollHeight exceeds the actual visible height (truncated content)
+      const isTextTruncated =
+        textRef.current.scrollHeight > textRef.current.clientHeight ||
+        textRef.current.scrollWidth > textRef.current.clientWidth;
+
+      setIsTruncated(isTextTruncated);
+    }
+  }, []);
   return (
-    <Box key={review.id} p={5}>
-      <Heading as="h3" size="lg" color="blackAlpha.600" pb={5}>
+    <Box key={review.id} p={{ base: '2', lg: '3' }}>
+      <Heading
+        as="h3"
+        fontSize={{ base: '22', sm: '24', md: '26', lg: '30' }}
+        color="blackAlpha.600"
+        pb={5}
+      >
         {review.title}
       </Heading>
-      <Grid templateColumns="repeat(5, 1fr)" gap={2}>
-        <GridItem gridColumn="span 4">
-          <Text noOfLines={expandedReviewId === review.id ? 0 : 3}>{review.content}</Text>
+      <Grid templateColumns="repeat(12, 1fr)" gap={2}>
+        <GridItem gridColumn={{ base: 'span 12', lg: 'span 8' }}>
+          <Flex flexDirection="column" gap={2}>
+            <Text ref={textRef} noOfLines={expandedReviewId === review.id ? 0 : [4, 3]}>
+              {review.content.join(' ')}
+            </Text>
+            {isTruncated && (
+              <Button
+                variant="link"
+                onClick={() => toggleExpandedReview(review.id)}
+                color="teal"
+                alignSelf="end"
+                mr={{ base: '0', lg: '2' }}
+              >
+                {expandedReviewId === review.id ? 'See Less' : 'See More'}
+              </Button>
+            )}
+          </Flex>
         </GridItem>
-        <GridItem textAlign="right">
+        <GridItem
+          textAlign={{ base: 'left', lg: 'right' }}
+          gridColumn={{ base: 'span 12', lg: 'span 4' }}
+        >
           <Box>
             <Text as="b">Would take again:</Text> {review.wouldTakeAgain}
           </Box>
@@ -44,17 +83,18 @@ export default function CourseReview({
             <Text as="b">Grade:</Text> {review.grade}
           </Box>
         </GridItem>
-        <GridItem gridColumn={4} justifySelf="end">
-          <Button variant="link" onClick={() => toggleExpandedReview(review.id)} color="teal">
-            {expandedReviewId === review.id ? 'See Less' : 'See More'}
-          </Button>
-        </GridItem>
-        <GridItem gridColumn="span 4">
+        <GridItem gridColumn={{ base: 'span 12', lg: 'span 8' }}>
           <Box>
             <Text as="b">Professor:</Text> David Humphrey
           </Box>
         </GridItem>
-        <GridItem textAlign="right">{review.bookmark ? 'Bookmarked' : 'Bookmark'}</GridItem>
+        <GridItem
+          justifySelf={{ base: 'start', lg: 'end' }}
+          gridColumn={{ base: 'span 12', lg: 'span 4' }}
+          color="teal"
+        >
+          {review.bookmark ? <FaBookmark size={25} /> : <FaRegBookmark size={25} />}
+        </GridItem>
       </Grid>
     </Box>
   );
