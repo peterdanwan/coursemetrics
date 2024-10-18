@@ -50,7 +50,7 @@ export default function CourseReview({
       <Grid templateColumns="repeat(12, 1fr)" gap={2}>
         <GridItem gridColumn={{ base: 'span 12', lg: 'span 8' }}>
           <Flex flexDirection="column" gap={2}>
-            <Text noOfLines={expandedReviewId === review.id ? 0 : [4, 3]}>
+            <Text ref={textRef} noOfLines={expandedReviewId === review.id ? 0 : [4, 3]}>
               {review.content.join(' ')}
             </Text>
             {isTruncated && (
