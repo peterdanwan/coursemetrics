@@ -1,7 +1,9 @@
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 
 // Define the Professor type
 type Professor = {
+  id: number;
   first_name: string;
   last_name: string;
 };
@@ -13,6 +15,12 @@ interface ProfessorsTableProps {
 }
 
 const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove }) => {
+  const router = useRouter();
+
+  const handleEditClick = (professorId: number) => {
+    router.push(`/admin/manage/edit-professor/${professorId}`);
+  };
+  
   // More logic would need to be added here to remove the professor from the database
   return (
     <>
@@ -77,8 +85,9 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove 
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
+                    onClick={() => handleEditClick(professor.id)}
                   >
-                    View Details
+                    Edit
                   </Button>
                   <Button
                     colorScheme="teal"
