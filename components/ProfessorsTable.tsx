@@ -1,6 +1,5 @@
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import { use } from 'react';
 
 // Define the Professor type
 type Professor = {
