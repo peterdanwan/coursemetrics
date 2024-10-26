@@ -13,7 +13,7 @@ interface ProfessorsTableProps {
 }
 
 const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove }) => {
-  // More logic would need to be added here to remove the course from the database
+  // More logic would need to be added here to remove the professor from the database
   return (
     <>
       {/* Table Header */}
