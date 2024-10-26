@@ -9,14 +9,16 @@ import {
   Button,
   Flex,
   Divider,
+  Link,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import CoursesTable from '@/components/CoursesTable'; // Import the new component
-import ProfessorsTable from '@/components/ProfessorsTable'; // Import the new component
-import ReviewsTable from '@/components/ReviewsTable'; // Import the new component
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import CoursesTable from '@/components/CoursesTable';
+import ProfessorsTable from '@/components/ProfessorsTable';
+import ReviewsTable from '@/components/ReviewsTable';
 
 // ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const courses = [
+const initialCourses = [
   {
     name: 'Course 1',
     section: 'A',
@@ -167,9 +169,19 @@ const reviews = [
 // ******************************************************************************************************************************************************************
 
 export default function Manage() {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+  const searchParams = useSearchParams();
+  const initialOption = searchParams.get('option') || '';
+  const [selectedOption, setSelectedOption] = useState<string>(initialOption);
   const [searchValue, setSearchValue] = useState<string>('');
   const [professors, setProfessors] = useState(initialProfessors);
+  const [courses, setCourses] = useState(initialCourses);
+
+  useEffect(() => {
+    // If the initial option is empty, you can set it to courses
+    if (!initialOption) {
+      setSelectedOption(initialOption);
+    }
+  }, [initialOption]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -182,6 +194,10 @@ export default function Manage() {
   const removeProfessor = (index: number) => {
     // More logic would need to be added here to remove the course from the database
     setProfessors((prevProfessors) => prevProfessors.filter((_, i) => i !== index));
+        
+  const removeCourse = (index: number) => {
+    // More logic would need to be added here to remove the course from the database
+    setCourses((prevCourses) => prevCourses.filter((_, i) => i !== index));
   };
 
   // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
@@ -258,16 +274,30 @@ export default function Manage() {
             />
           </FormControl>
         </Stack>
-        <Button colorScheme="teal" color="white" px={6}>
-          Add
-        </Button>
+        {/* Conditionally render Add button only for 'courses' and 'professors' */}
+        {selectedOption === 'courses' && (
+          <Link href="/admin/manage/add-course">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
+        {selectedOption === 'professors' && (
+          <Link href="/admin/manage/add-professor">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
       </Flex>
 
       <Divider mb={4} />
       {/* Conditionally render appropriate category when it is selected */}
-      {selectedOption === 'courses' && <CoursesTable courses={filteredCourses} />}
       {selectedOption === 'professors' && (
         <ProfessorsTable professors={filteredProfessors} onRemove={removeProfessor} />
+      )}
+      {selectedOption === 'courses' && (
+        <CoursesTable courses={filteredCourses} onRemove={removeCourse} />
       )}
       {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
     </Box>

@@ -1,3 +1,5 @@
+// components/ReviewsTable.tsx
+
 import { Box, Flex, Stack, Text, Button, Icon } from '@chakra-ui/react';
 import { FaCheckCircle, FaTimesCircle, FaExclamationCircle } from 'react-icons/fa';
 
@@ -133,9 +135,6 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
                     mb={{ base: 1, md: 0 }}
                   >
                     View Details
-                  </Button>
-                  <Button colorScheme="teal" color="white" flex="1" ml={{ base: 0, md: 1 }}>
-                    Remove
                   </Button>
                 </Flex>
 
