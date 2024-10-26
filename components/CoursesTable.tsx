@@ -12,9 +12,12 @@ type Course = {
 // Props interface
 interface CoursesTableProps {
   courses: Course[];
+  onRemove: (index: number) => void;
 }
 
-const CoursesTable: React.FC<CoursesTableProps> = ({ courses }) => {
+const CoursesTable: React.FC<CoursesTableProps> = ({ courses, onRemove }) => {
+  // More logic would need to be added here to remove the course from the database
+
   return (
     <>
       {/* Table Header */}
@@ -98,7 +101,13 @@ const CoursesTable: React.FC<CoursesTableProps> = ({ courses }) => {
                   >
                     Edit
                   </Button>
-                  <Button colorScheme="teal" color="white" flex="1" ml={{ base: 0, md: 1 }}>
+                  <Button
+                    colorScheme="teal"
+                    color="white"
+                    flex="1"
+                    ml={{ base: 0, md: 1 }}
+                    onClick={() => onRemove(index)}
+                  >
                     Remove
                   </Button>
                 </Flex>
