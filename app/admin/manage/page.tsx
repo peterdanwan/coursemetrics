@@ -9,8 +9,10 @@ import {
   Button,
   Flex,
   Divider,
+  Link,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import CoursesTable from '@/components/CoursesTable';
 import ProfessorsTable from '@/components/ProfessorsTable';
 import ReviewsTable from '@/components/ReviewsTable';
@@ -167,9 +169,18 @@ const reviews = [
 // ******************************************************************************************************************************************************************
 
 export default function Manage() {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+  const searchParams = useSearchParams();
+  const initialOption = searchParams.get('option') || '';
+  const [selectedOption, setSelectedOption] = useState<string>(initialOption);
   const [searchValue, setSearchValue] = useState<string>('');
   const [courses, setCourses] = useState(initialCourses);
+
+  useEffect(() => {
+    // If the initial option is empty, you can set it to courses
+    if (!initialOption) {
+      setSelectedOption(initialOption);
+    }
+  }, [initialOption]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -258,9 +269,21 @@ export default function Manage() {
             />
           </FormControl>
         </Stack>
-        <Button colorScheme="teal" color="white" px={6}>
-          Add
-        </Button>
+        {/* Conditionally render Add button only for 'courses' and 'professors' */}
+        {selectedOption === 'courses' && (
+          <Link href="/admin/manage/add-course">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
+        {selectedOption === 'professors' && (
+          <Link href="/admin/manage/add-professor">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
       </Flex>
 
       <Divider mb={4} />

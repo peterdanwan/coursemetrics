@@ -1,9 +1,9 @@
 // app/api/professors/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
-import { connectDB } from '@/config/database';
+import { connectDB } from '@/database/connectDB';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
-import Professor from '@/models/Professor';
+import Professor from '@/database/models/Professor';
 import { logger } from '@/utils';
 
 // ===== API ROUTE TO FETCH ALL PROFESSORS (available to all users) =====
@@ -44,12 +44,6 @@ export const GET = async function get_professors(req: NextRequest): Promise<Next
 
     // Fetch the professors and count the total number of records
     const professors = await Professor.findAll({ limit: limitNumber, offset: offsetNumber });
-    // .skip(skip)
-    // .limit(limitNumber)
-    // .populate('professorId')
-    // .exec();
-
-    console.log(professors.every((professor) => professor instanceof Professor));
 
     console.log(professors);
 

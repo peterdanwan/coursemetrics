@@ -8,6 +8,8 @@ import MainNav from '@/components/Navbar/MainNav';
 import Footer from '@/components/Footer/MainFooter';
 import { Container } from '@chakra-ui/react';
 import { getSession } from '@auth0/nextjs-auth0';
+import { seedDB } from '@/database/seedDB';
+import { connectDB } from '@/database/connectDB';
 
 export const metadata: Metadata = {
   title: 'CourseMetrics',
