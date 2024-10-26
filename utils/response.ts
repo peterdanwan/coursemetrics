@@ -1,6 +1,17 @@
 // utils/response.ts
 
-import { type ISuccessResponse, type IErrorResponse } from '@/interfaces';
+interface ISuccessResponse<T = any> {
+  status: 'ok';
+  data: T;
+}
+
+interface IErrorResponse {
+  status: 'error';
+  error: {
+    code: number;
+    message: string;
+  };
+}
 
 /**
  * A successful response looks like:

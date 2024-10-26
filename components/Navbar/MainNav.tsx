@@ -23,6 +23,8 @@ import {
   MenuDivider,
   Divider,
   Text,
+  Toast,
+  useToast,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
@@ -30,24 +32,20 @@ import { FiLogIn, FiLogOut } from 'react-icons/fi';
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useFlexStyle } from '@/styles/styles';
+import { useRouter } from 'next/navigation';
 
 export default function MainNav(props: { user: any }) {
   const { isOpen, onToggle } = useDisclosure();
-
-  // If the user is not stored in the database, store all details
-  useEffect(() => {
-    if (props.user) {
-      registerUserInDB();
-    }
-  }, [props.user]);
+  const [selectedCategory, setSelectedCategory] = useState('Select Category');
+  const router = useRouter();
+  const toast = useToast();
 
   const registerUserInDB = async () => {
     try {
-      await fetch('/api/auth', {
+      await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,8 +56,51 @@ export default function MainNav(props: { user: any }) {
     }
   };
 
-  const pathname = usePathname();
+  // If the user is not stored in the database, store all details
+  useEffect(() => {
+    if (props.user) {
+      registerUserInDB();
+    }
+  }, [props.user]);
+
   const flexStyle = useFlexStyle();
+  const handleSearch = (searchQuery: string, category: string) => {
+    if (searchQuery === '') {
+      if (category === 'Select Category') {
+        toast({
+          title: 'Invalid Search',
+          description: 'Please select a category before searching',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      } else if (category == 'Course Reviews') {
+        router.push('/courses');
+      } else if (category == 'Professor Reviews') {
+        router.push('/professors');
+      }
+    } else {
+      if (category == 'Course Reviews') {
+        // go to course page
+        router.push(`/courses/${searchQuery}`);
+        category = 'courses';
+      } else if (category == 'Professor Reviews') {
+        // go to professor page
+        router.push(`/professors/${searchQuery}`);
+        category = 'professors';
+      } else if (category == 'Select Category') {
+        toast({
+          title: 'Invalid Search',
+          description: 'Please select a category before searching',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    }
+  };
 
   return (
     <Box className="sticky z-50 top-0">
@@ -79,23 +120,35 @@ export default function MainNav(props: { user: any }) {
           ml={{ base: -2 }}
           display={{ base: 'flex', md: 'none' }}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
-            variant={'ghost'}
-            aria-label={'Toggle Navigation'}
-          />
+          <Link href="/">
+            <IconButton
+              onClick={onToggle}
+              icon={isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />}
+              variant={'ghost'}
+              aria-label={'Toggle Navigation'}
+            />
+          </Link>
         </Flex>
 
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Image src={logo} alt="Course Metrics Logo" width={50} height={50} />
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav position="left" />
+            <DesktopNav
+              position="left"
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              handleSearch={handleSearch}
+            />
           </Flex>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml="auto">
-            <DesktopNav position="right" />
+            <DesktopNav
+              position="right"
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              handleSearch={handleSearch}
+            />
           </Flex>
         </Flex>
 
@@ -189,21 +242,27 @@ export default function MainNav(props: { user: any }) {
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
+        <MobileNav
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          handleSearch={handleSearch}
+        />
       </Collapse>
     </Box>
   );
 }
 
-const handleSearch = (searchQuery: string) => {
-  if (searchQuery === '') {
-    console.log('Please enter a search query');
-    return;
-  }
-  console.log('Searching for:', searchQuery);
-};
-
-const DesktopNav = ({ position }: { position: string }) => {
+const DesktopNav = ({
+  position,
+  selectedCategory,
+  setSelectedCategory,
+  handleSearch,
+}: {
+  position: string;
+  selectedCategory: string;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
+  handleSearch: (searchQuery: string, category: string) => void;
+}) => {
   const pathname = usePathname();
   console.log('Pathname:', pathname);
   const linkColor = useColorModeValue('gray.600', 'gray.200');
@@ -222,6 +281,7 @@ const DesktopNav = ({ position }: { position: string }) => {
           return navItem.isRightAligned;
         }
       }).map((navItem) => {
+        const label = navItem.label === 'Select Category' ? selectedCategory : navItem.label;
         if (navItem.isSearch) {
           return (
             <Flex key={navItem.label} align="center">
@@ -231,7 +291,7 @@ const DesktopNav = ({ position }: { position: string }) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 w={{ base: 40, md: 32, lg: 72 }}
               />
-              <Button onClick={() => handleSearch(searchQuery)} ml={2}>
+              <Button onClick={() => handleSearch(searchQuery, selectedCategory)} ml={2}>
                 Search
               </Button>
             </Flex>
@@ -254,7 +314,7 @@ const DesktopNav = ({ position }: { position: string }) => {
                       borderRadius: linkBorderRadius,
                     }}
                   >
-                    {navItem.label}
+                    {label}
                   </Text>
                 </Link>
               </PopoverTrigger>
@@ -270,7 +330,12 @@ const DesktopNav = ({ position }: { position: string }) => {
                 >
                   <Stack>
                     {navItem.children.map((child) => (
-                      <DesktopSubNav key={child.label} {...child} />
+                      <DesktopSubNav
+                        key={child.label}
+                        {...child}
+                        setSelectedCategory={setSelectedCategory}
+                        isClearOption={child.isClearOption}
+                      />
                     ))}
                   </Stack>
                 </PopoverContent>
@@ -283,16 +348,32 @@ const DesktopNav = ({ position }: { position: string }) => {
   );
 };
 
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
+const DesktopSubNav = ({
+  label,
+  href,
+  subLabel,
+  setSelectedCategory,
+  isClearOption,
+}: NavItem & { setSelectedCategory?: React.Dispatch<React.SetStateAction<string>> }) => {
   return (
     <Box
       as="a"
       href={href}
+      onClick={() => {
+        if (setSelectedCategory) {
+          if (isClearOption) {
+            setSelectedCategory('Select Category');
+          } else {
+            setSelectedCategory(label);
+          }
+        }
+      }}
       role={'group'}
       display={'block'}
       p={2}
       rounded={'md'}
       _hover={{ bg: useColorModeValue('pink.50', 'gray.900') }}
+      color={isClearOption ? 'red.500' : 'inherit'}
     >
       <Stack direction={'row'} align={'center'}>
         <Box>
@@ -317,14 +398,27 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   );
 };
 
-const MobileNav = () => {
+const MobileNav = ({
+  selectedCategory,
+  setSelectedCategory,
+  handleSearch,
+}: {
+  selectedCategory: string;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
+  handleSearch: (searchQuery: string, category: string) => void;
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
       {NAV_ITEMS.map((navItem, index) => (
         <React.Fragment key={navItem.label}>
-          <MobileNavItem {...navItem} />
+          <MobileNavItem
+            {...navItem}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            isClearOption={navItem.isClearOption}
+          />
           {/* Insert search bar after "Select Category" */}
           {index === 0 && (
             <Flex align="center" mt={2} mb={4}>
@@ -333,8 +427,9 @@ const MobileNav = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 width="full"
+                color={'black'}
               />
-              <Button onClick={() => handleSearch(searchQuery)} ml={2}>
+              <Button onClick={() => handleSearch(searchQuery, selectedCategory)} ml={2}>
                 Search
               </Button>
             </Flex>
@@ -345,7 +440,17 @@ const MobileNav = () => {
   );
 };
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
+const MobileNavItem = ({
+  label,
+  children,
+  href,
+  selectedCategory,
+  setSelectedCategory,
+  isClearOption,
+}: NavItem & {
+  selectedCategory: string;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -361,7 +466,7 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         }}
       >
         <Text fontWeight={600} color={useColorModeValue('gray.600', 'gray.200')}>
-          {label}
+          {label === 'Select Category' ? selectedCategory : label}
         </Text>
         {children && (
           <Icon
@@ -385,8 +490,23 @@ const MobileNavItem = ({ label, children, href }: NavItem) => {
         >
           {children &&
             children.map((child) => (
-              <Box as="a" key={child.label} py={2} href={child.href}>
-                {child.label}
+              <Box
+                as="a"
+                key={child.label}
+                py={2}
+                href={child.href}
+                onClick={() => {
+                  if (child.isClearOption) {
+                    setSelectedCategory('Select Category');
+                  } else {
+                    setSelectedCategory(child.label);
+                  }
+                }}
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text color={child.isClearOption ? 'red.500' : 'gray.600'} fontWeight={500}>
+                  {child.label}
+                </Text>
               </Box>
             ))}
         </Stack>
@@ -401,7 +521,8 @@ interface NavItem {
   children?: Array<NavItem>;
   href?: string;
   isSearch?: boolean;
-  isRightAligned?: boolean; // Add this flag to identify right aligned items
+  isRightAligned?: boolean;
+  isClearOption?: boolean;
 }
 
 const NAV_ITEMS: Array<NavItem> = [
@@ -411,12 +532,14 @@ const NAV_ITEMS: Array<NavItem> = [
       {
         label: 'Course Reviews',
         subLabel: 'Browse Course Reviews',
-        href: '#',
       },
       {
         label: 'Professor Reviews',
         subLabel: 'Browse Professor Reviews',
-        href: '#',
+      },
+      {
+        label: 'Clear',
+        isClearOption: true,
       },
     ],
   },

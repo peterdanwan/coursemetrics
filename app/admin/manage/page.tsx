@@ -9,6 +9,7 @@ import {
   Button,
   Flex,
   Divider,
+  Link,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -262,9 +263,21 @@ export default function Manage() {
             />
           </FormControl>
         </Stack>
-        <Button colorScheme="teal" color="white" px={6}>
-          Add
-        </Button>
+        {/* Conditionally render Add button only for 'courses' and 'professors' */}
+        {selectedOption === 'courses' && (
+          <Link href="/admin/manage/add-course">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
+        {selectedOption === 'professors' && (
+          <Link href="/admin/manage/add-professor">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
       </Flex>
 
       <Divider mb={4} />
