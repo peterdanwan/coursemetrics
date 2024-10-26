@@ -9,14 +9,16 @@ import {
   Button,
   Flex,
   Divider,
+  Link,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import CoursesTable from '@/components/CoursesTable'; // Import the new component
-import ProfessorsTable from '@/components/ProfessorsTable'; // Import the new component
-import ReviewsTable from '@/components/ReviewsTable'; // Import the new component
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import CoursesTable from '@/components/CoursesTable';
+import ProfessorsTable from '@/components/ProfessorsTable';
+import ReviewsTable from '@/components/ReviewsTable';
 
 // ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const courses = [
+const initialCourses = [
   {
     name: 'Course 1',
     section: 'A',
@@ -63,7 +65,7 @@ const courses = [
   },
 ];
 
-const professors = [
+const initialProfessors = [
   {
     id: 1,
     first_name: 'John',
@@ -177,8 +179,19 @@ const reviews = [
 // ******************************************************************************************************************************************************************
 
 export default function Manage() {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+  const searchParams = useSearchParams();
+  const initialOption = searchParams.get('option') || '';
+  const [selectedOption, setSelectedOption] = useState<string>(initialOption);
   const [searchValue, setSearchValue] = useState<string>('');
+  const [professors, setProfessors] = useState(initialProfessors);
+  const [courses, setCourses] = useState(initialCourses);
+
+  useEffect(() => {
+    // If the initial option is empty, you can set it to courses
+    if (!initialOption) {
+      setSelectedOption(initialOption);
+    }
+  }, [initialOption]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
@@ -188,90 +201,116 @@ export default function Manage() {
     setSearchValue(event.target.value);
   };
 
-  // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
+  const removeProfessor = (index: number) => {
+    // More logic would need to be added here to remove the course from the database
+    setProfessors((prevProfessors) => prevProfessors.filter((_, i) => i !== index));
 
-  // Function to filter courses based on search value
-  const filteredCourses = courses.filter(
-    (course) =>
-      course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
-      course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchValue.toLowerCase())
-  );
+    const removeCourse = (index: number) => {
+      // More logic would need to be added here to remove the course from the database
+      setCourses((prevCourses) => prevCourses.filter((_, i) => i !== index));
+    };
 
-  const filteredProfessors = professors.filter((professor) => {
-    const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
-    return (
-      professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      fullName.includes(searchValue.toLowerCase())
+    // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
+
+    // Function to filter courses based on search value
+    const filteredCourses = courses.filter(
+      (course) =>
+        course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
+        course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchValue.toLowerCase())
     );
-  });
 
-  // Function to filter reviews based on search value
-  const filteredReviews = reviews.filter((review) => {
-    const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
+    const filteredProfessors = professors.filter((professor) => {
+      const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
+      return (
+        professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        fullName.includes(searchValue.toLowerCase())
+      );
+    });
+
+    // Function to filter reviews based on search value
+    const filteredReviews = reviews.filter((review) => {
+      const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
+      return (
+        review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
+        review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
+        review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
+        review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
+        normalizedRate.includes(searchValue)
+      );
+    });
+
+    // ******************************************************************************************************************************************************************
+
     return (
-      review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
-      normalizedRate.includes(searchValue)
+      <Box p={4}>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Stack direction="row" spacing={4} flex="1" maxW="50%">
+            <FormControl>
+              <FormLabel htmlFor="options" srOnly>
+                Select an option
+              </FormLabel>
+              <Select
+                id="options"
+                placeholder="Select option"
+                value={selectedOption}
+                onChange={handleSelectChange}
+                sx={{
+                  color: 'white',
+                  '& option': {
+                    color: 'black',
+                  },
+                }}
+              >
+                <option value="courses">Courses</option>
+                <option value="professors">Professors</option>
+                <option value="reviews">Reviews</option>
+              </Select>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor="search" srOnly>
+                Search
+              </FormLabel>
+              <Input
+                id="search"
+                placeholder="Search"
+                size="md"
+                type="search"
+                value={searchValue}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+          </Stack>
+          {/* Conditionally render Add button only for 'courses' and 'professors' */}
+          {selectedOption === 'courses' && (
+            <Link href="/admin/manage/add-course">
+              <Button as="a" colorScheme="teal" color="white" px={6}>
+                Add
+              </Button>
+            </Link>
+          )}
+          {selectedOption === 'professors' && (
+            <Link href="/admin/manage/add-professor">
+              <Button as="a" colorScheme="teal" color="white" px={6}>
+                Add
+              </Button>
+            </Link>
+          )}
+        </Flex>
+
+        <Divider mb={4} />
+        {/* Conditionally render appropriate category when it is selected */}
+        {selectedOption === 'professors' && (
+          <ProfessorsTable professors={filteredProfessors} onRemove={removeProfessor} />
+        )}
+        {selectedOption === 'courses' && (
+          <CoursesTable courses={filteredCourses} onRemove={removeCourse} />
+        )}
+        {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
+      </Box>
     );
-  });
-
-  // ******************************************************************************************************************************************************************
-
-  return (
-    <Box p={4}>
-      <Flex justify="space-between" align="center" mb={4}>
-        <Stack direction="row" spacing={4} flex="1" maxW="50%">
-          <FormControl>
-            <FormLabel htmlFor="options" srOnly>
-              Select an option
-            </FormLabel>
-            <Select
-              id="options"
-              placeholder="Select option"
-              value={selectedOption}
-              onChange={handleSelectChange}
-              sx={{
-                color: 'white',
-                '& option': {
-                  color: 'black',
-                },
-              }}
-            >
-              <option value="courses">Courses</option>
-              <option value="professors">Professors</option>
-              <option value="reviews">Reviews</option>
-            </Select>
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="search" srOnly>
-              Search
-            </FormLabel>
-            <Input
-              id="search"
-              placeholder="Search"
-              size="md"
-              type="search"
-              value={searchValue}
-              onChange={handleInputChange}
-            />
-          </FormControl>
-        </Stack>
-        <Button colorScheme="teal" color="white" px={6}>
-          Add
-        </Button>
-      </Flex>
-
-      <Divider mb={4} />
-      {/* Conditionally render appropriate category when it is selected */}
-      {selectedOption === 'courses' && <CoursesTable courses={filteredCourses} />}
-      {selectedOption === 'professors' && <ProfessorsTable professors={filteredProfessors} />}
-      {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
-    </Box>
-  );
+  };
 }

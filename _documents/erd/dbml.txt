@@ -1,0 +1,146 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+// Edit the script here: https://dbdiagram.io/d
+
+Table AdminAction {
+  admin_action_id integer [primary key]
+  review_id integer
+  admin_id integer
+  action_type_id integer
+  action_date timestamp
+}
+
+Table ActionType {
+  action_type_id integer [primary key]
+  action_type_name varchar [unique]
+}
+
+Table Course {
+  course_id integer [primary key]
+  course_code varchar
+  course_detail_id integer
+  course_term_id varchar
+  course_section varchar
+  course_delivery_format varchar
+}
+
+Table CourseTerm {
+  course_term_id integer [primary key]
+  course_season varchar
+  course_year integer
+}
+
+Table CourseDetail {
+  course_detail_id integer [primary key]
+  course_name varchar
+  course_description varchar
+}
+
+Table Policy {
+  policy_id integer [primary key]
+  policy_name varchar
+  policy_description varchar
+}
+
+Table Professor {
+  professor_id integer [primary key]
+  first_name varchar
+  last_name varchar
+}
+
+Table ProfessorCourse {
+  professor_course_id integer [primary key]
+  professor_id integer
+  course_id integer
+}
+
+Table Question {
+  question_id integer [primary key]
+  question_text varchar
+  review_type_id integer
+}
+
+Table Review {
+  review_id integer [primary key]
+  review_type_id integer
+  review_status_id integer
+  professor_course_id integer
+  user_id integer
+}
+
+Table ReviewAnswer {
+  review_answer_id integer [primary key]
+  review_question_id integer
+  answer varchar
+}
+
+Table ReviewHistory {
+  review_history_id integer [primary key]
+  review_id integer
+  review_status_id integer
+  changed_by integer
+}
+
+Table ReviewPolicy {
+  review_policy integer [primary key]
+  review_id integer
+  policy_id integer
+  policy_violated boolean
+}
+
+Table ReviewQuestion {
+  review_question_id integer [primary key]
+  review_id integer
+  question_id integer
+}
+
+Table ReviewStatus {
+  review_status_id integer [primary key]
+  status_name varchar
+}
+
+Table ReviewType {
+  review_type_id integer [primary key]
+  review_type_name varchar
+}
+
+Table User {
+  user_id integer [primary key]
+  full_name varchar
+  email varchar [unique]
+  role_id integer
+}
+
+Table UserRole {
+  role_id integer [primary key]
+  role_name varchar
+}
+
+Table UserProfile {
+  profile_id integer [primary key]
+  user_id integer
+  bio text
+}
+
+Ref: AdminAction.admin_id > User.user_id
+Ref: AdminAction.action_type_id > ActionType.action_type_id
+Ref: AdminAction.review_id > Review.review_id
+Ref: Course.course_detail_id > CourseDetail.course_detail_id
+Ref: ProfessorCourse.course_id > Course.course_id
+Ref: ProfessorCourse.professor_id > Professor.professor_id
+Ref: Question.review_type_id > ReviewType.review_type_id
+Ref: Review.professor_course_id > ProfessorCourse.professor_course_id
+Ref: Review.review_status_id > ReviewStatus.review_status_id
+Ref: Review.review_type_id > ReviewType.review_type_id
+Ref: Review.user_id > User.user_id
+Ref: ReviewAnswer.review_question_id > ReviewQuestion.review_question_id
+Ref: ReviewHistory.changed_by > User.user_id
+Ref: ReviewHistory.review_id > Review.review_id
+Ref: ReviewHistory.review_status_id > ReviewStatus.review_status_id
+Ref: ReviewPolicy.policy_id > Policy.policy_id
+Ref: ReviewPolicy.review_id > Review.review_id
+Ref: ReviewQuestion.question_id > Question.question_id
+Ref: ReviewQuestion.review_id > Review.review_id
+Ref: User.role_id > UserRole.role_id
+Ref: UserProfile.user_id - User.user_id
+Ref: Course.course_term_id > CourseTerm.course_term_id
