@@ -11,8 +11,8 @@ import {
   Divider,
   Link,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import CoursesTable from '@/components/CoursesTable'; // Import the new component
 import ProfessorsTable from '@/components/ProfessorsTable'; // Import the new component
 import ReviewsTable from '@/components/ReviewsTable'; // Import the new component
@@ -169,8 +169,17 @@ const reviews = [
 // ******************************************************************************************************************************************************************
 
 export default function Manage() {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+  const searchParams = useSearchParams();
+  const initialOption = searchParams.get('option') || '';
+  const [selectedOption, setSelectedOption] = useState<string>(initialOption);
   const [searchValue, setSearchValue] = useState<string>('');
+
+  useEffect(() => {
+    // If the initial option is empty, you can set it to courses
+    if (!initialOption) {
+      setSelectedOption(initialOption);
+    }
+  }, [initialOption]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);

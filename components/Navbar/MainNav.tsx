@@ -19,12 +19,15 @@ import {
   Avatar,
   MenuList,
   MenuItem,
+  MenuGroup,
+  MenuDivider,
   Divider,
   Text,
   Toast,
   useToast,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
+import { FiLogIn, FiLogOut } from 'react-icons/fi';
 
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
@@ -162,12 +165,75 @@ export default function MainNav(props: { user: any }) {
             />
             <MenuList>
               {props.user ? (
-                <MenuItem as="a" href="/api/auth/logout">
-                  Sign out
-                </MenuItem>
+                <>
+                  <MenuGroup sx={{ textAlign: 'center' }} title={`Hello ${props.user.name}!`}>
+                    <MenuItem as="a" href="/profile">
+                      Profile
+                    </MenuItem>
+                    {/* Add the logic of if the user is an admin here: */}
+                    <MenuItem>
+                      <Popover trigger="click" placement="right-start" closeOnBlur>
+                        {({ isOpen }) => (
+                          <>
+                            <PopoverTrigger>
+                              <Box
+                                as="div"
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                width="100%"
+                                cursor="pointer"
+                                bg={isOpen ? 'gray.100' : 'transparent'}
+                                _hover={{ bg: 'gray.100' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <Text fontWeight={isOpen ? 'bold' : 'normal'}>Manage</Text>
+                                <ChevronRightIcon />
+                              </Box>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <Stack spacing={0}>
+                                {' '}
+                                {/* Ensure no spacing between items */}
+                                <MenuItem
+                                  as="a"
+                                  href="/admin/manage?option=courses"
+                                  _hover={{ bg: 'gray.100' }}
+                                >
+                                  Course Management
+                                </MenuItem>
+                                <MenuItem
+                                  as="a"
+                                  href="/admin/manage?option=professors"
+                                  _hover={{ bg: 'gray.100' }}
+                                >
+                                  Professor Management
+                                </MenuItem>
+                                <MenuItem
+                                  as="a"
+                                  href="/admin/manage?option=reviews"
+                                  _hover={{ bg: 'gray.100' }}
+                                >
+                                  Review Management
+                                </MenuItem>
+                              </Stack>
+                            </PopoverContent>
+                          </>
+                        )}
+                      </Popover>
+                    </MenuItem>
+                    {/* End of Admin Logic */}
+                  </MenuGroup>
+                  <MenuDivider />
+                  <MenuItem as="a" href="/api/auth/logout">
+                    <Icon as={FiLogOut} mr={2} /> Sign out
+                  </MenuItem>
+                </>
               ) : (
                 <MenuItem as="a" href="/api/auth/login">
-                  Sign In
+                  <Icon as={FiLogIn} mr={2} /> Sign In
                 </MenuItem>
               )}
             </MenuList>
