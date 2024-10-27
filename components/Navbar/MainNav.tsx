@@ -275,6 +275,9 @@ export default function MainNav(props: { user: any }) {
                       Bookmark
                     </MenuItem>
                     {/* End of ELSE Logic */}
+                    <MenuItem as="a" href="/user/sap">
+                      Settings & Privacy
+                    </MenuItem>
                   </MenuGroup>
                   <MenuDivider />
                   <MenuItem as="a" href="/api/auth/logout">
