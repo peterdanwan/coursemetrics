@@ -20,7 +20,7 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove 
   const handleEditClick = (professorId: number) => {
     router.push(`/admin/manage/edit-professor/${professorId}`);
   };
-  
+
   // More logic would need to be added here to remove the professor from the database
   return (
     <>
