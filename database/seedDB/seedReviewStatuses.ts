@@ -1,3 +1,4 @@
+// database/seedDB/seedReviewStatuses.ts
 import ReviewStatus from '../models/ReviewStatus';
 
 const seedReviewStatuses = async () => {
