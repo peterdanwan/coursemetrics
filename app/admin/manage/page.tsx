@@ -218,113 +218,113 @@ export default function Manage() {
   const removeProfessor = (index: number) => {
     // More logic would need to be added here to remove the course from the database
     setProfessors((prevProfessors) => prevProfessors.filter((_, i) => i !== index));
-
-    const removeCourse = (index: number) => {
-      // More logic would need to be added here to remove the course from the database
-      setCourses((prevCourses) => prevCourses.filter((_, i) => i !== index));
-    };
-
-    // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
-
-    // Function to filter courses based on search value
-    const filteredCourses = courses.filter(
-      (course) =>
-        course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
-        course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
-        course.description.toLowerCase().includes(searchValue.toLowerCase())
-    );
-
-    const filteredProfessors = professors.filter((professor) => {
-      const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
-      return (
-        professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        fullName.includes(searchValue.toLowerCase())
-      );
-    });
-
-    // Function to filter reviews based on search value
-    const filteredReviews = reviews.filter((review) => {
-      const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
-      return (
-        review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
-        review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
-        review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
-        review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
-        normalizedRate.includes(searchValue)
-      );
-    });
-
-    // ******************************************************************************************************************************************************************
-
-    return (
-      <Box p={4}>
-        <Flex justify="space-between" align="center" mb={4}>
-          <Stack direction="row" spacing={4} flex="1" maxW="50%">
-            <FormControl>
-              <FormLabel htmlFor="options" srOnly>
-                Select an option
-              </FormLabel>
-              <Select
-                id="options"
-                placeholder="Select option"
-                value={selectedOption}
-                onChange={handleSelectChange}
-                sx={{
-                  color: 'white',
-                  '& option': {
-                    color: 'black',
-                  },
-                }}
-              >
-                <option value="courses">Courses</option>
-                <option value="professors">Professors</option>
-                <option value="reviews">Reviews</option>
-              </Select>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel htmlFor="search" srOnly>
-                Search
-              </FormLabel>
-              <Input
-                id="search"
-                placeholder="Search"
-                size="md"
-                type="search"
-                value={searchValue}
-                onChange={handleInputChange}
-              />
-            </FormControl>
-          </Stack>
-          {/* Conditionally render Add button only for 'courses' and 'professors' */}
-          {selectedOption === 'courses' && (
-            <Link href="/admin/manage/add-course">
-              <Button as="a" colorScheme="teal" color="white" px={6}>
-                Add
-              </Button>
-            </Link>
-          )}
-          {selectedOption === 'professors' && (
-            <Link href="/admin/manage/add-professor">
-              <Button as="a" colorScheme="teal" color="white" px={6}>
-                Add
-              </Button>
-            </Link>
-          )}
-        </Flex>
-
-        <Divider mb={4} />
-        {/* Conditionally render appropriate category when it is selected */}
-        {selectedOption === 'professors' && (
-          <ProfessorsTable professors={filteredProfessors} onRemove={removeProfessor} />
-        )}
-        {selectedOption === 'courses' && (
-          <CoursesTable courses={filteredCourses} onRemove={removeCourse} />
-        )}
-        {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
-      </Box>
-    );
   };
+
+  const removeCourse = (index: number) => {
+    // More logic would need to be added here to remove the course from the database
+    setCourses((prevCourses) => prevCourses.filter((_, i) => i !== index));
+  };
+
+  // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
+
+  // Function to filter courses based on search value
+  const filteredCourses = courses.filter(
+    (course) =>
+      course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
+      course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
+      course.description.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const filteredProfessors = professors.filter((professor) => {
+    const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
+    return (
+      professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+      fullName.includes(searchValue.toLowerCase())
+    );
+  });
+
+  // Function to filter reviews based on search value
+  const filteredReviews = reviews.filter((review) => {
+    const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
+    return (
+      review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
+      normalizedRate.includes(searchValue)
+    );
+  });
+
+  // ******************************************************************************************************************************************************************
+
+  return (
+    <Box p={4}>
+      <Flex justify="space-between" align="center" mb={4}>
+        <Stack direction="row" spacing={4} flex="1" maxW="50%">
+          <FormControl>
+            <FormLabel htmlFor="options" srOnly>
+              Select an option
+            </FormLabel>
+            <Select
+              id="options"
+              placeholder="Select option"
+              value={selectedOption}
+              onChange={handleSelectChange}
+              sx={{
+                color: 'white',
+                '& option': {
+                  color: 'black',
+                },
+              }}
+            >
+              <option value="courses">Courses</option>
+              <option value="professors">Professors</option>
+              <option value="reviews">Reviews</option>
+            </Select>
+          </FormControl>
+
+          <FormControl>
+            <FormLabel htmlFor="search" srOnly>
+              Search
+            </FormLabel>
+            <Input
+              id="search"
+              placeholder="Search"
+              size="md"
+              type="search"
+              value={searchValue}
+              onChange={handleInputChange}
+            />
+          </FormControl>
+        </Stack>
+        {/* Conditionally render Add button only for 'courses' and 'professors' */}
+        {selectedOption === 'courses' && (
+          <Link href="/admin/manage/add-course">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
+        {selectedOption === 'professors' && (
+          <Link href="/admin/manage/add-professor">
+            <Button as="a" colorScheme="teal" color="white" px={6}>
+              Add
+            </Button>
+          </Link>
+        )}
+      </Flex>
+
+      <Divider mb={4} />
+      {/* Conditionally render appropriate category when it is selected */}
+      {selectedOption === 'professors' && (
+        <ProfessorsTable professors={filteredProfessors} onRemove={removeProfessor} />
+      )}
+      {selectedOption === 'courses' && (
+        <CoursesTable courses={filteredCourses} onRemove={removeCourse} />
+      )}
+      {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
+    </Box>
+  );
 }

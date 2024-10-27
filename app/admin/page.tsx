@@ -33,7 +33,11 @@ export default function Admin() {
         gap={{ md: '2rem', lg: '6rem' }}
       >
         <Box p={4} flexBasis={{ base: '100%', md: '100%', lg: '23%' }} marginX={2}>
-          <Link as={NextLink} href="/admin/manage/courses" _hover={{ textDecoration: 'none' }}>
+          <Link
+            as={NextLink}
+            href="/admin/manage?option=courses"
+            _hover={{ textDecoration: 'none' }}
+          >
             <Card
               bg="gray.700"
               boxShadow="lg"
@@ -55,7 +59,11 @@ export default function Admin() {
         </Box>
 
         <Box p={4} flexBasis={{ base: '100%', md: '100%', lg: '23%' }} marginX={2}>
-          <Link as={NextLink} href="/admin/manage/professors" _hover={{ textDecoration: 'none' }}>
+          <Link
+            as={NextLink}
+            href="/admin/manage?option=professors"
+            _hover={{ textDecoration: 'none' }}
+          >
             <Card
               bg="gray.700"
               boxShadow="lg"
@@ -77,7 +85,11 @@ export default function Admin() {
         </Box>
 
         <Box p={4} flexBasis={{ base: '100%', md: '100%', lg: '23%' }} marginX={2}>
-          <Link as={NextLink} href="/admin/manage/reviews" _hover={{ textDecoration: 'none' }}>
+          <Link
+            as={NextLink}
+            href="/admin/manage?option=reviews"
+            _hover={{ textDecoration: 'none' }}
+          >
             <Card
               bg="gray.700"
               boxShadow="lg"
