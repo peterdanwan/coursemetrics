@@ -127,6 +127,7 @@ const initialProfessors = [
 
 const reviews = [
   {
+    id: '1',
     category: 'Course Review',
     course_code: 'CSC101',
     review_text:
@@ -135,6 +136,7 @@ const reviews = [
     status: 'approved',
   },
   {
+    id: '2',
     category: 'Course Review',
     course_code: 'MTH202',
     review_text:
@@ -143,6 +145,7 @@ const reviews = [
     status: 'pending',
   },
   {
+    id: '3',
     category: 'Professor Review',
     course_code: 'PHY303',
     review_text:
@@ -151,6 +154,7 @@ const reviews = [
     status: 'approved',
   },
   {
+    id: '4',
     category: 'Course Review',
     course_code: 'ENG104',
     review_text:
@@ -159,6 +163,7 @@ const reviews = [
     status: 'rejected',
   },
   {
+    id: '5',
     category: 'Professor Review',
     course_code: 'CHE201',
     review_text:
@@ -167,6 +172,7 @@ const reviews = [
     status: 'pending',
   },
   {
+    id: '6',
     category: 'Course Review',
     course_code: 'CSC101',
     review_text:
@@ -175,6 +181,7 @@ const reviews = [
     status: 'approved',
   },
   {
+    id: '7',
     category: 'Course Review',
     course_code: 'MTH202',
     review_text:
