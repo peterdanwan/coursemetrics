@@ -21,9 +21,8 @@ import {
   Stack,
   StackDivider,
 } from '@chakra-ui/react';
-import { StarIcon } from '@chakra-ui/icons';
 import CourseReview from '@/components/CourseReview';
-import { FaStar, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 
 // Dummy data for testing
@@ -253,6 +252,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 </Heading>
                 <Heading as="h2" color="teal" fontSize={{ md: '20' }}>
                   {course?.CourseDetail.course_name}
+                </Heading>
+                <Heading as="h2" color="teal" fontSize={{ md: '20' }}>
+                  {course?.CourseTerm.season} {course?.CourseTerm.year}
                 </Heading>
               </Box>
               <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
