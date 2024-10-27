@@ -1,7 +1,5 @@
 // database/seedDB/seedProfessorCourses.ts
 
-// database/seedDB/seedProfessorCourses.ts
-
 import ProfessorCourse from '../models/ProfessorCourse';
 
 const seedProfessorCourses = async () => {
