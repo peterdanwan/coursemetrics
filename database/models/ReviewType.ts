@@ -20,7 +20,7 @@ ReviewType.init(
   },
   {
     sequelize: sequelizeInstance,
-    tableName: 'review_type',
+    tableName: 'review_types',
   }
 );
 
