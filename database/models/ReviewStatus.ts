@@ -20,7 +20,7 @@ ReviewStatus.init(
   },
   {
     sequelize: sequelizeInstance,
-    tableName: 'review_status',
+    tableName: 'review_statuses',
   }
 );
 
