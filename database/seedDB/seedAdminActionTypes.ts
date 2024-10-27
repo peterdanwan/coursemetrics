@@ -1,9 +1,9 @@
 // database/seedDB/seedAdminActionTypes.ts
 
-import ActionType from '../models/ActionType';
+import AdminActionType from '../models/AdminActionType';
 
 const seedAdminActionTypes = async () => {
-  await ActionType.bulkCreate([
+  await AdminActionType.bulkCreate([
     {
       action_type_id: 1,
       action_type_name: 'rejected',
