@@ -1,7 +1,7 @@
 // app/courses/[courseCode]/page.tsx
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import {
   Grid,
@@ -24,6 +24,7 @@ import {
 import { StarIcon } from '@chakra-ui/icons';
 import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { apiFetcher } from '@/utils';
 
 // Dummy data for testing
 const res = {
@@ -171,9 +172,50 @@ const res = {
   ],
 };
 
+interface ICourseTerm {
+  course_term_id: number;
+  season: string;
+  year: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ICourseDetail {
+  course_name: string;
+  course_description: string;
+}
+
+interface ICourse {
+  course_id: number;
+  course_code: string;
+  CourseDetail: ICourseDetail;
+  course_term_id: number;
+  course_section: string;
+  course_delivery_format_id: number;
+  createdAt: string;
+  updatedAt: string;
+  CourseTerm: ICourseTerm;
+}
+
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
   const courseCode = params.courseCode;
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
+  const [course, setCourse] = useState<ICourse | null>(null);
+
+  const year = 2024;
+  const season = 'Winter';
+
+  const { data: response, error } = useSWR(
+    `/api/courses/${courseCode}?year=${year}&season=${season}`,
+    apiFetcher
+  );
+
+  // Use useEffect to update courseDetail only when data changes
+  useEffect(() => {
+    if (response) {
+      setCourse(response.data.courses[0]);
+    }
+  }, [response]);
 
   // Define the gridColumn property dynamically based on screen size
   // const gridColumnValue = useBreakpointValue({ base: 'span 8', md: 'span 8' });
@@ -207,10 +249,10 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
                   mb={2}
                 >
-                  CCP555
+                  {course?.course_code}
                 </Heading>
                 <Heading as="h2" color="teal" fontSize={{ md: '20' }}>
-                  Cloud Computing for Programmers
+                  {course?.CourseDetail.course_name}
                 </Heading>
               </Box>
               <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
@@ -225,11 +267,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             </Flex>
           </CardHeader>
           <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-            <Text fontSize={{ md: '14' }}>
-              Explore modern cloud application development through hands-on labs and projects,
-              focusing on technologies, patterns, tools, and best practices for building
-              distributed, reliable, and scalable applications on platforms like AWS and Azure
-            </Text>
+            <Text fontSize={{ md: '14' }}>{course?.CourseDetail.course_description}</Text>
           </CardBody>
         </Card>
       </GridItem>
