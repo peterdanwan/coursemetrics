@@ -170,7 +170,8 @@ export default function MainNav(props: { user: any }) {
                     <MenuItem as="a" href="/profile">
                       Profile
                     </MenuItem>
-                    {/* Add the logic of if the user is an admin here: */}
+                    {/* Add the logic of "IF the user is an admin" here, which is similar to:
+                    {props.user.isAdmin ?( ... ) : ( ... ) */}
                     <MenuItem>
                       <Popover trigger="click" placement="right-start" closeOnBlur>
                         {({ isOpen }) => (
@@ -196,7 +197,6 @@ export default function MainNav(props: { user: any }) {
                             <PopoverContent>
                               <Stack spacing={0}>
                                 {' '}
-                                {/* Ensure no spacing between items */}
                                 <MenuItem
                                   as="a"
                                   href="/admin/manage?option=courses"
@@ -224,7 +224,57 @@ export default function MainNav(props: { user: any }) {
                         )}
                       </Popover>
                     </MenuItem>
-                    {/* End of Admin Logic */}
+                    {/* End of Admin IF Logic */}
+                    {/* Beginning of ELSE logic, which is after the ": (else logic here)" */}
+                    <MenuItem>
+                      <Popover trigger="click" placement="right-start" closeOnBlur>
+                        {({ isOpen }) => (
+                          <>
+                            <PopoverTrigger>
+                              <Box
+                                as="div"
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                width="100%"
+                                cursor="pointer"
+                                bg={isOpen ? 'gray.100' : 'transparent'}
+                                _hover={{ bg: 'gray.100' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <Text fontWeight={isOpen ? 'bold' : 'normal'}>Reviews</Text>
+                                <ChevronRightIcon />
+                              </Box>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <Stack spacing={0}>
+                                {' '}
+                                <MenuItem
+                                  as="a"
+                                  href="/user/reviews/courses"
+                                  _hover={{ bg: 'gray.100' }}
+                                >
+                                  Courses
+                                </MenuItem>
+                                <MenuItem
+                                  as="a"
+                                  href="/user/reviews/professors"
+                                  _hover={{ bg: 'gray.100' }}
+                                >
+                                  Professors
+                                </MenuItem>
+                              </Stack>
+                            </PopoverContent>
+                          </>
+                        )}
+                      </Popover>
+                    </MenuItem>
+                    <MenuItem as="a" href="/user/bookmark">
+                      Bookmark
+                    </MenuItem>
+                    {/* End of ELSE Logic */}
                   </MenuGroup>
                   <MenuDivider />
                   <MenuItem as="a" href="/api/auth/logout">
