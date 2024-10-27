@@ -20,30 +20,35 @@ import ReviewsTable from '@/components/ReviewsTable';
 // ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
 const initialCourses = [
   {
+    id: '1',
     name: 'Course 1',
     section: 'A',
     term: 'Fall 2024',
     description: 'Introductory course to programming.',
   },
   {
+    id: '2',
     name: 'Course 2',
     section: 'B',
     term: 'Spring 2024',
     description: 'Advanced topics in software development.',
   },
   {
+    id: '3',
     name: 'Course 3',
     section: 'C',
     term: 'Winter 2024',
     description: 'Data Structures and Algorithms.',
   },
   {
+    id: '4',
     name: 'Course 4',
     section: 'D',
     term: 'Summer 2024',
     description: 'Web Development Fundamentals.',
   },
   {
+    id: '5',
     name: 'Course 5',
     section: 'A',
     term: 'Fall 2024',
@@ -51,12 +56,14 @@ const initialCourses = [
       'Introductory course to programming. This is a longer description that should be truncated if it exceeds the available space.',
   },
   {
+    id: '6',
     name: 'Course 6',
     section: 'B',
     term: 'Spring 2024',
     description: 'Advanced topics in software development.',
   },
   {
+    id: '7',
     name: 'Course 7',
     section: 'C',
     term: 'Winter 2024',

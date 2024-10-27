@@ -1,8 +1,10 @@
 // components/CoursesTable.tsx
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 
 // Define the Course type
 type Course = {
+  id: string;
   name: string;
   section: string;
   term: string;
@@ -17,7 +19,11 @@ interface CoursesTableProps {
 
 const CoursesTable: React.FC<CoursesTableProps> = ({ courses, onRemove }) => {
   // More logic would need to be added here to remove the course from the database
+  const router = useRouter();
 
+  const handleEditClick = (courseId: string) => {
+    router.push(`/admin/manage/edit-course/${courseId}`);
+  };
   return (
     <>
       {/* Table Header */}
@@ -98,6 +104,7 @@ const CoursesTable: React.FC<CoursesTableProps> = ({ courses, onRemove }) => {
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
+                    onClick={() => handleEditClick(course.id)}
                   >
                     Edit
                   </Button>
