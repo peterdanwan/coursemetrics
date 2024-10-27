@@ -6,13 +6,13 @@ Table AdminAction {
   admin_action_id integer [primary key]
   review_id integer
   admin_id integer
-  action_type_id integer
+  admin_action_type_id integer
   action_date timestamp
 }
 
-Table ActionType {
-  action_type_id integer [primary key]
-  action_type_name varchar [unique]
+Table AdminActionType {
+  admin_action_type_id integer [primary key]
+  admin_action_type_name varchar [unique]
 }
 
 Table Course {
@@ -123,7 +123,7 @@ Table UserProfile {
 }
 
 Ref: AdminAction.admin_id > User.user_id
-Ref: AdminAction.action_type_id > ActionType.action_type_id
+Ref: AdminAction.admin_action_type_id > AdminActionType.admin_action_type_id
 Ref: AdminAction.review_id > Review.review_id
 Ref: Course.course_detail_id > CourseDetail.course_detail_id
 Ref: ProfessorCourse.course_id > Course.course_id
