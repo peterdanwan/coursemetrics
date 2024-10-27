@@ -2,7 +2,7 @@
 
 import Review from '../models/Review';
 
-const seedReview = async () => {
+const seedReviews = async () => {
   await Review.bulkCreate([
     {
       review_type_id: 1,
@@ -55,4 +55,4 @@ const seedReview = async () => {
   ]);
 };
 
-export { seedReview };
+export { seedReviews };
