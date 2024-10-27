@@ -1,6 +1,6 @@
 import ReviewStatus from '../models/ReviewStatus';
 
-const seedReviewStatus = async () => {
+const seedReviewStatuses = async () => {
   await ReviewStatus.bulkCreate([
     {
       review_status_id: 1,
@@ -21,4 +21,4 @@ const seedReviewStatus = async () => {
   ]);
 };
 
-export { seedReviewStatus };
+export { seedReviewStatuses };

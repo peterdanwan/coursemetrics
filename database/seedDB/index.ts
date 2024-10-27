@@ -11,15 +11,15 @@ import { seedCourseDeliveryFormats } from './seedCourseDeliveryFormats';
 import { seedProfessors } from './seedProfessors';
 import { seedProfessorCourses } from './seedProfessorCourses';
 import { seedReviewTypes } from './seedReviewTypes';
-import { seedReviewStatus } from './seedReviewStatus';
+import { seedReviewStatuses } from './seedReviewStatuses';
 import { seedQuestions } from './seedQuestions';
-import { seedReview } from './seedReviews';
+import { seedReviews } from './seedReviews';
 import { seedReviewQuestions } from './seedReviewQuestions';
 import { seedReviewAnswers } from './seedReviewAnswers';
 import { seedPolicies } from './seedPolicies';
 import { seedReviewPolicyViolationLogs } from './seedReviewPolicyViolationLogs';
 import { seedReviewHistories } from './seedReviewHistories';
-import { seedAdminActionTypes } from './adminActionTypes';
+import { seedAdminActionTypes } from './seedAdminActionTypes';
 import { seedAdminActions } from './seedAdminActions';
 
 const dataExists = async () => {
@@ -45,9 +45,9 @@ const seedDB = async () => {
     await seedProfessors();
     await seedProfessorCourses();
     await seedReviewTypes();
-    await seedReviewStatus();
+    await seedReviewStatuses();
     await seedQuestions();
-    await seedReview();
+    await seedReviews();
     await seedReviewQuestions();
     await seedReviewAnswers();
     await seedPolicies();
