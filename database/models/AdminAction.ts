@@ -1,7 +1,7 @@
 // database/models/AdminAction.ts
 
 import { DataTypes, Model } from 'sequelize';
-import ActionType from './ActionType';
+import AdminActionType from './AdminActionType';
 import Review from './Review';
 import User from './User';
 import { sequelizeInstance } from '../sequelizeInstance';
@@ -53,26 +53,19 @@ AdminAction.init(
         key: 'user_id',
       },
     },
-    action_type_id: {
+    admin_action_type_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: ActionType,
-        key: 'action_type_id',
+        model: AdminActionType,
+        key: 'admin_action_type_id',
       },
     },
-    // instead of action_date, can we just use updatedAt?
-    // action_date: {
-    //   type: DataTypes.DATE,
-    //   allowNull: false,
-    // },
   },
   {
     sequelize: sequelizeInstance,
     tableName: 'admin_actions',
   }
 );
-
-// TODO: Add associations for Review and Question
 
 export default AdminAction;

@@ -13,14 +13,14 @@ ReviewStatus.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    status_name: {
+    status: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
   },
   {
     sequelize: sequelizeInstance,
-    tableName: 'review_status',
+    tableName: 'review_statuses',
   }
 );
 

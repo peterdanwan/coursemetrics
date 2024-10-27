@@ -9,10 +9,6 @@ import Question from './Question';
 // Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
 class ReviewQuestion extends Model {}
 
-/**
- * A ReviewQuestion contains the verbiage from the Question model.$
- * Each ReviewQuestion is tied to a specific Review through the reviewID.
- */
 ReviewQuestion.init(
   {
     review_question_id: {

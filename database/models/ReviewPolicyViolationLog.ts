@@ -6,11 +6,11 @@ import Policy from './Policy';
 import Review from './Review';
 
 // Ref: https://sequelize.org/docs/v6/core-concepts/model-basics/
-class ReviewPolicy extends Model {}
+class ReviewPolicyViolationLog extends Model {}
 
-ReviewPolicy.init(
+ReviewPolicyViolationLog.init(
   {
-    review_policy: {
+    review_policy_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -31,15 +31,11 @@ ReviewPolicy.init(
         key: 'policy_id',
       },
     },
-    policy_violated: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
   },
   {
     sequelize: sequelizeInstance,
-    tableName: 'review_policies',
+    tableName: 'review_policy_violation_logs',
   }
 );
 
-export default ReviewPolicy;
+export default ReviewPolicyViolationLog;
