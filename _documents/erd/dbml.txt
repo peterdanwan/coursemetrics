@@ -19,7 +19,7 @@ Table Course {
   course_id integer [primary key]
   course_code varchar
   course_detail_id integer
-  course_term_id varchar
+  course_term_id integer
   course_section varchar
   course_delivery_format varchar
 }
