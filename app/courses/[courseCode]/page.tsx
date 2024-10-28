@@ -66,13 +66,14 @@ function getURL(
     url = `/api/${apiRoute}/${courseCode}?season=${season}`;
   } else {
     url = `/api/${apiRoute}/${courseCode}`;
+    console.log('here');
   }
 
   return url;
 }
 
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
-  const courseCode = params.courseCode;
+  const courseCode = params.courseCode.toUpperCase();
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
   const [course, setCourse] = useState<ICourse | null>(null);
   const [reviews, setReviews]: any = useState(null);
