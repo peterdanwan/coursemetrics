@@ -1,33 +1,121 @@
 // app/courses/page.tsx
 
 'use client';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { Spinner } from '@nextui-org/react';
+import { useRouter } from 'next/navigation';
+import {
+  Grid,
+  GridItem,
+  Card,
+  CardHeader,
+  CardBody,
+  Heading,
+  Box,
+  Text,
+  Flex,
+  Spacer,
+  Button,
+} from '@chakra-ui/react';
+import { FaHeart } from 'react-icons/fa';
+import { apiFetcher } from '@/utils';
 
-/*
+interface ICourseTerm {
+  course_term_id: number;
+  season: string;
+  year: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
-Here is an example of how you would call the API to get all courses
+interface ICourseDetail {
+  course_name: string;
+  course_description: string;
+}
 
-*/
+interface ICourse {
+  course_id: number;
+  course_code: string;
+  CourseDetail: ICourseDetail;
+  course_term_id: number;
+  course_section: string;
+  course_delivery_format_id: number;
+  createdAt: string;
+  updatedAt: string;
+  CourseTerm: ICourseTerm;
+}
 
-const fetcher = async (uri: string) => {
-  const response = await fetch(uri);
-  return response.json();
-};
+export default function CoursesPage() {
+  const router = useRouter();
+  const [courses, setCourses] = useState<ICourse[]>([]);
 
-export default function Courses() {
-  const { data, error } = useSWR('/api/courses?page=1&limit=20', fetcher);
+  const { data: coursesResponse, error } = useSWR('/api/courses', apiFetcher);
 
-  console.log(data);
-  if (error) return <div>oops... {error.message}</div>;
+  useEffect(() => {
+    if (coursesResponse) {
+      setCourses(coursesResponse.data.courses);
+    }
+  }, [coursesResponse]);
 
-  // Have a better loading message or spinner that's different than the navbar's loading message
-  if (data === undefined)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp;Loading the different courses...
-      </div>
-    );
-  return <div>Hello World</div>;
+  const navigateToCourse = (courseCode: string) => {
+    router.push(`/courses/${courseCode}`);
+  };
+
+  return (
+    <Grid
+      gridTemplateColumns="repeat(12, 1fr)"
+      gap={{ base: '3', md: '3', lg: '6' }}
+      p={{ base: '3', md: '3', lg: '5' }}
+      margin="0 auto"
+      w={{ base: '100%', '2xl': '80%' }}
+      bgColor={'gray.100'}
+    >
+      {courses.length > 0 ? (
+        courses.map((course) => (
+          <GridItem
+            key={course.course_id}
+            gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}
+          >
+            <Card>
+              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+                <Flex align="center" gap={2} wrap="wrap">
+                  <Box>
+                    <Heading
+                      as="h1"
+                      color="teal"
+                      fontSize={{ base: '20', sm: '24', md: '24', lg: '28' }}
+                      mb={2}
+                    >
+                      {course.course_code}
+                    </Heading>
+                    <Heading as="h2" color="teal" fontSize={{ md: '18' }}>
+                      {course.CourseDetail.course_name}
+                    </Heading>
+                  </Box>
+                  <Spacer />
+                  <Box color="pink.400">
+                    <FaHeart size={20} />
+                  </Box>
+                </Flex>
+              </CardHeader>
+              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
+                <Text fontSize={{ md: '14' }}>{course.CourseDetail.course_description}</Text>
+              </CardBody>
+              <Button
+                colorScheme="teal"
+                variant="outline"
+                size="sm"
+                onClick={() => navigateToCourse(course.course_code)}
+                mt={2}
+              >
+                View Reviews
+              </Button>
+            </Card>
+          </GridItem>
+        ))
+      ) : (
+        <Text>No courses available</Text>
+      )}
+    </Grid>
+  );
 }

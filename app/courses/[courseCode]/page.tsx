@@ -210,14 +210,19 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 <Flex direction="column" gap={5}>
                   <Stack divider={<StackDivider />} height="700px" overflowY="scroll" spacing="4">
                     {/**** Course Review Component starts here ****/}
-                    {reviews.map((review: any, index: number) => (
-                      <CourseReview
-                        key={index}
-                        review={review}
-                        expandedReviewId={expandedReviewId}
-                        toggleExpandedReview={toggleExpandedReview}
-                      />
-                    ))}
+                    {/* Check if reviews array exist before calling .map */}
+                    {Array.isArray(reviews) ? (
+                      reviews.map((review: any, index: number) => (
+                        <CourseReview
+                          key={index}
+                          review={review}
+                          expandedReviewId={expandedReviewId}
+                          toggleExpandedReview={toggleExpandedReview}
+                        />
+                      ))
+                    ) : (
+                      <Text>No reviews available</Text>
+                    )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>
                   <Button
