@@ -20,6 +20,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@nextui-org/react": "^2.4.6",
+    "@types/react-select": "^5.0.0",
     "basic-auth": "^2.0.1",
     "framer-motion": "^11.3.31",
     "glob": "^11.0.0",
