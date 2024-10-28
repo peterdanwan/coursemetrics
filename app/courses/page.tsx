@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
+import { useSearchParams } from 'next/navigation';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -45,11 +46,33 @@ interface ICourse {
   CourseTerm: ICourseTerm;
 }
 
+function getURL(page: string | null, limit: string | null) {
+  let url: string;
+
+  if (page && limit) {
+    url = `/api/courses/page=${page}&limit=${limit}`;
+  } else if (page) {
+    url = `/api/courses/page=${page}`;
+  } else if (limit) {
+    url = `/api/courses/limit=${limit}`;
+  } else {
+    url = `/api/courses`;
+  }
+
+  return url;
+}
+
 export default function CoursesPage() {
+  const searchParams = useSearchParams();
+
   const router = useRouter();
   const [courses, setCourses] = useState<ICourse[]>([]);
 
-  const { data: coursesResponse, error } = useSWR('/api/courses', apiFetcher);
+  const page = searchParams.get('page') || null;
+  const limit = searchParams.get('limit') || null;
+  const coursesURL = getURL(page, limit);
+
+  const { data: coursesResponse, error } = useSWR(coursesURL, apiFetcher);
 
   useEffect(() => {
     if (coursesResponse) {
