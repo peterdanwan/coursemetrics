@@ -19,7 +19,7 @@ export default function CourseReview({
   expandedReviewId,
   toggleExpandedReview,
 }: {
-  review: CourseReview;
+  review: any;
   expandedReviewId: number;
   toggleExpandedReview: (id: number) => void;
 }) {
@@ -38,7 +38,7 @@ export default function CourseReview({
     }
   }, []);
   return (
-    <Box key={review.id} p={{ base: '2', lg: '3' }}>
+    <Box key={review.review_id} p={{ base: '2', lg: '3' }}>
       <Heading
         as="h3"
         fontSize={{ base: '22', sm: '24', md: '26', lg: '30' }}
@@ -51,7 +51,7 @@ export default function CourseReview({
         <GridItem gridColumn={{ base: 'span 12', lg: 'span 8' }}>
           <Flex flexDirection="column" gap={2}>
             <Text ref={textRef} noOfLines={expandedReviewId === review.id ? 0 : [4, 3]}>
-              {review.content.join(' ')}
+              {review.comment}
             </Text>
             {isTruncated && (
               <Button
@@ -71,30 +71,38 @@ export default function CourseReview({
           gridColumn={{ base: 'span 12', lg: 'span 4' }}
         >
           <Box>
-            <Text as="b">Would take again:</Text> {review.wouldTakeAgain}
+            <Text as="b">Course Term:</Text> {review.ProfessorCourse.Course.CourseTerm.season}{' '}
+            {review.ProfessorCourse.Course.CourseTerm.year}
+          </Box>
+          <Box>
+            <Text as="b">Would take again:</Text> {review.would_take_again ? 'Yes' : 'No'}
           </Box>
           <Box>
             <Text as="b">Difficulty:</Text> {review.difficulty}/5
           </Box>
           <Box>
-            <Text as="b">Course Load:</Text> {review.courseLoad}/5
+            <Text as="b">Course Load:</Text> {review.course_load}/5
           </Box>
           <Box>
             <Text as="b">Grade:</Text> {review.grade}
           </Box>
+          <Box>
+            <Text as="b">Rating:</Text> {review.rating}/5
+          </Box>
         </GridItem>
         <GridItem gridColumn={{ base: 'span 12', lg: 'span 8' }}>
           <Box>
-            <Text as="b">Professor:</Text> David Humphrey
+            <Text as="b">Professor:</Text> {review.ProfessorCourse.Professor.first_name}{' '}
+            {review.ProfessorCourse.Professor.last_name}
           </Box>
         </GridItem>
-        <GridItem
+        {/* <GridItem
           justifySelf={{ base: 'start', lg: 'end' }}
           gridColumn={{ base: 'span 12', lg: 'span 4' }}
           color="teal"
         >
           {review.bookmark ? <FaBookmark size={25} /> : <FaRegBookmark size={25} />}
-        </GridItem>
+        </GridItem> */}
       </Grid>
     </Box>
   );

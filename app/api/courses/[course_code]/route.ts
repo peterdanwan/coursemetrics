@@ -27,10 +27,27 @@ export const GET = withApiAuthRequired(async function get_course_by_course_code(
     season = String(season).charAt(0).toUpperCase() + String(season).slice(1);
     let year = Number(req.nextUrl.searchParams.get('year'));
 
+    const whereConditions = { course_code: courseCode };
+
+    let courseTermConditions: { season?: any; year?: any } = {};
+    if (season !== null && season !== undefined && season !== 'Null') {
+      courseTermConditions.season = season;
+    }
+
+    if (year !== null && year !== undefined && year !== 0) {
+      courseTermConditions.year = year;
+    }
+
+    if (season === 'Null' && year === 0) {
+      courseTermConditions = {};
+    }
+
     const courses = await Course.findAll({
-      where: {
-        course_code: courseCode,
-      },
+      where: whereConditions,
+      order: [
+        [CourseTerm, 'year', 'DESC'],
+        [CourseTerm, 'season', 'DESC'],
+      ],
       include: [
         {
           model: CourseDetail,
@@ -38,10 +55,8 @@ export const GET = withApiAuthRequired(async function get_course_by_course_code(
         },
         {
           model: CourseTerm,
-          where: {
-            season,
-            year,
-          },
+          attributes: ['season', 'year'],
+          where: courseTermConditions,
         },
       ],
     });

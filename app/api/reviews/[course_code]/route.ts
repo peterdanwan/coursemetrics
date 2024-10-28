@@ -1,4 +1,4 @@
-// app/api/reviews/route.ts
+// app/api/reviews/[course_code]/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
@@ -11,28 +11,46 @@ import ReviewAnswer from '@/database/models/ReviewAnswer';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
 import Question from '@/database/models/Question';
-import Course from '@/database/models/Course'; // Assuming you have a Course model
+import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
 
-export const GET = async function fetch_reviews(req: NextRequest): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/reviews/route.ts' });
+export const GET = async function fetch_reviews_by_course_code(
+  req: NextRequest
+): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/reviews/[course_code]/route.ts' });
 
   try {
     await connectDB();
 
     const { user }: any = await getSession();
+
     if (!user) {
       log.warn('User not authenticated');
-      return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
     }
 
-    log.info(`Fetching reviews for user with email: ${user.email}`);
+    const url = new URL(req.url);
+
+    const courseCode = url.pathname.split('/').pop();
+
+    let season = req.nextUrl.searchParams.get('season');
+    season = String(season).charAt(0).toUpperCase() + String(season).slice(1);
+    let year = Number(req.nextUrl.searchParams.get('year'));
+    let courseTermConditions: { season?: any; year?: any } = {};
+
+    if (season !== null && season !== undefined && season !== 'Null') {
+      courseTermConditions.season = season;
+    }
+
+    if (year !== null && year !== undefined && year !== 0) {
+      courseTermConditions.year = year;
+    }
+
+    if (season === 'Null' && year === 0) {
+      courseTermConditions = {};
+    }
 
     const reviews = await Review.findAll({
-      // where: {
-      //   review_status_id: 2,
-      // },
       include: [
         {
           model: User,
@@ -54,6 +72,7 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
         },
         {
           model: ProfessorCourse,
+          required: true,
           include: [
             {
               model: Professor,
@@ -62,14 +81,15 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
             },
             {
               model: Course,
+              where: { course_code: courseCode },
               include: [
                 {
                   model: CourseTerm,
+                  where: courseTermConditions,
                 },
               ],
             },
           ],
-          attributes: ['professor_course_id'],
         },
       ],
     });
@@ -90,8 +110,9 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
     );
 
     return NextResponse.json(createSuccessResponse(reviews), { status: 200 });
-  } catch (error: unknown) {
+  } catch (error) {
     console.error(error);
+
     log.error('Error fetching reviews', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
