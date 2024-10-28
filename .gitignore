@@ -37,3 +37,4 @@ next-env.d.ts
 
 # miscellaneous (will store our Teams Submission info)
 /miscellaneous
+app/test
