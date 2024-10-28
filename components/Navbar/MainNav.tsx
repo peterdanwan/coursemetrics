@@ -23,25 +23,112 @@ import {
   MenuDivider,
   Divider,
   Text,
-  Toast,
   useToast,
+  PopoverBody,
+  PopoverCloseButton,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
 
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useFlexStyle } from '@/styles/styles';
 import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { apiFetcher } from '@/utils';
+
+interface ICourseTerm {
+  course_term_id: number;
+  season: string;
+  year: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ICourseDetail {
+  course_name: string;
+  course_description: string;
+}
+
+interface ICourse {
+  course_id: number;
+  course_code: string;
+  CourseDetail: ICourseDetail;
+  course_term_id: number;
+  course_section: string;
+  course_delivery_format_id: number;
+  createdAt: string;
+  updatedAt: string;
+  CourseTerm: ICourseTerm;
+}
+
+function getURL(page: string | null, limit: string | null) {
+  let url: string;
+
+  if (page && limit) {
+    url = `/api/courses?page=${page}&limit=${limit}`;
+  } else if (page) {
+    url = `/api/courses?page=${page}`;
+  } else if (limit) {
+    url = `/api/courses?limit=${limit}`;
+  } else {
+    url = `/api/courses`;
+  }
+
+  return url;
+}
 
 export default function MainNav(props: { user: any }) {
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onToggle, onClose } = useDisclosure();
   const [selectedCategory, setSelectedCategory] = useState('Select Category');
   const router = useRouter();
   const toast = useToast();
+
+  const searchParams = useSearchParams();
+  const [allCourses, setAllCourses] = useState<ICourse[]>([]);
+  const [filteredCourses, setFilteredCourses] = useState<ICourse[]>([]);
+  const [query, setQuery] = useState<string>('');
+  const limit = 15;
+
+  const page = searchParams.get('page') || null;
+  const coursesURL = getURL(page, limit.toString());
+
+  const { data: coursesResponse, error } = useSWR(coursesURL, apiFetcher);
+
+  useEffect(() => {
+    if (coursesResponse) {
+      setAllCourses(coursesResponse.data.courses);
+    }
+  }, [coursesResponse]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (query) {
+        const regex = new RegExp(`\\b${query}\\b`, 'i');
+        const filtered = allCourses.filter(
+          (course) =>
+            regex.test(course.CourseDetail.course_name) ||
+            course.course_code.toLowerCase().includes(query.toLowerCase())
+        );
+        setFilteredCourses(filtered);
+      } else {
+        setFilteredCourses([]);
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [query, allCourses]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilteredCourses([]);
+    const searchQuery = e.target.value;
+    setQuery(searchQuery);
+  };
 
   const registerUserInDB = async () => {
     try {
@@ -139,6 +226,8 @@ export default function MainNav(props: { user: any }) {
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
               handleSearch={handleSearch}
+              handleSearchChange={handleSearchChange}
+              filteredCourses={filteredCourses}
             />
           </Flex>
 
@@ -148,6 +237,8 @@ export default function MainNav(props: { user: any }) {
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
               handleSearch={handleSearch}
+              handleSearchChange={handleSearchChange}
+              filteredCourses={filteredCourses}
             />
           </Flex>
         </Flex>
@@ -299,6 +390,9 @@ export default function MainNav(props: { user: any }) {
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           handleSearch={handleSearch}
+          handleSearchChange={handleSearchChange}
+          filteredCourses={filteredCourses}
+          onCloseMenu={onClose}
         />
       </Collapse>
     </Box>
@@ -310,13 +404,18 @@ const DesktopNav = ({
   selectedCategory,
   setSelectedCategory,
   handleSearch,
+  handleSearchChange,
+  filteredCourses,
 }: {
   position: string;
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: (searchQuery: string, category: string) => void;
+  handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  filteredCourses: ICourse[];
 }) => {
   const pathname = usePathname();
+  const router = useRouter();
   console.log('Pathname:', pathname);
   const linkColor = useColorModeValue('gray.600', 'gray.200');
   const linkHoverColor = useColorModeValue('gray.800', 'white');
@@ -324,6 +423,20 @@ const DesktopNav = ({
   const linkBorderRadius = 'lg';
   const popoverContentBgColor = useColorModeValue('white', 'gray.800');
   const [searchQuery, setSearchQuery] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  useEffect(() => {
+    if (filteredCourses.length > 0) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  }, [filteredCourses, onOpen, onClose]);
+
+  const handlePopoverClose = () => {
+    setSearchQuery('');
+    handleSearchChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
+    onClose();
+  };
 
   return (
     <Stack direction={'row'} spacing={{ md: 1, lg: 2 }} alignItems="center">
@@ -338,13 +451,50 @@ const DesktopNav = ({
         if (navItem.isSearch) {
           return (
             <Flex key={navItem.label} align="center">
-              <Input
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                w={{ base: 40, md: 32, lg: 72 }}
-              />
-              <Button onClick={() => handleSearch(searchQuery, selectedCategory)} ml={2}>
+              <Popover isOpen={filteredCourses.length > 0} placement="bottom-start">
+                <PopoverTrigger>
+                  <Input
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      handleSearchChange(e);
+                    }}
+                    w={{ base: 40, md: 32, lg: 72 }}
+                  />
+                </PopoverTrigger>
+                <PopoverContent
+                  border={0}
+                  boxShadow={'xl'}
+                  bg={popoverContentBgColor}
+                  p={4}
+                  rounded={'xl'}
+                  minW={'sm'}
+                >
+                  <PopoverBody>
+                    {filteredCourses.map((course: ICourse) => (
+                      <Box
+                        key={course.course_id}
+                        p={2}
+                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                        onClick={() => router.push(`/courses/${course.course_code}`)}
+                      >
+                        <Text fontWeight="bold">{course.CourseDetail.course_name}</Text>
+                        <Text fontSize="sm">{course.course_code}</Text>
+                      </Box>
+                    ))}
+                  </PopoverBody>
+                  <PopoverCloseButton onClick={() => handlePopoverClose()} />
+                </PopoverContent>
+              </Popover>
+
+              <Button
+                onClick={() => {
+                  handleSearch(searchQuery, selectedCategory);
+                  handlePopoverClose();
+                }}
+                ml={2}
+              >
                 Search
               </Button>
             </Flex>
@@ -455,12 +605,35 @@ const MobileNav = ({
   selectedCategory,
   setSelectedCategory,
   handleSearch,
+  handleSearchChange,
+  filteredCourses,
+  onCloseMenu,
 }: {
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: (searchQuery: string, category: string) => void;
+  handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  filteredCourses: ICourse[];
+  onCloseMenu: () => void;
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const popoverContentBgColor = useColorModeValue('white', 'gray.800');
+  const router = useRouter();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  useEffect(() => {
+    if (filteredCourses.length > 0) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  }, [filteredCourses, onOpen, onClose]);
+
+  const handlePopoverClose = () => {
+    setSearchQuery('');
+    handleSearchChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
+    onClose();
+  };
 
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
@@ -475,14 +648,56 @@ const MobileNav = ({
           {/* Insert search bar after "Select Category" */}
           {index === 0 && (
             <Flex align="center" mt={2} mb={4}>
-              <Input
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                width="full"
-                color={'black'}
-              />
-              <Button onClick={() => handleSearch(searchQuery, selectedCategory)} ml={2}>
+              <Popover isOpen={isOpen} onClose={handlePopoverClose} placement="bottom-start">
+                <PopoverTrigger>
+                  <Input
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      handleSearchChange(e);
+                    }}
+                    w="100%"
+                    textColor="black"
+                  />
+                </PopoverTrigger>
+                <PopoverContent
+                  border={1}
+                  boxShadow={'xl'}
+                  bg={popoverContentBgColor}
+                  p={4}
+                  rounded={'xl'}
+                  minW={'sm'}
+                  textColor="black"
+                >
+                  <PopoverBody p={2}>
+                    {filteredCourses.map((course: ICourse) => (
+                      <Box
+                        key={course.course_id}
+                        p={3}
+                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                        onClick={() => {
+                          router.push(`/courses/${course.course_code}`);
+                          handlePopoverClose();
+                          onCloseMenu();
+                        }}
+                      >
+                        <Text fontWeight="bold">{course.CourseDetail.course_name}</Text>
+                        <Text fontSize="sm">{course.course_code}</Text>
+                      </Box>
+                    ))}
+                  </PopoverBody>
+                  <PopoverCloseButton onClick={handlePopoverClose} />
+                </PopoverContent>
+              </Popover>
+              <Button
+                onClick={() => {
+                  handleSearch(searchQuery, selectedCategory);
+                  handlePopoverClose();
+                  onCloseMenu();
+                }}
+                ml={2}
+              >
                 Search
               </Button>
             </Flex>
@@ -555,7 +770,10 @@ const MobileNavItem = ({
                     setSelectedCategory(child.label);
                   }
                 }}
-                _hover={{ textDecoration: 'none' }}
+                _hover={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                }}
               >
                 <Text color={child.isClearOption ? 'red.500' : 'gray.600'} fontWeight={500}>
                   {child.label}
