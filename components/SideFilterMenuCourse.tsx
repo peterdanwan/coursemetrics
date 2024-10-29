@@ -51,7 +51,7 @@ export default function SideFilterMenuCourse({
       <Button ref={btnRef} colorScheme="teal" onClick={onOpen}>
         Filters
       </Button>
-      <Drawer isOpen={isOpen} placement="right" onClose={onClose} finalFocusRef={btnRef} size="sm">
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose} finalFocusRef={btnRef} size="sm">
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
