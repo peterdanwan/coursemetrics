@@ -11,9 +11,13 @@ import {
   Spacer,
   Button,
   Select,
+  IconButton,
+  Alert,
 } from '@chakra-ui/react';
 import { FaHeart } from 'react-icons/fa';
 import Link from 'next/link';
+import { StarIcon } from '@chakra-ui/icons';
+import { CiBookmark } from 'react-icons/ci';
 
 interface ICourseTerm {
   season: string;
@@ -54,6 +58,9 @@ export default function CourseCard({ courses }: CourseCardProps) {
       `/courses/${selectedCourse.course_code}?season=${selectedCourse.CourseTerm.season}&year=${selectedCourse.CourseTerm.year}`
     );
   };
+  const handleBookmark = () => {
+    alert('Bookmark clicked - Still in development');
+  };
 
   return (
     <>
@@ -77,7 +84,9 @@ export default function CourseCard({ courses }: CourseCardProps) {
             </Box>
             <Spacer />
             <Box color="pink.400">
-              <FaHeart size={20} />
+              <IconButton aria-label="Bookmark" variant={'outline'} onClick={handleBookmark}>
+                <CiBookmark size={20} />
+              </IconButton>
             </Box>
             <Box>
               <Select
