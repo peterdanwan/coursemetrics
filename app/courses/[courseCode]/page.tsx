@@ -20,6 +20,7 @@ import {
   Button,
   Stack,
   StackDivider,
+  Select,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
@@ -75,6 +76,7 @@ function getURL(
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
   const courseCode = params.courseCode.toUpperCase();
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
+  const [courses, setCourses] = useState<ICourse[]>([]);
   const [course, setCourse] = useState<ICourse | null>(null);
   const [reviews, setReviews]: any = useState(null);
   const searchParams = useSearchParams();
@@ -83,29 +85,54 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const year = searchParams.get('year') || null;
   const season = searchParams.get('season') || null;
 
-  const courseURL = getURL('courses', season, year, courseCode);
-  const reviewsURL = getURL('reviews', season, year, courseCode);
+  const courseURL = getURL('courses', null, null, courseCode);
 
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
 
-  const { data: reviewResponse, error: reviewResponseError } = useSWR(
-    courseResponse ? reviewsURL : null,
-    apiFetcher
-  );
-
   useEffect(() => {
     if (courseResponse) {
-      setCourse(courseResponse.data.courses[0]);
+      setCourses(courseResponse.data.courses);
+
+      // Find the course that matches the season and year from the URL
+      let initialCourse;
+
+      if (year && season) {
+        initialCourse = courseResponse.data.courses.find(
+          (courseItem: ICourse) =>
+            courseItem.CourseTerm.year.toString() === year &&
+            courseItem.CourseTerm.season.toLowerCase() === season.toLowerCase()
+        );
+      }
+
+      if (!initialCourse) {
+        // If no matching course is found, default to the first course
+        initialCourse = courseResponse.data.courses[0];
+      }
+
+      setCourse(initialCourse);
     }
+  }, [courseResponse, year, season]);
+
+  const reviewsURL = course
+    ? getURL('reviews', course.CourseTerm.season, course.CourseTerm.year.toString(), courseCode)
+    : null;
+
+  const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
+
+  useEffect(() => {
     if (reviewResponse) {
       setReviews(reviewResponse.data);
     }
-  }, [courseResponse, reviewResponse]);
+  }, [reviewResponse]);
 
-  // Define the gridColumn property dynamically based on screen size
-  // const gridColumnValue = useBreakpointValue({ base: 'span 8', md: 'span 8' });
+  const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTermId = Number(e.target.value);
+    const selectedCourse = courses.find((course) => course.course_term_id === selectedTermId);
+    if (selectedCourse) {
+      setCourse(selectedCourse);
+    }
+  };
 
-  // Toggle expanded review
   const toggleExpandedReview = (reviewId: number) => {
     setExpandedReviewId((prevId) => (prevId === reviewId ? -1 : reviewId));
   };
@@ -200,9 +227,26 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   </Heading>
                   <Spacer order={{ base: '2', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '3', sm: '3', md: '3', lg: '3' }}>
-                    <Text>
-                      Filter by: <span>[Professor]</span>
-                    </Text>
+                    {courses.length > 0 && (
+                      <Select
+                        placeholder="Select Term"
+                        size="sm"
+                        onChange={handleTermChange}
+                        value={course?.course_term_id}
+                      >
+                        {courses.map((courseItem) => (
+                          <option key={courseItem.course_term_id} value={courseItem.course_term_id}>
+                            {courseItem.CourseTerm.season} {courseItem.CourseTerm.year}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
+
+                    <Select placeholder="Filter by" size="sm">
+                      <option value="1">Professor</option>
+                      <option value="2">Difficulty</option>
+                      <option value="3">Course Load</option>
+                    </Select>
                   </Box>
                 </Flex>
               </CardHeader>

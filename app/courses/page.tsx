@@ -3,36 +3,26 @@
 'use client';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   Grid,
   GridItem,
-  Card,
-  CardHeader,
-  CardBody,
-  Heading,
   Box,
-  Text,
-  Flex,
-  Spacer,
-  Button,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Select,
+  Text,
 } from '@chakra-ui/react';
-import { FaHeart } from 'react-icons/fa';
+import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
-import { useSearchParams } from 'next/navigation';
+import { parse } from 'path';
 
 interface ICourseTerm {
   course_term_id: number;
   season: string;
   year: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface ICourseDetail {
@@ -52,15 +42,11 @@ interface ICourse {
   CourseTerm: ICourseTerm;
 }
 
-function getURL(page: string | null, limit: string | null) {
+function getURL(page: string | null, limit: string) {
   let url: string;
 
-  if (page && limit) {
+  if (page) {
     url = `/api/courses?page=${page}&limit=${limit}`;
-  } else if (page) {
-    url = `/api/courses?page=${page}`;
-  } else if (limit) {
-    url = `/api/courses?limit=${limit}`;
   } else {
     url = `/api/courses`;
   }
@@ -70,29 +56,46 @@ function getURL(page: string | null, limit: string | null) {
 
 export default function CoursesPage() {
   const searchParams = useSearchParams();
-
-  const router = useRouter();
-  const [courses, setCourses] = useState<ICourse[]>([]);
-  const [limit, setLimit] = useState<number>(15);
+  const [groupedCourses, setGroupedCourses] = useState<Record<string, ICourse[]>>({});
+  const [limit, setLimit] = useState<string>('2');
 
   const page = searchParams.get('page') || null;
-  const coursesURL = getURL(page, limit.toString());
+  const coursesURL = getURL(page, limit);
 
   const { data: coursesResponse, error } = useSWR(coursesURL, apiFetcher);
 
   useEffect(() => {
     if (coursesResponse) {
-      setCourses(coursesResponse.data.courses);
+      const coursesArray = coursesResponse.data.courses;
+
+      // Group courses by course_code
+      const groupedCourses = coursesArray.reduce(
+        (acc: Record<string, ICourse[]>, course: ICourse) => {
+          const { course_code } = course;
+          if (!acc[course_code]) {
+            acc[course_code] = [];
+          }
+          acc[course_code].push(course);
+          return acc;
+        },
+        {}
+      );
+
+      setGroupedCourses(groupedCourses);
+      console.log('groupedCourses', groupedCourses);
     }
   }, [coursesResponse]);
 
-  const navigateToCourse = (courseCode: string) => {
-    router.push(`/courses/${courseCode}`);
+  const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newLimit = e.target.value;
+    setLimit(newLimit);
   };
 
-  const handleLimitChange = (value: string) => {
-    setLimit(Number(value));
-  };
+  if (error) return <Text>Error loading courses</Text>;
+  if (!coursesResponse) return <Text>Loading courses...</Text>;
+
+  const uniqueCourseCodes = Object.keys(groupedCourses);
+  const displayedCourseCodes = uniqueCourseCodes.slice(0, parseInt(limit, 10));
 
   return (
     <>
@@ -104,7 +107,7 @@ export default function CoursesPage() {
         w={{ base: '100%', xl: '95%' }}
         bgColor={'gray.100'}
       >
-        {courses.length > 0 && (
+        {uniqueCourseCodes.length > 0 && (
           <GridItem
             gridColumn={{ base: 'span 12' }}
             display="flex"
@@ -115,11 +118,18 @@ export default function CoursesPage() {
               <NumberInput
                 color="teal"
                 backgroundColor="white"
-                step={5}
-                defaultValue={15}
-                min={10}
-                max={30}
-                onChange={handleLimitChange}
+                step={1}
+                defaultValue={2}
+                min={1}
+                max={5}
+                value={limit}
+                onChange={(valueString) => {
+                  handleLimitChange({
+                    target: { value: valueString },
+                  } as React.ChangeEvent<HTMLInputElement>);
+                }}
+                keepWithinRange
+                clampValueOnBlur
               >
                 <NumberInputField readOnly css={{ cursor: 'default' }} />
                 <NumberInputStepper>
@@ -130,76 +140,16 @@ export default function CoursesPage() {
             </Box>
           </GridItem>
         )}
-        {courses.length > 0 ? (
-          courses.map((course) => (
-            <GridItem
-              key={course.course_id}
-              gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}
-            >
-              <Card>
-                <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                  <Flex align="center" gap={2} wrap="wrap">
-                    <Box>
-                      <Heading
-                        as="h1"
-                        color="teal"
-                        fontSize={{ base: '20', sm: '24', md: '24', lg: '28' }}
-                        mb={2}
-                      >
-                        {course.course_code}
-                      </Heading>
-                      <Heading as="h2" color="teal" fontSize={{ md: '18' }}>
-                        {course.CourseDetail.course_name}
-                      </Heading>
-                    </Box>
-                    <Spacer />
-                    <Box color="pink.400">
-                      <FaHeart size={20} />
-                    </Box>
-                  </Flex>
-                </CardHeader>
-                <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                  <Text fontSize={{ md: '14' }}>{course.CourseDetail.course_description}</Text>
-                </CardBody>
-                <Button
-                  colorScheme="teal"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateToCourse(course.course_code)}
-                  mt={2}
-                >
-                  View Reviews
-                </Button>
-              </Card>
+        {uniqueCourseCodes.length > 0 ? (
+          displayedCourseCodes.map((courseCode) => (
+            <GridItem key={courseCode} gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}>
+              <CourseCard courses={groupedCourses[courseCode]} />
             </GridItem>
           ))
         ) : (
           <Text>No courses available</Text>
         )}
       </Grid>
-      {/* {courses.length > 0 && (
-        <Grid
-          gridTemplateColumns="repeat(12, 1fr)"
-          gap={{ base: '3', md: '3', lg: '6' }}
-          p={{ base: '3', md: '3', lg: '5' }}
-          margin="0 auto"
-          w={{ base: '100%', '2xl': '80%' }}
-          bgColor={'gray.100'}
-        >
-          <Box p={5}>
-            <Text fontSize="lg" mb={2}>
-              Select number of courses to display:
-            </Text>
-            <NumberInput step={5} defaultValue={15} min={10} max={30} onChange={handleLimitChange}>
-              <NumberInputField readOnly css={{ cursor: 'default' }} />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </Box>
-        </Grid>
-      )} */}
     </>
   );
 }
