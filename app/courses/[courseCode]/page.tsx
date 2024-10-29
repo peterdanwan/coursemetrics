@@ -26,6 +26,9 @@ import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
+import { FaCropSimple } from 'react-icons/fa6';
+import Head from 'next/head';
+import SideMenu from '@/components/SideFilterMenuCourse';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -78,7 +81,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
   const [courses, setCourses] = useState<ICourse[]>([]);
   const [course, setCourse] = useState<ICourse | null>(null);
+  const [terms, setTerms] = useState<ICourseTerm[]>([]);
   const [reviews, setReviews]: any = useState(null);
+  const [sections, setSections] = useState<ICourse[]>([]);
   const searchParams = useSearchParams();
 
   // Get year and season from query params, with fallback to current values
@@ -91,13 +96,25 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   useEffect(() => {
     if (courseResponse) {
-      setCourses(courseResponse.data.courses);
+      const coursesArray = courseResponse.data.courses;
+      setCourses(coursesArray);
+
+      // Extract unique terms
+      const termMap = new Map<string, ICourseTerm>();
+      coursesArray.forEach((courseItem: ICourse) => {
+        const termKey = `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}`;
+        if (!termMap.has(termKey)) {
+          termMap.set(termKey, courseItem.CourseTerm);
+        }
+      });
+      const uniqueTerms = Array.from(termMap.values());
+      setTerms(uniqueTerms);
 
       // Find the course that matches the season and year from the URL
       let initialCourse;
 
       if (year && season) {
-        initialCourse = courseResponse.data.courses.find(
+        initialCourse = coursesArray.find(
           (courseItem: ICourse) =>
             courseItem.CourseTerm.year.toString() === year &&
             courseItem.CourseTerm.season.toLowerCase() === season.toLowerCase()
@@ -106,10 +123,16 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
       if (!initialCourse) {
         // If no matching course is found, default to the first course
-        initialCourse = courseResponse.data.courses[0];
+        initialCourse = coursesArray[0];
       }
 
       setCourse(initialCourse);
+      const initialTermKey = `${initialCourse.CourseTerm.season}_${initialCourse.CourseTerm.year}`;
+      const initialSections = coursesArray.filter(
+        (courseItem: ICourse) =>
+          `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}` === initialTermKey
+      );
+      setSections(initialSections);
     }
   }, [courseResponse, year, season]);
 
@@ -118,16 +141,38 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     : null;
 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
+  console.log(reviewResponse);
 
   useEffect(() => {
     if (reviewResponse) {
-      setReviews(reviewResponse.data);
+      if (Array.isArray(reviewResponse.data)) {
+        setReviews(reviewResponse.data);
+      } else {
+        setReviews([]);
+      }
     }
   }, [reviewResponse]);
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedTermId = Number(e.target.value);
-    const selectedCourse = courses.find((course) => course.course_term_id === selectedTermId);
+    const selectedTermKey = e.target.value;
+    const [selectedSeason, selectedYear] = selectedTermKey.split('_');
+
+    // Filter courses that match the selected term
+    const selectedCourses = courses.filter(
+      (course) =>
+        course.CourseTerm.season === selectedSeason &&
+        course.CourseTerm.year.toString() === selectedYear
+    );
+
+    if (selectedCourses.length > 0) {
+      setSections(selectedCourses);
+      setCourse(selectedCourses[0]); // Set the first course as default
+    }
+  };
+
+  const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCourseId = Number(e.target.value);
+    const selectedCourse = sections.find((course) => course.course_id === selectedCourseId);
     if (selectedCourse) {
       setCourse(selectedCourse);
     }
@@ -179,6 +224,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
                 <Text fontSize={{ md: '14' }}>{course?.CourseDetail.course_description}</Text>
+                <Text fontSize={{ md: '14' }}>
+                  Course Section: <b>{course?.course_section}</b>
+                </Text>
+                <Text fontSize={{ md: '14' }}>
+                  Term: <b>{`${course?.CourseTerm.season} ${course?.CourseTerm.year}`}</b>
+                </Text>
+                <Text fontSize={{ md: '14' }}>
+                  Delivery Format: <b>{course?.course_delivery_format_id}</b>
+                </Text>
               </CardBody>
             </Card>
           </GridItem>
@@ -227,26 +281,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   </Heading>
                   <Spacer order={{ base: '2', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '3', sm: '3', md: '3', lg: '3' }}>
-                    {courses.length > 0 && (
-                      <Select
-                        placeholder="Select Term"
-                        size="sm"
-                        onChange={handleTermChange}
-                        value={course?.course_term_id}
-                      >
-                        {courses.map((courseItem) => (
-                          <option key={courseItem.course_term_id} value={courseItem.course_term_id}>
-                            {courseItem.CourseTerm.season} {courseItem.CourseTerm.year}
-                          </option>
-                        ))}
-                      </Select>
-                    )}
-
-                    <Select placeholder="Filter by" size="sm">
-                      <option value="1">Professor</option>
-                      <option value="2">Difficulty</option>
-                      <option value="3">Course Load</option>
-                    </Select>
+                    <SideMenu
+                      terms={terms}
+                      sections={sections}
+                      course={course}
+                      handleTermChange={handleTermChange}
+                      handleSectionChange={handleSectionChange}
+                    />
                   </Box>
                 </Flex>
               </CardHeader>

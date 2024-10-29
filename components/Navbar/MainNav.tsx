@@ -33,7 +33,7 @@ import useFetchUser from '../useFetchUser';
 
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
-import React, { useState, useEffect, use, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useFlexStyle } from '@/styles/styles';
@@ -101,10 +101,12 @@ export default function MainNav(props: { user: any }) {
   const { data: coursesResponse, error } = useSWR(coursesURL, apiFetcher);
 
   useEffect(() => {
-    if (coursesResponse) {
-      setAllCourses(coursesResponse.data.courses || []);
+    if (coursesResponse && coursesResponse.data) {
+      setAllCourses(coursesResponse.data.courses);
+    } else if (error) {
+      console.error('Error fetching courses:', error);
     }
-  }, [coursesResponse]);
+  }, [coursesResponse, error]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
