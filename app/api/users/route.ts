@@ -23,6 +23,7 @@ export const POST = async function create_user(req: NextRequest): Promise<NextRe
       return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
     }
 
+    // Extract the user credentials returned from Auth0
     const userEmail = user.email;
     const userName = user.name;
     log.info(`Checking for existing user or creating a new one, email: ${userEmail}`);
@@ -61,6 +62,55 @@ export const POST = async function create_user(req: NextRequest): Promise<NextRe
     log.error('Error processing user', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
+      { status: 500 }
+    );
+  }
+};
+
+// ===== API ROUTE TO GET USER INFORMATION =====
+export const GET = async function get_user(req: NextRequest): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/auth/route.ts' });
+
+  try {
+    // Connect to the database
+    await connectDB();
+
+    // Get the user session from Auth0
+    const { user }: any = await getSession();
+    if (!user) {
+      log.warn('User not authenticated');
+      return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
+    }
+
+    // Find the user by email
+    const userInstance = await User.findOne({
+      where: { email: user.email },
+      include: [
+        {
+          model: UserProfile,
+          attributes: ['user_id'], // Add any other UserProfile fields you need
+        },
+      ],
+    });
+
+    if (!userInstance) {
+      log.warn('User not found in database', { email: user.email });
+      return NextResponse.json(createErrorResponse(404, 'User not found'), { status: 404 });
+    }
+
+    log.info('User retrieved successfully', { email: user.email });
+
+    return NextResponse.json(
+      createSuccessResponse({
+        user: userInstance,
+      }),
+      { status: 200 }
+    );
+  } catch (error: unknown) {
+    console.error(error);
+    log.error('Error retrieving user', { error });
+    return NextResponse.json(
+      createErrorResponse(500, 'Something went wrong. A server-side error occurred.'),
       { status: 500 }
     );
   }
