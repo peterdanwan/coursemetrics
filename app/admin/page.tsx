@@ -1,13 +1,12 @@
 // app/admin/page.tsx
 'use client';
 import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Link } from '@chakra-ui/react';
+import React from 'react';
 import NextLink from 'next/link';
+import withAdminAuth from '@/components/withAdminAuth';
 
-// Need to add the admin accessibility logic
-
-export default function Admin() {
-  // Replace 'Admin Name' with the actual admin name variable or prop if available
-  const adminName = 'Admin Name';
+export default withAdminAuth(function Admin({ user }: { user: any }) {
+  const adminName = user?.full_name || 'Admin';
 
   return (
     <Flex
@@ -112,4 +111,4 @@ export default function Admin() {
       </Flex>
     </Flex>
   );
-}
+});

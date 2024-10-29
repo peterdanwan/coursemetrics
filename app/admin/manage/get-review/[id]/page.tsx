@@ -18,6 +18,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
+import withAdminAuth from '@/components/withAdminAuth';
 
 interface ReviewDetail {
   question: string;
@@ -32,7 +33,7 @@ interface ReviewData {
   reviewDetails: ReviewDetail[];
 }
 
-export default function ReviewDetails() {
+export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('id');
@@ -164,4 +165,4 @@ export default function ReviewDetails() {
       </Flex>
     </Flex>
   );
-}
+});
