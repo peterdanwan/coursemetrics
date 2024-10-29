@@ -29,6 +29,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
+import useFetchUser from '../useFetchUser';
 
 import Image from 'next/image';
 import logo from '@/assets/images/CourseMetricsLogo.png';
@@ -84,6 +85,7 @@ function getURL(page: string | null, limit: string | null) {
 export default function MainNav(props: { user: any }) {
   const { isOpen, onToggle, onClose } = useDisclosure();
   const [selectedCategory, setSelectedCategory] = useState('Select Category');
+  const { user, loading: userLoading, error: userError } = useFetchUser();
   const router = useRouter();
   const toast = useToast();
 
@@ -147,10 +149,8 @@ export default function MainNav(props: { user: any }) {
 
   // If the user is not stored in the database, store all details
   useEffect(() => {
-    if (props.user) {
-      registerUserInDB();
-    }
-  }, [props.user]);
+    registerUserInDB();
+  }, [user, userLoading, userError]);
 
   const flexStyle = useFlexStyle();
   const handleSearch = (searchQuery: string, category: string) => {
@@ -257,116 +257,119 @@ export default function MainNav(props: { user: any }) {
               minW={0}
             />
             <MenuList>
-              {props.user ? (
+              {user ? (
                 <>
                   <MenuGroup sx={{ textAlign: 'center' }} title={`Hello ${props.user.name}!`}>
                     <MenuItem as="a" href="/profile">
                       Profile
                     </MenuItem>
-                    {/* Add the logic of "IF the user is an admin" here, which is similar to:
-                    {props.user.isAdmin ?( ... ) : ( ... ) */}
-                    <MenuItem>
-                      <Popover trigger="click" placement="right-start" closeOnBlur>
-                        {({ isOpen }) => (
-                          <>
-                            <PopoverTrigger>
-                              <Box
-                                as="div"
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                width="100%"
-                                cursor="pointer"
-                                bg={isOpen ? 'gray.100' : 'transparent'}
-                                _hover={{ bg: 'gray.100' }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              >
-                                <Text fontWeight={isOpen ? 'bold' : 'normal'}>Manage</Text>
-                                <ChevronRightIcon />
-                              </Box>
-                            </PopoverTrigger>
-                            <PopoverContent>
-                              <Stack spacing={0}>
-                                {' '}
-                                <MenuItem
-                                  as="a"
-                                  href="/admin/manage?option=courses"
-                                  _hover={{ bg: 'gray.100' }}
-                                >
-                                  Course Management
-                                </MenuItem>
-                                <MenuItem
-                                  as="a"
-                                  href="/admin/manage?option=professors"
-                                  _hover={{ bg: 'gray.100' }}
-                                >
-                                  Professor Management
-                                </MenuItem>
-                                <MenuItem
-                                  as="a"
-                                  href="/admin/manage?option=reviews"
-                                  _hover={{ bg: 'gray.100' }}
-                                >
-                                  Review Management
-                                </MenuItem>
-                              </Stack>
-                            </PopoverContent>
-                          </>
-                        )}
-                      </Popover>
-                    </MenuItem>
-                    {/* End of Admin IF Logic */}
-                    {/* Beginning of ELSE logic, which is after the ": (else logic here)" */}
-                    <MenuItem>
-                      <Popover trigger="click" placement="right-start" closeOnBlur>
-                        {({ isOpen }) => (
-                          <>
-                            <PopoverTrigger>
-                              <Box
-                                as="div"
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                width="100%"
-                                cursor="pointer"
-                                bg={isOpen ? 'gray.100' : 'transparent'}
-                                _hover={{ bg: 'gray.100' }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                              >
-                                <Text fontWeight={isOpen ? 'bold' : 'normal'}>Reviews</Text>
-                                <ChevronRightIcon />
-                              </Box>
-                            </PopoverTrigger>
-                            <PopoverContent>
-                              <Stack spacing={0}>
-                                {' '}
-                                <MenuItem
-                                  as="a"
-                                  href="/user/reviews/courses"
-                                  _hover={{ bg: 'gray.100' }}
-                                >
-                                  Courses
-                                </MenuItem>
-                                <MenuItem
-                                  as="a"
-                                  href="/user/reviews/professors"
-                                  _hover={{ bg: 'gray.100' }}
-                                >
-                                  Professors
-                                </MenuItem>
-                              </Stack>
-                            </PopoverContent>
-                          </>
-                        )}
-                      </Popover>
-                    </MenuItem>
-                    <MenuItem as="a" href="/user/bookmark">
-                      Bookmark
-                    </MenuItem>
+                    {user?.role_id === 1 ? (
+                      <>
+                        <MenuItem>
+                          <Popover trigger="click" placement="right-start" closeOnBlur>
+                            {({ isOpen }) => (
+                              <>
+                                <PopoverTrigger>
+                                  <Box
+                                    as="div"
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                    width="100%"
+                                    cursor="pointer"
+                                    bg={isOpen ? 'gray.100' : 'transparent'}
+                                    _hover={{ bg: 'gray.100' }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                    }}
+                                  >
+                                    <Text fontWeight={isOpen ? 'bold' : 'normal'}>Manage</Text>
+                                    <ChevronRightIcon />
+                                  </Box>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Stack spacing={0}>
+                                    {' '}
+                                    <MenuItem
+                                      as="a"
+                                      href="/admin/manage?option=courses"
+                                      _hover={{ bg: 'gray.100' }}
+                                    >
+                                      Course Management
+                                    </MenuItem>
+                                    <MenuItem
+                                      as="a"
+                                      href="/admin/manage?option=professors"
+                                      _hover={{ bg: 'gray.100' }}
+                                    >
+                                      Professor Management
+                                    </MenuItem>
+                                    <MenuItem
+                                      as="a"
+                                      href="/admin/manage?option=reviews"
+                                      _hover={{ bg: 'gray.100' }}
+                                    >
+                                      Review Management
+                                    </MenuItem>
+                                  </Stack>
+                                </PopoverContent>
+                              </>
+                            )}
+                          </Popover>
+                        </MenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <MenuItem>
+                          <Popover trigger="click" placement="right-start" closeOnBlur>
+                            {({ isOpen }) => (
+                              <>
+                                <PopoverTrigger>
+                                  <Box
+                                    as="div"
+                                    display="flex"
+                                    justifyContent="space-between"
+                                    alignItems="center"
+                                    width="100%"
+                                    cursor="pointer"
+                                    bg={isOpen ? 'gray.100' : 'transparent'}
+                                    _hover={{ bg: 'gray.100' }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                    }}
+                                  >
+                                    <Text fontWeight={isOpen ? 'bold' : 'normal'}>Reviews</Text>
+                                    <ChevronRightIcon />
+                                  </Box>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Stack spacing={0}>
+                                    {' '}
+                                    <MenuItem
+                                      as="a"
+                                      href="/user/reviews/courses"
+                                      _hover={{ bg: 'gray.100' }}
+                                    >
+                                      Courses
+                                    </MenuItem>
+                                    <MenuItem
+                                      as="a"
+                                      href="/user/reviews/professors"
+                                      _hover={{ bg: 'gray.100' }}
+                                    >
+                                      Professors
+                                    </MenuItem>
+                                  </Stack>
+                                </PopoverContent>
+                              </>
+                            )}
+                          </Popover>
+                        </MenuItem>
+                        <MenuItem as="a" href="/user/bookmark">
+                          Bookmark
+                        </MenuItem>
+                      </>
+                    )}
                     {/* End of ELSE Logic */}
                     <MenuItem as="a" href="/user/sap">
                       Settings & Privacy

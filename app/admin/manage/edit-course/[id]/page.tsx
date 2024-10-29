@@ -15,6 +15,8 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Select, { MultiValue } from 'react-select';
+import withAdminAuth from '@/components/withAdminAuth';
+import customStyles from '@/styles/customStyles';
 
 // ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
 const sampleProfessors = [
@@ -38,7 +40,7 @@ const sampleTerms = [
 
 // ******************************************************************************************************************************************************************
 
-export default function EditCourse() {
+export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const courseId = searchParams.get('id');
@@ -167,44 +169,4 @@ export default function EditCourse() {
       </Box>
     </Flex>
   );
-}
-
-// These customStyles would be similar in this page, add-professor, add-course and edit-professor pages
-// After all the page is complete and merge, I will return and refactor the customStyles to a separate file.
-const customStyles = {
-  control: (provided: any, { isFocused }: any) => ({
-    ...provided,
-    borderColor: isFocused ? 'teal' : 'gray.200',
-    borderWidth: isFocused ? '2px' : '1px',
-    boxShadow: 'none',
-    '&:hover': {
-      borderColor: isFocused ? 'teal' : 'gray.200',
-    },
-    minHeight: '40px',
-  }),
-  multiValue: (provided: any) => ({
-    ...provided,
-    backgroundColor: 'teal',
-  }),
-  multiValueLabel: (provided: any) => ({
-    ...provided,
-    color: 'white',
-  }),
-  multiValueRemove: (provided: any) => ({
-    ...provided,
-    color: 'white',
-    ':hover': {
-      backgroundColor: 'darkred',
-      color: 'white',
-    },
-  }),
-  option: (provided: any, { isSelected, isFocused }: any) => ({
-    ...provided,
-    backgroundColor: isSelected ? 'teal' : isFocused ? 'lightgray' : 'white',
-    color: isSelected ? 'white' : 'black',
-    ':active': {
-      backgroundColor: 'teal',
-      color: 'white',
-    },
-  }),
-};
+});

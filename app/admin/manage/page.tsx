@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import CoursesTable from '@/components/CoursesTable';
 import ProfessorsTable from '@/components/ProfessorsTable';
 import ReviewsTable from '@/components/ReviewsTable';
+import withAdminAuth from '@/components/withAdminAuth';
 
 // ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
 const initialCourses = [
@@ -192,7 +193,7 @@ const reviews = [
 ];
 // ******************************************************************************************************************************************************************
 
-export default function Manage() {
+export default withAdminAuth(function Manage({ user }: { user: any }) {
   const searchParams = useSearchParams();
   const initialOption = searchParams.get('option') || '';
   const [selectedOption, setSelectedOption] = useState<string>(initialOption);
@@ -327,4 +328,4 @@ export default function Manage() {
       {selectedOption === 'reviews' && <ReviewsTable reviews={filteredReviews} />}
     </Box>
   );
-}
+});

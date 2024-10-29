@@ -1,6 +1,7 @@
 // app/page.tsx
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 import {
   Box,
@@ -13,8 +14,39 @@ import {
   useColorModeValue,
   createIcon,
 } from '@chakra-ui/react';
+import useFetchUser from '@/components/useFetchUser';
+import { Spinner } from '@nextui-org/react';
 
 export default function Home() {
+  const router = useRouter();
+  const { user, loading, error } = useFetchUser();
+  const [isRedirecting, setIsRedirecting] = useState(true);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (error) {
+      console.error('Error fetching user data:', error);
+      setIsRedirecting(false);
+      return;
+    }
+
+    if (user && user.role_id === 1) {
+      router.replace('/admin');
+    } else {
+      setIsRedirecting(false);
+    }
+  }, [user, loading, error, router]);
+
+  if (isRedirecting || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp;Loading the data ...
+      </div>
+    );
+  }
+
   return (
     <>
       <Container
