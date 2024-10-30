@@ -1,4 +1,4 @@
-// app/api/courses/[course_code]/route.ts
+// app/api/courses/[courseCode]/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
@@ -13,7 +13,7 @@ import CourseTerm from '@/database/models/CourseTerm';
 export const GET = withApiAuthRequired(async function get_course_by_course_code(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/courses/[course_code]/route.ts' });
+  const log = logger.child({ module: 'app/api/courses/[courseCode]/route.ts' });
 
   try {
     await connectDB();
