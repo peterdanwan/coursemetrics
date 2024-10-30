@@ -70,7 +70,6 @@ function getURL(
     url = `/api/${apiRoute}/${courseCode}?season=${season}`;
   } else {
     url = `/api/${apiRoute}/${courseCode}`;
-    console.log('here');
   }
 
   return url;
@@ -141,7 +140,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     : null;
 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
-  console.log(reviewResponse);
 
   useEffect(() => {
     if (reviewResponse) {
