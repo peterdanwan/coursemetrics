@@ -1,25 +1,24 @@
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { apiFetcher } from '@/utils';
 
-// Define the Professor type
-type Professor = {
-  id: number;
-  first_name: string;
-  last_name: string;
-};
-
-// Props interface
-interface ProfessorsTableProps {
-  professors: Professor[];
-  onRemove: (index: number) => void;
-}
-
-const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove }) => {
+const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (index: number) => void }> = ({
+  professors,
+  onRemove,
+}) => {
   const router = useRouter();
+  const { data: professorData, error: professorError } = useSWR('/api/professors', apiFetcher);
+  console.log('Professors Data: ', professorData);
+
+  const displayedProfessors = professorData?.data.professors || professors;
 
   const handleEditClick = (professorId: number) => {
     router.push(`/admin/manage/edit-professor/${professorId}`);
   };
+
+  if (professorError) return <div>Failed to load professors</div>;
+  if (!professorData) return <div>Loading...</div>;
 
   // More logic would need to be added here to remove the professor from the database
   return (
@@ -65,10 +64,15 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove 
         }}
       >
         <Stack spacing={4}>
-          {professors.map((professor, index) => (
-            <Box key={index} borderWidth="1px" borderRadius="lg" padding={4} bg="gray.50">
+          {displayedProfessors.map((professor: any) => (
+            <Box
+              key={professor.professor_id}
+              borderWidth="1px"
+              borderRadius="lg"
+              padding={4}
+              bg="gray.50"
+            >
               <Flex justify="space-between" align="center">
-                {/* Concatenate first name and last name */}
                 <Text flex="5" color="black" m={1}>
                   {`${professor.first_name} ${professor.last_name}`}
                 </Text>
@@ -85,7 +89,7 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove 
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
-                    onClick={() => handleEditClick(professor.id)}
+                    onClick={() => handleEditClick(professor.professor_id)}
                   >
                     Edit
                   </Button>
@@ -94,7 +98,7 @@ const ProfessorsTable: React.FC<ProfessorsTableProps> = ({ professors, onRemove 
                     color="white"
                     flex="1"
                     ml={{ base: 0, md: 1 }}
-                    onClick={() => onRemove(index)}
+                    onClick={() => onRemove(professor.professor_id)}
                   >
                     Remove
                   </Button>

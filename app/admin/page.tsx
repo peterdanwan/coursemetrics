@@ -4,9 +4,32 @@ import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Link } from '@cha
 import React from 'react';
 import NextLink from 'next/link';
 import withAdminAuth from '@/components/withAdminAuth';
+import useSWR from 'swr';
+
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Failed to fetch');
+  return response.json();
+};
 
 export default withAdminAuth(function Admin({ user }: { user: any }) {
   const adminName = user?.full_name || 'Admin';
+
+  const { data: professorData, error: professorError } = useSWR('/api/professors', fetcher);
+  const { data: courseData, error: courseError } = useSWR('/api/courses', fetcher);
+  const { data: reviewData, error: reviewError } = useSWR('/api/reviews', fetcher);
+  console.log('Professors Data: ', professorData);
+  console.log('Courses Data: ', courseData);
+  console.log('Reviews Data: ', reviewData);
+
+  const numberOfProfessors = professorData?.data.totalProfessors || 0;
+  const numberOfCourses = courseData?.data.totalCourses || 0;
+  const numberOfPendingReviews = reviewData
+    ? reviewData.data.filter((review: any) => review.review_status_id === 1).length
+    : 0;
+
+  if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
+  if (!courseData || !professorData || !reviewData) return <div>Loading...</div>;
 
   return (
     <Flex
@@ -45,7 +68,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
             >
               <CardHeader>
                 <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
-                  40 {/* {numberOfCourses} Replace with the actual number of courses */}
+                  {courseData ? numberOfCourses : 'Loading...'}
                 </Text>
               </CardHeader>
               <CardBody>
@@ -71,7 +94,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
             >
               <CardHeader>
                 <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
-                  10 {/* {numberOfProfessors} Replace with the actual number of professors */}
+                  {professorData ? numberOfProfessors : 'Loading...'}
                 </Text>
               </CardHeader>
               <CardBody>
@@ -97,7 +120,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
             >
               <CardHeader>
                 <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
-                  5 {/* {numberOfReviews} Replace with the actual number of reviews */}
+                  {reviewData ? numberOfPendingReviews : 'Loading...'}
                 </Text>
               </CardHeader>
               <CardBody>

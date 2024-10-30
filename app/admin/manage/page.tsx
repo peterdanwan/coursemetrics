@@ -17,189 +17,21 @@ import CoursesTable from '@/components/CoursesTable';
 import ProfessorsTable from '@/components/ProfessorsTable';
 import ReviewsTable from '@/components/ReviewsTable';
 import withAdminAuth from '@/components/withAdminAuth';
-
-// ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const initialCourses = [
-  {
-    id: '1',
-    name: 'Course 1',
-    section: 'A',
-    term: 'Fall 2024',
-    description: 'Introductory course to programming.',
-  },
-  {
-    id: '2',
-    name: 'Course 2',
-    section: 'B',
-    term: 'Spring 2024',
-    description: 'Advanced topics in software development.',
-  },
-  {
-    id: '3',
-    name: 'Course 3',
-    section: 'C',
-    term: 'Winter 2024',
-    description: 'Data Structures and Algorithms.',
-  },
-  {
-    id: '4',
-    name: 'Course 4',
-    section: 'D',
-    term: 'Summer 2024',
-    description: 'Web Development Fundamentals.',
-  },
-  {
-    id: '5',
-    name: 'Course 5',
-    section: 'A',
-    term: 'Fall 2024',
-    description:
-      'Introductory course to programming. This is a longer description that should be truncated if it exceeds the available space.',
-  },
-  {
-    id: '6',
-    name: 'Course 6',
-    section: 'B',
-    term: 'Spring 2024',
-    description: 'Advanced topics in software development.',
-  },
-  {
-    id: '7',
-    name: 'Course 7',
-    section: 'C',
-    term: 'Winter 2024',
-    description:
-      'Data Structures and Algorithms. This course will cover advanced topics and practical applications.',
-  },
-];
-
-const initialProfessors = [
-  {
-    id: 1,
-    first_name: 'John',
-    last_name: 'Doe',
-  },
-  {
-    id: 2,
-    first_name: 'Jane',
-    last_name: 'Smith',
-  },
-  {
-    id: 3,
-    first_name: 'Emily',
-    last_name: 'Johnson',
-  },
-  {
-    id: 4,
-    first_name: 'Michael',
-    last_name: 'Brown',
-  },
-  {
-    id: 5,
-    first_name: 'Sarah',
-    last_name: 'Davis',
-  },
-  {
-    id: 6,
-    first_name: 'John',
-    last_name: 'Doe',
-  },
-  {
-    id: 7,
-    first_name: 'Jane',
-    last_name: 'Smith',
-  },
-  {
-    id: 8,
-    first_name: 'Emily',
-    last_name: 'Johnson',
-  },
-  {
-    id: 9,
-    first_name: 'Michael',
-    last_name: 'Brown',
-  },
-  {
-    id: 10,
-    first_name: 'Sarah',
-    last_name: 'Davis',
-  },
-];
-
-const reviews = [
-  {
-    id: '1',
-    category: 'Course Review',
-    course_code: 'CSC101',
-    review_text:
-      'This course provides a solid introduction to computer science, with a focus on programming fundamentals. Highly recommended for beginners!',
-    average_rate: 4.5,
-    status: 'approved',
-  },
-  {
-    id: '2',
-    category: 'Course Review',
-    course_code: 'MTH202',
-    review_text:
-      'The content was quite challenging, but the professor was very helpful. I struggled with some concepts, but overall, it was a good learning experience.',
-    average_rate: 3.8,
-    status: 'pending',
-  },
-  {
-    id: '3',
-    category: 'Professor Review',
-    course_code: 'PHY303',
-    review_text:
-      'Professor Smith explains difficult concepts clearly and is always available to answer questions. However, the exams were much harder than expected.',
-    average_rate: 4.2,
-    status: 'approved',
-  },
-  {
-    id: '4',
-    category: 'Course Review',
-    course_code: 'ENG104',
-    review_text:
-      'I didn’t enjoy the lectures, but the assignments were interesting. The course material felt outdated, and there was little class interaction.',
-    average_rate: 2.5,
-    status: 'rejected',
-  },
-  {
-    id: '5',
-    category: 'Professor Review',
-    course_code: 'CHE201',
-    review_text:
-      'Dr. Thompson is a brilliant professor but can be very strict. If you want to succeed in this class, you need to work hard and follow all the guidelines.',
-    average_rate: 4.0,
-    status: 'pending',
-  },
-  {
-    id: '6',
-    category: 'Course Review',
-    course_code: 'CSC101',
-    review_text:
-      'This course provides a solid introduction to computer science, with a focus on programming fundamentals. Highly recommended for beginners!',
-    average_rate: 4.5,
-    status: 'approved',
-  },
-  {
-    id: '7',
-    category: 'Course Review',
-    course_code: 'MTH202',
-    review_text:
-      'The content was quite challenging, but the professor was very helpful. I struggled with some concepts, but overall, it was a good learning experience.',
-    average_rate: 3.8,
-    status: 'pending',
-  },
-];
-// ******************************************************************************************************************************************************************
+import useSWR from 'swr';
+import { apiFetcher } from '@/utils';
 
 export default withAdminAuth(function Manage({ user }: { user: any }) {
   const searchParams = useSearchParams();
   const initialOption = searchParams.get('option') || '';
   const [selectedOption, setSelectedOption] = useState<string>(initialOption);
   const [searchValue, setSearchValue] = useState<string>('');
-  const [professors, setProfessors] = useState(initialProfessors);
-  const [courses, setCourses] = useState(initialCourses);
+
+  const { data: professors, error: professorError } = useSWR('/api/professors', apiFetcher);
+  const { data: reviews, error: reviewError } = useSWR('/api/reviews', apiFetcher);
+  const { data: courses, error: courseError } = useSWR('/api/courses', apiFetcher);
+  console.log('Professors Data:', professors);
+  console.log('Reviews Data:', reviews);
+  console.log('Courses Data:', courses);
 
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
@@ -216,49 +48,80 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
     setSearchValue(event.target.value);
   };
 
-  const removeProfessor = (index: number) => {
-    // More logic would need to be added here to remove the course from the database
-    setProfessors((prevProfessors) => prevProfessors.filter((_, i) => i !== index));
+  // Fix this when the BY ID and DELETE API is implemented
+  const removeProfessor = async (professorId: number) => {
+    try {
+      const response = await fetch(`/api/professors/${professorId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete professor');
+      }
+
+      // Optionally, you can trigger a refetch or update state here to refresh the data
+    } catch (error) {
+      console.error('Error removing professor:', error);
+    }
   };
 
-  const removeCourse = (index: number) => {
-    // More logic would need to be added here to remove the course from the database
-    setCourses((prevCourses) => prevCourses.filter((_, i) => i !== index));
+  // Fix this when the BY ID and DELETE API is implemented
+  const removeCourse = async (courseId: number) => {
+    try {
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete course');
+      }
+
+      // Optionally, you can trigger a refetch or update state here to refresh the data
+    } catch (error) {
+      console.error('Error removing course:', error);
+    }
   };
 
-  // ************************************************** FILTER SAMPLE DATA TO BE CHANGED WITH DB DATA **************************************************
+  // Error handling for courses
+  if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
+  if (!courses || !professors || !reviews) return <div>Loading...</div>;
 
   // Function to filter courses based on search value
-  const filteredCourses = courses.filter(
-    (course) =>
-      course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
-      course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const filteredCourses = Array.isArray(courses)
+    ? (courses as any[]).filter(
+        (course) =>
+          course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
+          course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
+          course.description.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : [];
 
-  const filteredProfessors = professors.filter((professor) => {
-    const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
-    return (
-      professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-      fullName.includes(searchValue.toLowerCase())
-    );
-  });
+  // Safely filter professors if defined
+  const filteredProfessors = Array.isArray(professors)
+    ? professors.filter((professor) => {
+        const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
+        return (
+          professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          fullName.includes(searchValue.toLowerCase())
+        );
+      })
+    : [];
 
-  // Function to filter reviews based on search value
-  const filteredReviews = reviews.filter((review) => {
-    const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
-    return (
-      review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
-      normalizedRate.includes(searchValue)
-    );
-  });
-
-  // ******************************************************************************************************************************************************************
+  // Safely filter reviews if defined
+  const filteredReviews = Array.isArray(reviews)
+    ? reviews.filter((review) => {
+        const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
+        return (
+          review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
+          review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
+          review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
+          review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
+          normalizedRate.includes(searchValue)
+        );
+      })
+    : [];
 
   return (
     <Box p={4}>
