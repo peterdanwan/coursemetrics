@@ -20,28 +20,28 @@ export const GET = withApiAuthRequired(async function get_courses(
     await connectDB();
     const url = new URL(req.url);
 
-    const queryParams: { page: string; limit: string } = {
-      page: url.searchParams.get('page') || '1',
-      limit: url.searchParams.get('limit') || '10',
-    };
+    // const queryParams: { page: string; limit: string } = {
+    //   page: url.searchParams.get('page') || '1',
+    //   limit: url.searchParams.get('limit') || '10',
+    // };
 
     // Ref Doc: https://www.shecodes.io/athena/60744-what-is-parseint-in-javascript#
-    const pageNumber: number = parseInt(queryParams.page, 10);
-    const limit: number = parseInt(queryParams.limit, 10);
+    // const pageNumber: number = parseInt(queryParams.page, 10);
+    // const limit: number = parseInt(queryParams.limit, 10);
 
     // Validate pagination parameters
-    if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 1 || limit < 1) {
-      log.error('Invalid pagination parameters', { pageNumber, limit });
-      return NextResponse.json(createErrorResponse(400, 'Invalid pagination parameters'), {
-        status: 400,
-      });
-    }
+    // if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 1 || limit < 1) {
+    //   log.error('Invalid pagination parameters', { pageNumber, limit });
+    //   return NextResponse.json(createErrorResponse(400, 'Invalid pagination parameters'), {
+    //     status: 400,
+    //   });
+    // }
 
-    log.info('Fetching courses', { pageNumber, limit });
+    // log.info('Fetching courses', { pageNumber, limit });
 
     const { count: totalCourses, rows: courses } = await Course.findAndCountAll({
-      offset: (pageNumber - 1) * limit,
-      limit,
+      // offset: (pageNumber - 1) * limit,
+      // limit,
       order: [['course_code', 'ASC']],
       include: [
         {
@@ -59,13 +59,13 @@ export const GET = withApiAuthRequired(async function get_courses(
       ],
     });
 
-    const totalPages = Math.ceil(totalCourses / limit);
+    // const totalPages = Math.ceil(totalCourses / limit);
 
     log.debug(
       {
         courses,
-        totalPages,
-        currentPage: pageNumber,
+        // totalPages,
+        // currentPage: pageNumber,
         totalCourses,
       },
       'Courses fetched from DB'
@@ -76,8 +76,8 @@ export const GET = withApiAuthRequired(async function get_courses(
     return NextResponse.json(
       createSuccessResponse({
         courses,
-        totalPages,
-        currentPage: pageNumber,
+        // totalPages,
+        // currentPage: pageNumber,
         totalCourses,
       }),
       { status: 200 }
