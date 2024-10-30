@@ -1,4 +1,4 @@
-// app/api/reviews/[course_code]/route.ts
+// app/api/reviews/courses/[courseCode]/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
@@ -18,7 +18,7 @@ import CourseTerm from '@/database/models/CourseTerm';
 export const GET = async function fetch_reviews_by_course_code(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/reviews/[course_code]/route.ts' });
+  const log = logger.child({ module: 'app/api/reviews/courses/[courseCode]/route.ts' });
 
   try {
     await connectDB();
