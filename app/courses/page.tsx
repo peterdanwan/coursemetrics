@@ -17,7 +17,6 @@ import {
 } from '@chakra-ui/react';
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
-import { parse } from 'path';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -82,7 +81,6 @@ export default function CoursesPage() {
       );
 
       setGroupedCourses(groupedCourses);
-      console.log('groupedCourses', groupedCourses);
     }
   }, [coursesResponse]);
 

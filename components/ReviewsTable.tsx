@@ -142,8 +142,8 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
                       review.review_status_id === 1
                         ? 'pending'
                         : review.review_status_id === 2
-                        ? 'approved'
-                        : 'rejected'
+                          ? 'approved'
+                          : 'rejected'
                     }
                   />
                 </Text>
