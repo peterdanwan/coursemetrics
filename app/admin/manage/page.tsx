@@ -17,7 +17,7 @@ import CoursesTable from '@/components/CoursesTable';
 import ProfessorsTable from '@/components/ProfessorsTable';
 import ReviewsTable from '@/components/ReviewsTable';
 import withAdminAuth from '@/components/withAdminAuth';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { apiFetcher } from '@/utils';
 
 export default withAdminAuth(function Manage({ user }: { user: any }) {
@@ -60,6 +60,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
       }
 
       // Optionally, you can trigger a refetch or update state here to refresh the data
+      mutate('/api/professors');
     } catch (error) {
       console.error('Error removing professor:', error);
     }

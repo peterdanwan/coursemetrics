@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { apiFetcher } from '@/utils';
 
-const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (index: number) => void }> = ({
+const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: number) => void }> = ({
   professors,
   onRemove,
 }) => {
