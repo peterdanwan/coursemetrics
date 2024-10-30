@@ -1,8 +1,6 @@
 # Docker Compose configuration for setting up a local testing environment.
 # This includes a PostgreSQL database and Adminer for database management.
 
-version: '3.1'
-
 networks:
   development-network:
     driver: bridge
