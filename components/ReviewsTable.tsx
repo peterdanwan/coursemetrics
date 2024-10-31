@@ -28,6 +28,11 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
     router.push(`/admin/manage/get-review/${reviewId}`);
   };
 
+  const getStatus = (review: any) => {
+    const review_status_id = review.review_status_id;
+    return review_status_id === 1 ? 'pending' : review_status_id === 2 ? 'approved' : 'rejected';
+  };
+
   if (reviewError) return <div>Failed to load reviews</div>;
   if (!reviewData) return <div>Loading...</div>;
 
@@ -137,15 +142,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
 
                 {/* Status Icon */}
                 <Text flex="1" textAlign="center" ml={5}>
-                  <ReviewsStatusIcon
-                    status={
-                      review.review_status_id === 1
-                        ? 'pending'
-                        : review.review_status_id === 2
-                          ? 'approved'
-                          : 'rejected'
-                    }
-                  />
+                  <ReviewsStatusIcon status={getStatus(review)} />
                 </Text>
               </Flex>
             </Box>
