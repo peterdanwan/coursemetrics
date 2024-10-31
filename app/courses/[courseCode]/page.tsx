@@ -65,7 +65,7 @@ function getURL(
 ) {
   let url: string;
   if (year && season) {
-    url = `/api/${apiRoute}/${courseCode}?year=${year}&season=${season}`;
+    url = `/api/${apiRoute}/${courseCode}?season=${season}&year=${year}`;
   } else if (year) {
     url = `/api/${apiRoute}/${courseCode}?year=${year}`;
   } else if (season) {
@@ -101,6 +101,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   useEffect(() => {
     if (courseResponse) {
+      console.log(courseResponse);
       const coursesArray = courseResponse.data.courses;
       setCourses(coursesArray);
 
@@ -142,7 +143,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   }, [courseResponse, year, season]);
 
   const reviewsURL = course
-    ? getURL('reviews', course.CourseTerm.season, course.CourseTerm.year.toString(), courseCode)
+    ? getURL(
+        'reviews/courses',
+        course.CourseTerm.season,
+        course.CourseTerm.year.toString(),
+        courseCode
+      )
     : null;
 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
