@@ -21,6 +21,7 @@ import {
   Stack,
   StackDivider,
   Select,
+  useDisclosure,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
@@ -29,6 +30,7 @@ import { useSearchParams } from 'next/navigation';
 import { FaCropSimple } from 'react-icons/fa6';
 import Head from 'next/head';
 import SideMenu from '@/components/SideFilterMenuCourse';
+import CourseReviewForm from '@/components/CourseReviewForm';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -63,13 +65,14 @@ function getURL(
 ) {
   let url: string;
   if (year && season) {
-    url = `/api/${apiRoute}/${courseCode}?year=${year}&season=${season}`;
+    url = `/api/${apiRoute}/${courseCode}?season=${season}&year=${year}`;
   } else if (year) {
     url = `/api/${apiRoute}/${courseCode}?year=${year}`;
   } else if (season) {
     url = `/api/${apiRoute}/${courseCode}?season=${season}`;
   } else {
     url = `/api/${apiRoute}/${courseCode}`;
+    // console.log('here');
   }
 
   return url;
@@ -93,8 +96,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
 
+  // For review form modal
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   useEffect(() => {
     if (courseResponse) {
+      console.log(courseResponse);
       const coursesArray = courseResponse.data.courses;
       setCourses(coursesArray);
 
@@ -136,10 +143,16 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   }, [courseResponse, year, season]);
 
   const reviewsURL = course
-    ? getURL('reviews', course.CourseTerm.season, course.CourseTerm.year.toString(), courseCode)
+    ? getURL(
+        'reviews/courses',
+        course.CourseTerm.season,
+        course.CourseTerm.year.toString(),
+        courseCode
+      )
     : null;
 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
+  // console.log(reviewResponse);
 
   useEffect(() => {
     if (reviewResponse) {
@@ -315,15 +328,20 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     // width="200px"
                     alignSelf="flex-end"
                     mt={5}
+                    onClick={onOpen}
                   >
                     Add Review
                   </Button>
+                  <CourseReviewForm
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    key={isOpen ? 'open' : 'closed'}
+                  />
                 </Flex>
               </CardBody>
             </Card>
           </GridItem>
           {/* Quick Stats Section */}
-          {/* TODO: Componentize QuickStats */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
@@ -429,7 +447,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             </Card>
           </GridItem>
           {/* Prerequisites Section */}
-          {/* TODO: Componentize Prerequisite */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
