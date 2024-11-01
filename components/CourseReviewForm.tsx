@@ -463,7 +463,8 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                             />
                           </RadioGroup>
                           <FormErrorMessage>
-                            {errors.courseLoadRating && errors.courseLoadRating.message}
+                            {errors.evaluationFairnessRating &&
+                              errors.evaluationFairnessRating.message}
                           </FormErrorMessage>
                         </FormControl>
 
@@ -496,7 +497,8 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                             />
                           </RadioGroup>
                           <FormErrorMessage>
-                            {errors.courseLoadRating && errors.courseLoadRating.message}
+                            {errors.materialRelevanceRating &&
+                              errors.materialRelevanceRating.message}
                           </FormErrorMessage>
                         </FormControl>
                       </Flex>
@@ -548,7 +550,9 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                         placeholder="Share any difficulties or challenges you faced in this course..."
                         {...register('difficultyReview')}
                       />
-                      <FormErrorMessage>{errors.tags && errors.tags.message}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.difficultyReview && errors.difficultyReview.message}
+                      </FormErrorMessage>
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.solution}>
@@ -558,7 +562,9 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                         placeholder="How you overcame the above challenges..."
                         {...register('solution')}
                       />
-                      <FormErrorMessage>{errors.tags && errors.tags.message}</FormErrorMessage>
+                      <FormErrorMessage>
+                        {errors.solution && errors.solution.message}
+                      </FormErrorMessage>
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.assessmentsReview}>
