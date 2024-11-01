@@ -105,28 +105,28 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
       defaultValue: '1',
     });
 
-  // Course Load Rating Radio Group
+  // Responsiveness Rating Radio Group
   const { radioGroup: responsivenessGroup, getRadioProps: getResponsivenessRadioProps } =
     useCreateRatingRadioGroup({
       name: 'responsivenessRating',
       defaultValue: '1',
     });
 
-  // Content Quality Rating Radio Group
+  // Engagement Rating Radio Group
   const { radioGroup: engagementGroup, getRadioProps: getEngagementRadioProps } =
     useCreateRatingRadioGroup({
       name: 'engagementRating',
       defaultValue: '1',
     });
 
-  // Course Structure Rating Radio Group
+  // Knowledge Rating Radio Group
   const { radioGroup: knowledgeGroup, getRadioProps: getKnowledgeRadioProps } =
     useCreateRatingRadioGroup({
       name: 'knowledgeRating',
       defaultValue: '1',
     });
 
-  // Evaluation Fairness Rating Radio Group
+  // Grading Fairness Rating Radio Group
   const { radioGroup: gradingFairnessGroup, getRadioProps: getGradingFairnessRadioProps } =
     useCreateRatingRadioGroup({
       name: 'gradingFairnessRating',
@@ -351,7 +351,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.engagementRating}>
-                          <FormLabel>Content Quality:</FormLabel>
+                          <FormLabel>Engagement:</FormLabel>
                           <RadioGroup name="engagementRating">
                             <Controller
                               name="engagementRating"
@@ -386,7 +386,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
 
                       <Flex flex="1" direction="column" gap={5}>
                         <FormControl isInvalid={!!errors.knowledgeRating}>
-                          <FormLabel>Course Structure:</FormLabel>
+                          <FormLabel>Knowledge:</FormLabel>
                           <RadioGroup name="knowledgeRating" id="course-structure">
                             <Controller
                               name="knowledgeRating"
@@ -419,7 +419,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                         </FormControl>
 
                         <FormControl isInvalid={!!errors.gradingFairnessRating}>
-                          <FormLabel>Evaluation Fairness:</FormLabel>
+                          <FormLabel>Grading Fairness:</FormLabel>
                           <RadioGroup name="gradingFairnessRating" id="evaluation-fairness">
                             <Controller
                               name="gradingFairnessRating"
