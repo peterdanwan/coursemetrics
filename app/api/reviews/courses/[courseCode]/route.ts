@@ -51,6 +51,9 @@ export const GET = async function fetch_reviews_by_course_code(
     }
 
     const reviews = await Review.findAll({
+      where: {
+        review_type_id: 1,
+      },
       include: [
         {
           model: User,

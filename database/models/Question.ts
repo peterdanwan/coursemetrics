@@ -27,6 +27,10 @@ Question.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    is_rating: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
     review_type_id: {
       type: DataTypes.INTEGER,
       allowNull: false,

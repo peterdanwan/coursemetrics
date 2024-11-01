@@ -333,11 +333,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     mt={5}
                     onClick={onCourseReviewFormOpen}
                   >
-                    Add Review
+                    Submit Review
                   </Button>
                   <CourseReviewForm
                     isOpen={isCourseReviewFormOpen}
                     onClose={onCourseReviewFormClose}
+                    courseResponse={courseResponse}
+                    reviewResponse={reviewResponse}
                     key={isCourseReviewFormOpen ? 'open' : 'closed'}
                   />
                 </Flex>

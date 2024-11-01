@@ -1,37 +1,19 @@
-import {
-  Radio,
-  RadioGroup,
-  Box,
-  UseRadioProps,
-  useRadio,
-  Input,
-  FormLabel,
-} from '@chakra-ui/react';
-import { forwardRef, InputHTMLAttributes } from 'react';
-import { UseFormRegister, FieldValues, Path, UseFormReturn } from 'react-hook-form';
-import { FormValues } from './CourseReviewForm';
+import { Box, UseRadioProps, useRadio } from '@chakra-ui/react';
 
 interface InputProps extends UseRadioProps {
   children: React.ReactNode;
-  // name: string;
-  // register: UseFormRegister<FormValues>;
 }
 
-// 1. Create a component that consumes the `useRadio` hook
-// const Rating = forwardRef({props: InputProps}, ref) => {
-const Rating = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
-  // const { children, , name } = props;
+const Rating: React.FC<InputProps> = (props) => {
   const { getInputProps, getRadioProps } = useRadio(props);
-
   const input = getInputProps();
   const checkbox = getRadioProps();
 
-  // console.log('checkbox input');
-  // console.log(input.name, input.value, input.checked);
+  const idAttr = `${props.id}${props.value}`;
 
   return (
     <Box as="label">
-      <input {...input} id={props.id} name={props.name} />
+      <input {...input} id={idAttr} name={props.name} />
       <Box
         {...checkbox}
         cursor="pointer"
@@ -46,16 +28,14 @@ const Rating = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         _focus={{
           boxShadow: 'outline',
         }}
-        px={5}
-        py={3}
+        px={{ base: '4', sm: '5', md: '5', lg: '5' }}
+        py={{ base: '2', sm: '3', md: '3', lg: '3' }}
       >
-        <FormLabel m={0} htmlFor={props.id}>
-          {props.children}
-        </FormLabel>
+        {props.children}
       </Box>
     </Box>
   );
-});
+};
 
 Rating.displayName = 'Rating';
 

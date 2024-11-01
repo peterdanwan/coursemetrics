@@ -1,5 +1,5 @@
-import { useForm, SubmitHandler, FieldValues, Controller } from 'react-hook-form';
-import React, { useEffect } from 'react';
+import { useForm, SubmitHandler, FieldValues, useFieldArray } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -13,46 +13,37 @@ import {
   ModalBody,
   ModalCloseButton,
   Select,
-  useRadioGroup,
-  HStack,
-  Radio,
   RadioGroup,
   Stack,
   Flex,
   useDisclosure,
   Text,
+  Radio,
+  Textarea,
 } from '@chakra-ui/react';
 
-import Rating from './Rating';
+import RatingScale from './RatingScale';
 import ConfirmationModal from './ConfirmationModal';
-import { Textarea } from '@nextui-org/react';
+import { apiFetcher } from '@/utils';
+import useSWR from 'swr';
+
+type QuestionUI = {
+  question_id: string;
+  question_text: string;
+  is_rating: boolean;
+  answer: string;
+};
 
 export interface FormValues extends FieldValues {
   courseName: string;
   term: string;
   sectionCode: string;
   professor: string;
-  existingProfs: Array<string>;
-  difficultyRating: string;
-  courseLoadRating: string;
-  contentQualityRating: string;
-  courseStructureRating: string;
-  evaluationFairnessRating: string;
-  materialRelevanceRating: string;
-  takeAgain: Boolean;
+  questions: QuestionUI[];
+  takeAgain: boolean;
   grade: string;
-  tags: Array<string>;
-  existingTags: Array<string>;
-  difficultyReview: Array<string>;
-  solution: Array<string>;
-  assessmentsReview: Array<string>;
-  references: Array<string>;
-  otherComment: Array<string>;
-}
-
-interface ReviewFormProps {
-  isOpen: boolean;
-  onClose: () => void;
+  commentTitle: string;
+  comment: string;
 }
 
 const defaultFormVal: FormValues = {
@@ -60,25 +51,21 @@ const defaultFormVal: FormValues = {
   term: '',
   sectionCode: '',
   professor: '',
-  existingProfs: [],
-  difficultyRating: '1',
-  courseLoadRating: '1',
-  contentQualityRating: '1',
-  courseStructureRating: '1',
-  evaluationFairnessRating: '1',
-  materialRelevanceRating: '1',
+  questions: [],
   takeAgain: false,
   grade: '',
-  tags: [],
-  existingTags: [],
-  difficultyReview: [],
-  solution: [],
-  assessmentsReview: [],
-  references: [],
-  otherComment: [],
+  commentTitle: '',
+  comment: '',
 };
 
-const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
+interface CourseReviewFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  courseResponse: any;
+  reviewResponse: any;
+}
+
+const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, courseResponse }) => {
   const {
     reset,
     register,
@@ -90,65 +77,81 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
     defaultValues: defaultFormVal,
   });
 
-  const ratingOptions = ['1', '2', '3', '4', '5'];
+  // Course name passed from course page
+  const courseName = courseResponse?.data.courses[0].course_code;
 
-  const useCreateRatingRadioGroup = ({
-    name,
-    defaultValue,
-  }: {
-    name: string;
-    defaultValue: string;
-  }) => {
-    const { getRootProps, getRadioProps } = useRadioGroup({
-      name,
-      defaultValue,
-    });
-    const radioGroup = getRootProps();
-    // console.log('radioGroup name', radioGroup.name);
-    return { radioGroup, getRadioProps };
-  };
+  // To access "questions" fields in form
+  const { fields } = useFieldArray({ name: 'questions', control });
 
-  // Difficulty Rating Radio Group
-  const { radioGroup: difficultyGroup, getRadioProps: getDifficultyRadioProps } =
-    useCreateRatingRadioGroup({
-      name: 'difficultyRating',
-      defaultValue: '1',
-    });
+  const [courseProfessors, setCourseProfessors] = useState<any>(null);
+  const [courseQuestions, setCourseQuestions] = useState<any>(null);
 
-  // Course Load Rating Radio Group
-  const { radioGroup: courseLoadGroup, getRadioProps: getCourseLoadRadioProps } =
-    useCreateRatingRadioGroup({
-      name: 'courseLoadRating',
-      defaultValue: '1',
-    });
+  const { data: courseProfessorResponse, error: courseProfessorResponseError } = useSWR(
+    `/api/professors/course/${courseResponse?.data.courses[0].course_code}`,
+    apiFetcher
+  );
 
-  // Content Quality Rating Radio Group
-  const { radioGroup: contentQualityGroup, getRadioProps: getContentQualityRadioProps } =
-    useCreateRatingRadioGroup({
-      name: 'contentQualityRating',
-      defaultValue: '1',
-    });
+  const { data: courseQuestionsResponse, error: courseQuestionsResponseError } = useSWR(
+    `/api/questions?type=1`,
+    apiFetcher
+  );
 
-  // Course Structure Rating Radio Group
-  const { radioGroup: courseStructureGroup, getRadioProps: getCourseStructureRadioProps } =
-    useCreateRatingRadioGroup({
-      name: 'courseStructureRating',
-      defaultValue: '1',
-    });
+  useEffect(() => {
+    if (courseProfessorResponse && courseProfessorResponse.status === 'ok') {
+      // console.log(courseProfessorResponse);
+      const uniqueProfs = Array.from(
+        new Set(
+          courseProfessorResponse.data.professors.map(
+            (professor: any) => `${professor.first_name} ${professor.last_name}`
+          )
+        )
+      );
+      setCourseProfessors(uniqueProfs);
+    }
+  }, [courseProfessorResponse]);
 
-  // Evaluation Fairness Rating Radio Group
-  const { radioGroup: evaluationFairnessGroup, getRadioProps: getEvaluationFairnessRadioProps } =
-    useCreateRatingRadioGroup({
-      name: 'evaluationFairnessRating',
-      defaultValue: '1',
-    });
+  useEffect(() => {
+    if (courseQuestionsResponse && courseQuestionsResponse.status === 'ok') {
+      const courseQuestionsFromDB = courseQuestionsResponse.data.questions;
+      setCourseQuestions(courseQuestionsFromDB);
 
-  // Material Relevance Rating Radio Group
-  const { radioGroup: materialRelevanceGroup, getRadioProps: getMaterialRelevanceRadioProps } =
-    useCreateRatingRadioGroup({
-      name: 'materialRelevanceRating',
-      defaultValue: '1',
-    });
+      // dynamically set questions from DB and default values to form by
+      // populating questions from DB to an array of questionUI objects "questionsUI":
+      const questionsUI: QuestionUI[] = courseQuestionsFromDB.map((courseQuestion: any) => {
+        const questionUI: QuestionUI = {
+          question_id: courseQuestion.question_id.toString(),
+          question_text: courseQuestion.question_text,
+          is_rating: courseQuestion.is_rating,
+          answer: '',
+        };
+        return questionUI;
+      });
+
+      // update "questions" from default form values with "questionsUI"
+      // to reflect on form UI
+      const updatedDefaultFormVal: FormValues = {
+        ...defaultFormVal,
+        courseName: courseName,
+        questions: questionsUI,
+      };
+
+      for (const prop in updatedDefaultFormVal) {
+        setValue(prop as string, updatedDefaultFormVal[prop as keyof FormValues]);
+      }
+    }
+  }, [courseQuestionsResponse, courseQuestions, courseName, setValue]);
+
+  const uniqueTerms = Array.from(
+    new Set(
+      courseResponse?.data.courses.map(
+        (course: any) => `${course.CourseTerm.season} ${course.CourseTerm.year}`
+      )
+    )
+  );
+
+  const uniqueSectionCodes = Array.from(
+    new Set(courseResponse?.data.courses.map((course: any) => `${course.course_section}`))
+  );
 
   // Confirmation on closing form Modal <ConfirmationModal />:
   const {
@@ -165,20 +168,11 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
   } = useDisclosure();
 
   useEffect(() => {
-    let data: FormValues = defaultFormVal;
-
     if (!isOpen) {
-      // console.log('Form closed');
-      // onReset();
       reset(defaultFormVal);
       return;
     }
-
-    // set the values of each form field to match "data"
-    for (const prop in data) {
-      setValue(prop as string, data[prop as keyof FormValues]);
-    }
-  }, [isOpen, reset, setValue]);
+  }, [isOpen, reset]);
 
   const submitForm: SubmitHandler<FormValues> = (data) => {
     console.log(`Submitting form with the following data:`);
@@ -190,457 +184,392 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
   const handleFormModalClose = () => {
     openConfirmModal();
   };
-
   return (
     <>
-      <Modal
-        onClose={handleFormModalClose}
-        isOpen={isOpen}
-        isCentered
-        size="full"
-        scrollBehavior="inside"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
-            Add Review
-          </ModalHeader>
-          <ModalCloseButton color="black" bgColor="gray.200" m={2} />
-          <ModalBody color="black">
-            <form onSubmit={handleSubmit(submitForm)}>
-              <Flex gap={10} wrap="wrap" direction={{ base: 'column', md: 'column', lg: 'row' }}>
-                <Flex flex="1" gap={5} direction="column">
-                  <FormControl isInvalid={!!errors.courseName}>
-                    <FormLabel htmlFor="course-name">
-                      Course Name:{' '}
-                      <Text as="span" color="teal" fontSize="sm">
-                        (Required)
-                      </Text>
-                    </FormLabel>
-                    <Select
-                      id="course-name"
-                      placeholder="Select from existing courses..."
-                      {...register('courseName', {
-                        required: 'Course name is required. Please select from the list.',
-                      })}
+      {courseProfessors && courseQuestions ? (
+        <>
+          <div>
+            <Modal
+              onClose={handleFormModalClose}
+              isOpen={isOpen}
+              isCentered
+              size="full"
+              scrollBehavior="inside"
+            >
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                  Add Review
+                </ModalHeader>
+                <ModalCloseButton color="black" bgColor="gray.200" m={2} />
+                <ModalBody color="black">
+                  <form onSubmit={handleSubmit(submitForm)}>
+                    <Flex
+                      gap={10}
+                      wrap="wrap"
+                      direction={{ base: 'column', md: 'column', lg: 'row' }}
                     >
-                      <option value="abc">ABC</option>
-                      <option value="xyz">XYZ</option>
-                    </Select>
-                    <FormErrorMessage>
-                      {errors.courseName && errors.courseName.message}
-                    </FormErrorMessage>
-                  </FormControl>
-                  <FormControl isInvalid={!!errors.term}>
-                    <FormLabel htmlFor="term">
-                      Term:{' '}
-                      <Text as="span" color="teal" fontSize="sm">
-                        (Required)
-                      </Text>
-                    </FormLabel>
-                    <Input
-                      id="term"
-                      placeholder="Follow Format SEMESTER YEAR (Winter 2024, Fall 2023, etr)"
-                      {...register('term', {
-                        required: 'Term is required. Please enter the term this course is taken.',
-                      })}
-                    />
+                      <Flex flex="1" gap={5} direction="column">
+                        <FormControl isInvalid={!!errors.courseName}>
+                          <FormLabel htmlFor="course-name">
+                            Course Name:{' '}
+                            <Text as="span" color="teal" fontSize="sm">
+                              (Required)
+                            </Text>
+                          </FormLabel>
+                          <Input
+                            id="course-name"
+                            type="text"
+                            placeholder={courseResponse?.data.courses[0].course_code}
+                            value={courseResponse?.data.courses[0].course_code}
+                            readOnly
+                            disabled
+                            {...register('courseName', {
+                              required: 'Course name is required. Please select from the list.',
+                            })}
+                          />
 
-                    <FormErrorMessage>{errors.term && errors.term.message}</FormErrorMessage>
-                  </FormControl>
-
-                  <FormControl isInvalid={!!errors.sectionCode}>
-                    <FormLabel htmlFor="section-code">
-                      Section Code:{' '}
-                      <Text as="span" color="teal" fontSize="sm">
-                        (Required)
-                      </Text>
-                    </FormLabel>
-                    <Select
-                      id="section-code"
-                      placeholder="Select from existing sections..."
-                      {...register('sectionCode', {
-                        required: 'Course section is required. Please select from the list.',
-                      })}
-                    >
-                      <option value="nzz">NZZ</option>
-                      <option value="ncc">NCC</option>
-                    </Select>
-
-                    <FormErrorMessage>
-                      {errors.sectionCode && errors.sectionCode.message}
-                    </FormErrorMessage>
-                  </FormControl>
-
-                  <FormControl isInvalid={!!errors.professor}>
-                    <FormLabel htmlFor="professor">
-                      Professor:{' '}
-                      <Text as="span" color="teal" fontSize="sm">
-                        (Required)
-                      </Text>
-                    </FormLabel>
-                    <Select
-                      id="professor"
-                      placeholder="Add existing professor(s)..."
-                      {...register('professor', {
-                        required: 'Professor is required. Please select from the list.',
-                      })}
-                    >
-                      <option value="peter wan">Peter Wan</option>
-                      <option value="john smith">John Smith</option>
-                    </Select>
-
-                    <FormErrorMessage>
-                      {errors.professor && errors.professor.message}
-                    </FormErrorMessage>
-                  </FormControl>
-
-                  {/**** Included Profs: Need to discuss how this is implemented *****/}
-
-                  <Flex gap={5} wrap="wrap">
-                    <Flex gap={5} wrap="wrap">
-                      <Flex flex="1" direction="column" gap={5}>
-                        <FormControl isInvalid={!!errors.difficultyRating}>
-                          <FormLabel>Difficulty:</FormLabel>
-                          <RadioGroup name="difficultyRating" id="difficultyRating">
-                            <Controller
-                              name="difficultyRating"
-                              control={control}
-                              rules={{ required: 'This rating is required' }}
-                              render={({ field }) => {
-                                return (
-                                  <HStack {...difficultyGroup} onChange={field.onChange}>
-                                    {ratingOptions.map((value) => {
-                                      const radio = getDifficultyRadioProps({ value });
-                                      return (
-                                        <Rating
-                                          key={value}
-                                          {...radio}
-                                          id={`difficultyRating-${value}`}
-                                          name={`difficultyRating`}
-                                        >
-                                          {value}
-                                        </Rating>
-                                      );
-                                    })}
-                                  </HStack>
-                                );
-                              }}
-                            />
-                          </RadioGroup>
                           <FormErrorMessage>
-                            {errors.difficultyRating && errors.difficultyRating.message}
+                            {errors.courseName && errors.courseName.message}
                           </FormErrorMessage>
                         </FormControl>
+                        <FormControl isInvalid={!!errors.term}>
+                          <FormLabel htmlFor="term">
+                            Term:{' '}
+                            <Text as="span" color="teal" fontSize="sm">
+                              (Required)
+                            </Text>
+                          </FormLabel>
+                          <Select
+                            id="course-name"
+                            placeholder="Select from existing terms..."
+                            {...register('term', {
+                              required:
+                                'Term is required. Please enter the term this course is taken.',
+                            })}
+                          >
+                            {uniqueTerms.map((term, index) => (
+                              <option key={index} value={term}>
+                                {term}
+                              </option>
+                            ))}
+                          </Select>
+      {courseProfessors && courseQuestions ? (
+        <>
+          <Modal
+            onClose={handleFormModalClose}
+            isOpen={isOpen}
+            isCentered
+            size="full"
+            scrollBehavior="inside"
+          >
+            <ModalOverlay />
+            <ModalContent overflow="scroll">
+              <ModalHeader color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                New Review
+              </ModalHeader>
+              <ModalCloseButton color="black" bgColor="gray.200" m={2} />
+              <ModalBody color="black">
+                <form onSubmit={handleSubmit(submitForm)}>
+                  <Flex
+                    gap={{ base: '5', sm: '2', md: '2', lg: '10' }}
+                    wrap="wrap"
+                    direction={{ base: 'column', md: 'column', lg: 'row' }}
+                  >
+                    <Flex flex="1" gap={5} direction="column">
+                      {/**** COURSE NAME ****/}
+                      <FormControl isInvalid={!!errors.courseName}>
+                        <FormLabel htmlFor="course-name">
+                          Course Name:{' '}
+                          <Text as="span" color="teal" fontSize="sm">
+                            (Required)
+                          </Text>
+                        </FormLabel>
+                        <Input
+                          id="course-name"
+                          type="text"
+                          placeholder={courseName || 'Select course from the list...'}
+                          value={courseName || ''}
+                          readOnly
+                          disabled
+                          {...register('courseName', {
+                            required: 'Course name is required. Please select from the list.',
+                          })}
+                        />
+                        <FormErrorMessage>
+                          {errors.courseName && errors.courseName.message}
+                        </FormErrorMessage>
+                      </FormControl>
 
-                        <FormControl isInvalid={!!errors.courseLoadRating}>
-                          <FormLabel>Course Load:</FormLabel>
-                          <RadioGroup name="courseLoadRating" id="course-load">
-                            <Controller
-                              name="courseLoadRating"
-                              control={control}
-                              rules={{ required: 'This rating is required' }}
-                              render={({ field }) => {
-                                return (
-                                  <HStack {...courseLoadGroup} onChange={field.onChange}>
-                                    {ratingOptions.map((value) => {
-                                      const radio = getCourseLoadRadioProps({ value });
-                                      return (
-                                        <Rating
-                                          key={value}
-                                          {...radio}
-                                          id={`courseLoadRating-${value}`}
-                                          name={`courseLoadRating`}
-                                        >
-                                          {value}
-                                        </Rating>
-                                      );
-                                    })}
-                                  </HStack>
-                                );
-                              }}
-                            />
-                          </RadioGroup>
-                          <FormErrorMessage>
-                            {errors.courseLoadRating && errors.courseLoadRating.message}
-                          </FormErrorMessage>
-                        </FormControl>
+                      {/**** TERM ****/}
+                      <FormControl isInvalid={!!errors.term}>
+                        <FormLabel htmlFor="term">
+                          Term:{' '}
+                          <Text as="span" color="teal" fontSize="sm">
+                            (Required)
+                          </Text>
+                        </FormLabel>
+                        <Select
+                          id="term"
+                          placeholder="Select from existing terms..."
+                          {...register('term', {
+                            required:
+                              'Term is required. Please enter the term this course is taken.',
+                          })}
+                        >
+                          {uniqueTerms.map((term: any, index: number) => (
+                            <option key={index} value={term}>
+                              {term}
+                            </option>
+                          ))}
+                        </Select>
+                        <FormErrorMessage>{errors.term && errors.term.message}</FormErrorMessage>
+                      </FormControl>
 
-                        <FormControl isInvalid={!!errors.contentQualityRating}>
-                          <FormLabel>Content Quality:</FormLabel>
-                          <RadioGroup name="contentQualityRating" id="content-quality">
-                            <Controller
-                              name="contentQualityRating"
-                              control={control}
-                              rules={{ required: 'This rating is required' }}
-                              render={({ field }) => {
-                                return (
-                                  <HStack {...contentQualityGroup} onChange={field.onChange}>
-                                    {ratingOptions.map((value) => {
-                                      const radio = getContentQualityRadioProps({ value });
-                                      return (
-                                        <Rating
-                                          key={value}
-                                          {...radio}
-                                          id={`contentQualityRating-${value}`}
-                                          name={`contentQualityRating`}
-                                        >
-                                          {value}
-                                        </Rating>
-                                      );
-                                    })}
-                                  </HStack>
-                                );
-                              }}
-                            />
-                          </RadioGroup>
-                          <FormErrorMessage>
-                            {errors.contentQualityRating && errors.contentQualityRating.message}
-                          </FormErrorMessage>
-                        </FormControl>
-                      </Flex>
+                      {/**** SECTION CODE ****/}
+                      <FormControl isInvalid={!!errors.sectionCode}>
+                        <FormLabel htmlFor="section-code">
+                          Section Code:{' '}
+                          <Text as="span" color="teal" fontSize="sm">
+                            (Required)
+                          </Text>
+                        </FormLabel>
+                        <Select
+                          id="section-code"
+                          placeholder="Select from existing sections..."
+                          {...register('sectionCode', {
+                            required: 'Course section is required. Please select from the list.',
+                          })}
+                        >
+                          {uniqueSectionCodes.map((sectionCode: any, index: number) => (
+                            <option key={index} value={sectionCode}>
+                              {sectionCode}
+                            </option>
+                          ))}
+                        </Select>
+                        <FormErrorMessage>
+                          {errors.sectionCode && errors.sectionCode.message}
+                        </FormErrorMessage>
+                      </FormControl>
 
-                      <Flex flex="1" direction="column" gap={5}>
-                        <FormControl isInvalid={!!errors.courseStructureRating}>
-                          <FormLabel>Course Structure:</FormLabel>
-                          <RadioGroup name="courseStructureRating" id="course-structure">
-                            <Controller
-                              name="courseStructureRating"
-                              control={control}
-                              rules={{ required: 'This rating is required' }}
-                              render={({ field }) => {
-                                return (
-                                  <HStack {...courseStructureGroup} onChange={field.onChange}>
-                                    {ratingOptions.map((value) => {
-                                      const radio = getCourseStructureRadioProps({ value });
-                                      return (
-                                        <Rating
-                                          key={value}
-                                          {...radio}
-                                          id={`courseStructureRating-${value}`}
-                                          name={`courseStructureRating`}
-                                        >
-                                          {value}
-                                        </Rating>
-                                      );
-                                    })}
-                                  </HStack>
-                                );
-                              }}
-                            />
-                          </RadioGroup>
-                          <FormErrorMessage>
-                            {errors.courseStructureRating && errors.courseStructureRating.message}
-                          </FormErrorMessage>
-                        </FormControl>
+                      {/**** PROFESSOR ****/}
+                      <FormControl isInvalid={!!errors.professor}>
+                        <FormLabel htmlFor="professor">
+                          Professor:{' '}
+                          <Text as="span" color="teal" fontSize="sm">
+                            (Required)
+                          </Text>
+                        </FormLabel>
+                        <Select
+                          id="professor"
+                          placeholder="Add existing professor(s)..."
+                          {...register('professor', {
+                            required: 'Professor is required. Please select from the list.',
+                          })}
+                        >
+                          {courseProfessors?.map((courseProfessor: any, index: number) => (
+                            <option key={index} value={courseProfessor}>
+                              {courseProfessor}
+                            </option>
+                          ))}
+                        </Select>
+                        <FormErrorMessage>
+                          {errors.professor && errors.professor.message}
+                        </FormErrorMessage>
+                      </FormControl>
 
-                        <FormControl isInvalid={!!errors.evaluationFairnessRating}>
-                          <FormLabel>Evaluation Fairness:</FormLabel>
-                          <RadioGroup name="evaluationFairnessRating" id="evaluation-fairness">
-                            <Controller
-                              name="evaluationFairnessRating"
-                              control={control}
-                              rules={{ required: 'This rating is required' }}
-                              render={({ field }) => {
-                                return (
-                                  <HStack {...evaluationFairnessGroup} onChange={field.onChange}>
-                                    {ratingOptions.map((value) => {
-                                      const radio = getEvaluationFairnessRadioProps({ value });
-                                      return (
-                                        <Rating
-                                          key={value}
-                                          {...radio}
-                                          id={`evaluationFairnessRating-${value}`}
-                                          name={`evaluationFairnessRating`}
-                                        >
-                                          {value}
-                                        </Rating>
-                                      );
-                                    })}
-                                  </HStack>
-                                );
-                              }}
-                            />
-                          </RadioGroup>
-                          <FormErrorMessage>
-                            {errors.evaluationFairnessRating &&
-                              errors.evaluationFairnessRating.message}
-                          </FormErrorMessage>
-                        </FormControl>
-
-                        <FormControl isInvalid={!!errors.materialRelevanceRating}>
-                          <FormLabel>Material Relevance:</FormLabel>
-                          <RadioGroup name="materialRelevanceRating" id="material-relevance">
-                            <Controller
-                              name="materialRelevanceRating"
-                              control={control}
-                              rules={{ required: 'This rating is required' }}
-                              render={({ field }) => {
-                                return (
-                                  <HStack {...materialRelevanceGroup} onChange={field.onChange}>
-                                    {ratingOptions.map((value) => {
-                                      const radio = getMaterialRelevanceRadioProps({ value });
-                                      return (
-                                        <Rating
-                                          key={value}
-                                          {...radio}
-                                          id={`materialRelevanceRating-${value}`}
-                                          name={`materialRelevanceRating`}
-                                        >
-                                          {value}
-                                        </Rating>
-                                      );
-                                    })}
-                                  </HStack>
-                                );
-                              }}
-                            />
-                          </RadioGroup>
-                          <FormErrorMessage>
-                            {errors.materialRelevanceRating &&
-                              errors.materialRelevanceRating.message}
-                          </FormErrorMessage>
-                        </FormControl>
+                      {/**** QUESTIONS SECTION ****/}
+                      <Flex gap={5} wrap="wrap">
+                        <Flex gap={5} wrap="wrap">
+                          {/**** RATING QUESTIONS ****/}
+                          <Flex direction="column" gap={{ base: '5', sm: '2', md: '2', lg: '2' }}>
+                            {fields?.map((q: any, index: number) => {
+                              if (!q.is_rating) return;
+                              return (
+                                <RatingScale
+                                  key={q.question_id}
+                                  index={index}
+                                  fieldErrors={errors.questions?.[index]?.answer}
+                                  question_text={q.question_text}
+                                  ratingName={`questions.${index}.answer`}
+                                  defaultValue=""
+                                  control={control}
+                                />
+                              );
+                            })}
+                          </Flex>
+                        </Flex>
+                        <Flex
+                          flex="1"
+                          direction="column"
+                          gap={{ base: '5', sm: '2', md: '2', lg: '2' }}
+                        >
+                          <FormControl
+                            isInvalid={!!errors.takeAgain}
+                            h={{ base: 'auto', sm: '106.5px', md: '106.5px', lg: '106.5px' }}
+                          >
+                            <FormLabel whiteSpace="nowrap">
+                              Would Take Again:{' '}
+                              <Text as="span" color="teal" fontSize="sm">
+                                (Required)
+                              </Text>
+                            </FormLabel>
+                            <RadioGroup defaultValue="" name="takeAgain">
+                              <Stack direction="row" spacing={4}>
+                                <Radio
+                                  value="yes"
+                                  id="takeAgain-yes"
+                                  {...register('takeAgain', {
+                                    required: 'Please indicate if you would take this course again',
+                                  })}
+                                >
+                                  Yes
+                                </Radio>
+                                <Radio
+                                  value="no"
+                                  id="takeAgain-no"
+                                  {...register('takeAgain', {
+                                    required: 'Please indicate if you would take this course again',
+                                  })}
+                                >
+                                  No
+                                </Radio>
+                              </Stack>
+                            </RadioGroup>
+                            <FormErrorMessage>
+                              {errors.takeAgain && errors.takeAgain.message}
+                            </FormErrorMessage>
+                          </FormControl>
+                          <FormControl
+                            isInvalid={!!errors.grade}
+                            h={{ base: 'auto', sm: '106.5px', md: '106.5px', lg: '106.5px' }}
+                          >
+                            <FormLabel htmlFor="grade">
+                              Grade:{' '}
+                              <Text as="span" color="teal" fontSize="sm">
+                                (Optional)
+                              </Text>
+                            </FormLabel>
+                            <Select id="grade" placeholder="Select grade..." {...register('grade')}>
+                              {/* Ref Doc: https://www.senecapolytechnic.ca/about/policies/grading-policy.html */}
+                              <option value="A+">A+</option>
+                              <option value="A">A</option>
+                              <option value="B+">B+</option>
+                              <option value="B">B</option>
+                              <option value="C+">C+</option>
+                              <option value="C">C</option>
+                              <option value="D+">D+</option>
+                              <option value="D">D</option>
+                              <option value="F">F</option>
+                              <option value="DNC">DNC</option>
+                            </Select>
+                            {/* <FormErrorMessage>
+                              {errors.grade && errors.grade.message}
+                            </FormErrorMessage> */}
+                          </FormControl>
+                        </Flex>
                       </Flex>
                     </Flex>
-                    <FormControl flex="1">
-                      <FormLabel whiteSpace="nowrap">Would Take Again:</FormLabel>
-                      <RadioGroup defaultValue="yes" name="takeAgain">
-                        <Stack direction="row" spacing={4}>
-                          <Radio value="yes" id="takeAgain-yes" {...register('takeAgain')}>
-                            Yes
-                          </Radio>
-                          <Radio value="no" id="takeAgain-no" {...register('takeAgain')}>
-                            No
-                          </Radio>
-                        </Stack>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormControl isInvalid={!!errors.grade}>
-                      <FormLabel htmlFor="grade">Grade:</FormLabel>
-                      <Select id="grade" placeholder="Select grade..." {...register('grade')}>
-                        <option value="a">A</option>
-                        <option value="b">B</option>
-                        <option value="c">C</option>
-                        <option value="d">D</option>
-                        <option value="f">F</option>
-                      </Select>
-                      <FormErrorMessage>{errors.grade && errors.grade.message}</FormErrorMessage>
-                    </FormControl>
 
-                    <FormControl isInvalid={!!errors.tags}>
-                      <FormLabel htmlFor="tags">Tags:</FormLabel>
-                      <Select id="tags" placeholder="Select tag..." {...register('tags')}>
-                        <option value="html">HTML</option>
-                        <option value="css">CSS</option>
-                        <option value="aws">AWS</option>
-                      </Select>
-                      <FormErrorMessage>{errors.tags && errors.tags.message}</FormErrorMessage>
-                    </FormControl>
+                    <Flex flex="1" direction="column" gap={10}>
+                      <Flex direction="column" gap={5}>
+                        {/**** COMMENT TITLE ****/}
+                        <FormControl isInvalid={!!errors.commentTitle}>
+                          <FormLabel htmlFor="comment-title">
+                            Title:{' '}
+                            <Text as="span" color="teal" fontSize="sm">
+                              (Required)
+                            </Text>
+                          </FormLabel>
+                          <Input
+                            id="comment-title"
+                            placeholder="Title"
+                            {...register('commentTitle', {
+                              required: 'Title is required.',
+                            })}
+                          />
+                          <FormErrorMessage>
+                            {errors.commentTitle && errors.commentTitle.message}
+                          </FormErrorMessage>
+                        </FormControl>
+
+                        {/**** COMMENT ****/}
+                        <FormControl isInvalid={!!errors.comment}>
+                          <FormLabel htmlFor="comment">
+                            Comment:{' '}
+                            <Text as="span" color="teal" fontSize="sm">
+                              (Required)
+                            </Text>
+                          </FormLabel>
+                          <Textarea
+                            id="comment"
+                            placeholder="Anything about this course you would like to share..."
+                            {...register('comment', {
+                              required: 'Comment is required.',
+                            })}
+                          />
+                          <FormErrorMessage>
+                            {errors.comment && errors.comment.message}
+                          </FormErrorMessage>
+                        </FormControl>
+
+                        {/**** REVIEW QUESTIONS ****/}
+                        {fields?.map((q: any, index: number) => {
+                          if (q.is_rating) return;
+                          return (
+                            <FormControl key={index}>
+                              <FormLabel htmlFor={`questions.${index}.answer`}>
+                                {q.question_text}{' '}
+                                <Text as="span" color="teal" fontSize="sm">
+                                  (Optional)
+                                </Text>
+                              </FormLabel>
+                              <Textarea
+                                id={`questions.${index}.answer`}
+                                {...register(`questions.${index}.answer`)}
+                              />
+                            </FormControl>
+                          );
+                        })}
+                      </Flex>
+                      <Button
+                        type="submit"
+                        disabled={Object.keys(errors).length > 0}
+                        alignSelf="end"
+                        colorScheme="teal"
+                        isLoading={isSubmitting}
+                      >
+                        Submit
+                      </Button>
+                    </Flex>
                   </Flex>
-
-                  {/**** Included Tags: Need to discuss how this is implemented *****/}
-                </Flex>
-                <Flex flex="1" direction="column" gap={10}>
-                  <Flex direction="column" gap={5}>
-                    <FormControl isInvalid={!!errors.difficultyReview}>
-                      <FormLabel htmlFor="difficulty-review">Difficulty Review:</FormLabel>
-                      <Textarea
-                        id="difficulty-review"
-                        placeholder="Share any difficulties or challenges you faced in this course..."
-                        {...register('difficultyReview')}
-                      />
-                      <FormErrorMessage>
-                        {errors.difficultyReview && errors.difficultyReview.message}
-                      </FormErrorMessage>
-                    </FormControl>
-
-                    <FormControl isInvalid={!!errors.solution}>
-                      <FormLabel htmlFor="solution">Solution:</FormLabel>
-                      <Textarea
-                        id="solution"
-                        placeholder="How you overcame the above challenges..."
-                        {...register('solution')}
-                      />
-                      <FormErrorMessage>
-                        {errors.solution && errors.solution.message}
-                      </FormErrorMessage>
-                    </FormControl>
-
-                    <FormControl isInvalid={!!errors.assessmentsReview}>
-                      <FormLabel htmlFor="assessments">Assessments Review:</FormLabel>
-                      <Textarea
-                        id="assessments"
-                        placeholder="Your review for any Assignment/Lab/Quiz/Exam in this course..."
-                        {...register('assessmentsReview')}
-                      />
-                      <FormErrorMessage>
-                        {errors.assessmentsReview && errors.assessmentsReview.message}
-                      </FormErrorMessage>
-                    </FormControl>
-
-                    <FormControl isInvalid={!!errors.references}>
-                      <FormLabel htmlFor="references">References:</FormLabel>
-                      <Textarea
-                        id="references"
-                        placeholder="Share any resources/references that helped you overcome the challenges..."
-                        {...register('references')}
-                      />
-                      <FormErrorMessage>
-                        {errors.references && errors.references.message}
-                      </FormErrorMessage>
-                    </FormControl>
-
-                    <FormControl isInvalid={!!errors.otherComment}>
-                      <FormLabel htmlFor="other-comment">Other Comment:</FormLabel>
-                      <Textarea
-                        id="other-comment"
-                        placeholder="Anything else you would like to share..."
-                        {...register('otherComment')}
-                      />
-                      <FormErrorMessage>
-                        {errors.otherComment && errors.otherComment.message}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </Flex>
-                  <Button
-                    type="submit"
-                    disabled={Object.keys(errors).length > 0}
-                    alignSelf="end"
-                    colorScheme="teal"
-                    isLoading={isSubmitting}
-                  >
-                    Submit
-                  </Button>
-                </Flex>
-              </Flex>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      {/* Confirmation Modal: Close Form Warning */}
-      <ConfirmationModal
-        isOpen={isConfirmModalOpen}
-        closeFormModal={onClose}
-        closeConfirmModal={closeConfirmModal}
-        // resetForm={onReset}
-        isWarning={true}
-        title="Discard Changes"
-        message="Are you sure you want
+                </form>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+          <ConfirmationModal
+            isOpen={isConfirmModalOpen}
+            closeFormModal={onClose}
+            closeConfirmModal={closeConfirmModal}
+            isWarning={true}
+            title="Discard Changes"
+            message="Are you sure you want
             to discard all changes?"
-        confirmBtnText="Yes"
-      />
-      {/* Confirmation Modal: Form Submission Success */}
-      <ConfirmationModal
-        isOpen={isSuccessConfirmModalOpen}
-        closeFormModal={onClose}
-        closeConfirmModal={closeSuccessConfirmModal}
-        // resetForm={onReset}
-        isWarning={false}
-        title="Review Submitted!"
-        message="Your review has been submitted successfully."
-        confirmBtnText="OK"
-      />
+            confirmBtnText="Yes"
+          />
+          <ConfirmationModal
+            isOpen={isSuccessConfirmModalOpen}
+            closeFormModal={onClose}
+            closeConfirmModal={closeSuccessConfirmModal}
+            isWarning={false}
+            title="Review Submitted!"
+            message="Thank you! Your review has been submitted successfully."
+            confirmBtnText="OK"
+          />
+        </>
+      ) : (
+        <>Loading....</>
+      )}
     </>
   );
 };

@@ -26,6 +26,11 @@ const seedProfessorCourses = async () => {
     },
     {
       professor_id: 2,
+      course_id: 4,
+      term_id: 2,
+    },
+    {
+      professor_id: 2,
       course_id: 5,
       term_id: 3,
     },
