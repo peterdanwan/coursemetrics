@@ -37,6 +37,7 @@ export interface FormValues extends FieldValues {
   engagementRating: string;
   knowledgeRating: string;
   gradingFairnessRating: string;
+  clarityRating: string;
   takeAgain: Boolean;
   // grade: string;
   // tags: Array<string>;
@@ -60,6 +61,7 @@ const defaultFormVal: FormValues = {
   engagementRating: '1',
   knowledgeRating: '1',
   gradingFairnessRating: '1',
+  clarityRating: '1',
   takeAgain: false,
   // grade: '',
   // tags: [],
@@ -130,6 +132,12 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
   const { radioGroup: gradingFairnessGroup, getRadioProps: getGradingFairnessRadioProps } =
     useCreateRatingRadioGroup({
       name: 'gradingFairnessRating',
+      defaultValue: '1',
+    });
+
+  const { radioGroup: clarityGroup, getRadioProps: getClarityRadioProps } =
+    useCreateRatingRadioGroup({
+      name: 'clarityRating',
       defaultValue: '1',
     });
 
@@ -448,6 +456,38 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                           </RadioGroup>
                           <FormErrorMessage>
                             {errors.gradingFairnessRating && errors.gradingFairnessRating.message}
+                          </FormErrorMessage>
+                        </FormControl>
+                        <FormControl isInvalid={!!errors.clarityRating}>
+                          <FormLabel>Clarity:</FormLabel>
+                          <RadioGroup name="clarityRating" id="evaluation-fairness">
+                            <Controller
+                              name="clarityRating"
+                              control={control}
+                              rules={{ required: 'This rating is required' }}
+                              render={({ field }) => {
+                                return (
+                                  <HStack {...clarityGroup} onChange={field.onChange}>
+                                    {ratingOptions.map((value) => {
+                                      const radio = getClarityRadioProps({ value });
+                                      return (
+                                        <Rating
+                                          key={value}
+                                          {...radio}
+                                          id={`clarityRating-${value}`}
+                                          name={`clarityRating`}
+                                        >
+                                          {value}
+                                        </Rating>
+                                      );
+                                    })}
+                                  </HStack>
+                                );
+                              }}
+                            />
+                          </RadioGroup>
+                          <FormErrorMessage>
+                            {errors.clarityRating && errors.clarityRating.message}
                           </FormErrorMessage>
                         </FormControl>
                       </Flex>
