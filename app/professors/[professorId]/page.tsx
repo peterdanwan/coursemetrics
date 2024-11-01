@@ -21,11 +21,13 @@ import {
   Stack,
   StackDivider,
   Select,
+  useDisclosure,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
+import ProfReviewForm from '@/components/ProfReviewForm';
 
 import SideMenu from '@/components/SideFilterMenuCourse';
 
@@ -91,6 +93,13 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
   const [professor, setProfessor] = useState<IProfessor | null>(null);
   const [professors, setProfessors] = useState<IProfessor[]>([]);
   const searchParams = useSearchParams();
+
+  // For review form modal
+  const {
+    isOpen: isCourseReviewFormOpen,
+    onOpen: onCourseReviewFormOpen,
+    onClose: onCourseReviewFormClose,
+  } = useDisclosure();
 
   // Missing API route for single professor
 
@@ -259,9 +268,15 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                     // width="200px"
                     alignSelf="flex-end"
                     mt={5}
+                    onClick={onCourseReviewFormOpen}
                   >
                     Add Review
                   </Button>
+                  <ProfReviewForm
+                    isOpen={isCourseReviewFormOpen}
+                    onClose={onCourseReviewFormClose}
+                    key={isCourseReviewFormOpen ? 'open' : 'closed'}
+                  />
                 </Flex>
               </CardBody>
             </Card>
