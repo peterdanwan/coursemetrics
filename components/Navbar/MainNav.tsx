@@ -40,6 +40,7 @@ import { useFlexStyle } from '@/styles/styles';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { apiFetcher } from '@/utils';
+import { get } from 'http';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -171,11 +172,9 @@ export default function MainNav(props: { user: any }) {
       }
     } else {
       if (category == 'Course Reviews') {
-        // go to course page
         router.push(`/courses/${searchQuery}`);
         category = 'courses';
       } else if (category == 'Professor Reviews') {
-        // go to professor page
         router.push(`/professors/${searchQuery}`);
         category = 'professors';
       } else if (category == 'Select Category') {
@@ -188,6 +187,17 @@ export default function MainNav(props: { user: any }) {
         });
         return;
       }
+    }
+  };
+
+  const getButtonText = (category: string) => {
+    switch (category) {
+      case 'Course Reviews':
+        return 'View Courses';
+      case 'Professor Reviews':
+        return 'View Professors';
+      default:
+        return 'Search';
     }
   };
 
@@ -230,6 +240,7 @@ export default function MainNav(props: { user: any }) {
               handleSearch={handleSearch}
               handleSearchChange={handleSearchChange}
               filteredCourses={filteredCourses}
+              getButtonText={getButtonText}
             />
           </Flex>
 
@@ -241,6 +252,7 @@ export default function MainNav(props: { user: any }) {
               handleSearch={handleSearch}
               handleSearchChange={handleSearchChange}
               filteredCourses={filteredCourses}
+              getButtonText={getButtonText}
             />
           </Flex>
         </Flex>
@@ -398,6 +410,7 @@ export default function MainNav(props: { user: any }) {
           handleSearchChange={handleSearchChange}
           filteredCourses={filteredCourses}
           onCloseMenu={onClose}
+          getButtonText={getButtonText}
         />
       </Collapse>
     </Box>
@@ -411,6 +424,7 @@ const DesktopNav = ({
   handleSearch,
   handleSearchChange,
   filteredCourses,
+  getButtonText,
 }: {
   position: string;
   selectedCategory: string;
@@ -418,6 +432,7 @@ const DesktopNav = ({
   handleSearch: (searchQuery: string, category: string) => void;
   handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   filteredCourses: ICourse[];
+  getButtonText: (category: string) => string;
 }) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -499,8 +514,11 @@ const DesktopNav = ({
                   handlePopoverClose();
                 }}
                 ml={2}
+                p={2}
+                size={{ base: 'sm', md: 'sm', lg: 'md' }}
+                _hover={{ cursor: 'pointer' }}
               >
-                Search
+                {getButtonText(selectedCategory)}
               </Button>
             </Flex>
           );
@@ -613,6 +631,7 @@ const MobileNav = ({
   handleSearchChange,
   filteredCourses,
   onCloseMenu,
+  getButtonText,
 }: {
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
@@ -620,6 +639,7 @@ const MobileNav = ({
   handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   filteredCourses: ICourse[];
   onCloseMenu: () => void;
+  getButtonText: (category: string) => string;
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const popoverContentBgColor = useColorModeValue('white', 'gray.800');
@@ -702,8 +722,11 @@ const MobileNav = ({
                   onCloseMenu();
                 }}
                 ml={2}
+                size={'sm'}
+                p={5}
+                _hover={{ cursor: 'pointer' }}
               >
-                Search
+                {getButtonText(selectedCategory)}
               </Button>
             </Flex>
           )}
