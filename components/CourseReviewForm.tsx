@@ -20,6 +20,7 @@ import {
   Stack,
   Flex,
   useDisclosure,
+  Text,
 } from '@chakra-ui/react';
 
 import Rating from './Rating';
@@ -103,7 +104,7 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
       defaultValue,
     });
     const radioGroup = getRootProps();
-    console.log('radioGroup name', radioGroup.name);
+    // console.log('radioGroup name', radioGroup.name);
     return { radioGroup, getRadioProps };
   };
 
@@ -210,7 +211,12 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
               <Flex gap={10} wrap="wrap" direction={{ base: 'column', md: 'column', lg: 'row' }}>
                 <Flex flex="1" gap={5} direction="column">
                   <FormControl isInvalid={!!errors.courseName}>
-                    <FormLabel htmlFor="course-name">Course name:</FormLabel>
+                    <FormLabel htmlFor="course-name">
+                      Course Name:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Select
                       id="course-name"
                       placeholder="Select from existing courses..."
@@ -225,9 +231,13 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       {errors.courseName && errors.courseName.message}
                     </FormErrorMessage>
                   </FormControl>
-
                   <FormControl isInvalid={!!errors.term}>
-                    <FormLabel htmlFor="term">Term: </FormLabel>
+                    <FormLabel htmlFor="term">
+                      Term:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Input
                       id="term"
                       placeholder="Follow Format SEMESTER YEAR (Winter 2024, Fall 2023, etr)"
@@ -240,7 +250,12 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.sectionCode}>
-                    <FormLabel htmlFor="section-code">Section Code:</FormLabel>
+                    <FormLabel htmlFor="section-code">
+                      Section Code:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Select
                       id="section-code"
                       placeholder="Select from existing sections..."
@@ -251,13 +266,19 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="nzz">NZZ</option>
                       <option value="ncc">NCC</option>
                     </Select>
+
                     <FormErrorMessage>
                       {errors.sectionCode && errors.sectionCode.message}
                     </FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.professor}>
-                    <FormLabel htmlFor="professor">Professor:</FormLabel>
+                    <FormLabel htmlFor="professor">
+                      Professor:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Select
                       id="professor"
                       placeholder="Add existing professor(s)..."
@@ -268,6 +289,7 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="peter wan">Peter Wan</option>
                       <option value="john smith">John Smith</option>
                     </Select>
+
                     <FormErrorMessage>
                       {errors.professor && errors.professor.message}
                     </FormErrorMessage>
@@ -597,7 +619,7 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
         closeConfirmModal={closeConfirmModal}
         // resetForm={onReset}
         isWarning={true}
-        title="Discard Changes?"
+        title="Discard Changes"
         message="Are you sure you want
             to discard all changes?"
         confirmBtnText="Yes"
