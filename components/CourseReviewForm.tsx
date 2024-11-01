@@ -20,7 +20,7 @@ import {
   Stack,
   Flex,
   useDisclosure,
-  FormHelperText,
+  Text,
 } from '@chakra-ui/react';
 
 import Rating from './Rating';
@@ -211,7 +211,12 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
               <Flex gap={10} wrap="wrap" direction={{ base: 'column', md: 'column', lg: 'row' }}>
                 <Flex flex="1" gap={5} direction="column">
                   <FormControl isInvalid={!!errors.courseName}>
-                    <FormLabel htmlFor="course-name">Course Name:</FormLabel>
+                    <FormLabel htmlFor="course-name">
+                      Course Name:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Select
                       id="course-name"
                       placeholder="Select from existing courses..."
@@ -222,16 +227,17 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="abc">ABC</option>
                       <option value="xyz">XYZ</option>
                     </Select>
-                    {!!errors.courseName ? (
-                      <FormErrorMessage>
-                        {errors.courseName && errors.courseName.message}
-                      </FormErrorMessage>
-                    ) : (
-                      <FormHelperText color="teal">Required</FormHelperText>
-                    )}
+                    <FormErrorMessage>
+                      {errors.courseName && errors.courseName.message}
+                    </FormErrorMessage>
                   </FormControl>
                   <FormControl isInvalid={!!errors.term}>
-                    <FormLabel htmlFor="term">Term: </FormLabel>
+                    <FormLabel htmlFor="term">
+                      Term:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Input
                       id="term"
                       placeholder="Follow Format SEMESTER YEAR (Winter 2024, Fall 2023, etr)"
@@ -240,17 +246,16 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       })}
                     />
 
-                    {!!errors.term ? (
-                      <FormErrorMessage>
-                        {errors.courseName && errors.courseName.message}
-                      </FormErrorMessage>
-                    ) : (
-                      <FormHelperText color="teal">Required</FormHelperText>
-                    )}
+                    <FormErrorMessage>{errors.term && errors.term.message}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.sectionCode}>
-                    <FormLabel htmlFor="section-code">Section Code:</FormLabel>
+                    <FormLabel htmlFor="section-code">
+                      Section Code:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Select
                       id="section-code"
                       placeholder="Select from existing sections..."
@@ -262,17 +267,18 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="ncc">NCC</option>
                     </Select>
 
-                    {!!errors.sectionCode ? (
-                      <FormErrorMessage>
-                        {errors.courseName && errors.courseName.message}
-                      </FormErrorMessage>
-                    ) : (
-                      <FormHelperText color="teal">Required</FormHelperText>
-                    )}
+                    <FormErrorMessage>
+                      {errors.sectionCode && errors.sectionCode.message}
+                    </FormErrorMessage>
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.professor}>
-                    <FormLabel htmlFor="professor">Professor:</FormLabel>
+                    <FormLabel htmlFor="professor">
+                      Professor:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
                     <Select
                       id="professor"
                       placeholder="Add existing professor(s)..."
@@ -284,13 +290,9 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="john smith">John Smith</option>
                     </Select>
 
-                    {!!errors.professor ? (
-                      <FormErrorMessage>
-                        {errors.courseName && errors.courseName.message}
-                      </FormErrorMessage>
-                    ) : (
-                      <FormHelperText color="teal">Required</FormHelperText>
-                    )}
+                    <FormErrorMessage>
+                      {errors.professor && errors.professor.message}
+                    </FormErrorMessage>
                   </FormControl>
 
                   {/**** Included Profs: Need to discuss how this is implemented *****/}
@@ -617,7 +619,7 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
         closeConfirmModal={closeConfirmModal}
         // resetForm={onReset}
         isWarning={true}
-        title="Discard Changes?"
+        title="Discard Changes"
         message="Are you sure you want
             to discard all changes?"
         confirmBtnText="Yes"
