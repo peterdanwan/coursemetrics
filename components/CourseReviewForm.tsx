@@ -20,6 +20,7 @@ import {
   Stack,
   Flex,
   useDisclosure,
+  FormHelperText,
 } from '@chakra-ui/react';
 
 import Rating from './Rating';
@@ -103,7 +104,7 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
       defaultValue,
     });
     const radioGroup = getRootProps();
-    console.log('radioGroup name', radioGroup.name);
+    // console.log('radioGroup name', radioGroup.name);
     return { radioGroup, getRadioProps };
   };
 
@@ -210,7 +211,7 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
               <Flex gap={10} wrap="wrap" direction={{ base: 'column', md: 'column', lg: 'row' }}>
                 <Flex flex="1" gap={5} direction="column">
                   <FormControl isInvalid={!!errors.courseName}>
-                    <FormLabel htmlFor="course-name">Course name:</FormLabel>
+                    <FormLabel htmlFor="course-name">Course Name:</FormLabel>
                     <Select
                       id="course-name"
                       placeholder="Select from existing courses..."
@@ -221,11 +222,14 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="abc">ABC</option>
                       <option value="xyz">XYZ</option>
                     </Select>
-                    <FormErrorMessage>
-                      {errors.courseName && errors.courseName.message}
-                    </FormErrorMessage>
+                    {!!errors.courseName ? (
+                      <FormErrorMessage>
+                        {errors.courseName && errors.courseName.message}
+                      </FormErrorMessage>
+                    ) : (
+                      <FormHelperText color="teal">Required</FormHelperText>
+                    )}
                   </FormControl>
-
                   <FormControl isInvalid={!!errors.term}>
                     <FormLabel htmlFor="term">Term: </FormLabel>
                     <Input
@@ -236,7 +240,13 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       })}
                     />
 
-                    <FormErrorMessage>{errors.term && errors.term.message}</FormErrorMessage>
+                    {!!errors.term ? (
+                      <FormErrorMessage>
+                        {errors.courseName && errors.courseName.message}
+                      </FormErrorMessage>
+                    ) : (
+                      <FormHelperText color="teal">Required</FormHelperText>
+                    )}
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.sectionCode}>
@@ -251,9 +261,14 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="nzz">NZZ</option>
                       <option value="ncc">NCC</option>
                     </Select>
-                    <FormErrorMessage>
-                      {errors.sectionCode && errors.sectionCode.message}
-                    </FormErrorMessage>
+
+                    {!!errors.sectionCode ? (
+                      <FormErrorMessage>
+                        {errors.courseName && errors.courseName.message}
+                      </FormErrorMessage>
+                    ) : (
+                      <FormHelperText color="teal">Required</FormHelperText>
+                    )}
                   </FormControl>
 
                   <FormControl isInvalid={!!errors.professor}>
@@ -268,9 +283,14 @@ const CourseReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                       <option value="peter wan">Peter Wan</option>
                       <option value="john smith">John Smith</option>
                     </Select>
-                    <FormErrorMessage>
-                      {errors.professor && errors.professor.message}
-                    </FormErrorMessage>
+
+                    {!!errors.professor ? (
+                      <FormErrorMessage>
+                        {errors.courseName && errors.courseName.message}
+                      </FormErrorMessage>
+                    ) : (
+                      <FormHelperText color="teal">Required</FormHelperText>
+                    )}
                   </FormControl>
 
                   {/**** Included Profs: Need to discuss how this is implemented *****/}

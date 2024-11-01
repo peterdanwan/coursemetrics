@@ -508,7 +508,7 @@ const DesktopNav = ({
 
         return (
           <Box key={navItem.label} className="px-2 whitespace-nowrap">
-            <Popover trigger={'hover'} placement={'bottom-start'}>
+            <Popover trigger={'click'} placement={'bottom-start'}>
               <PopoverTrigger>
                 <Link href={navItem.href ?? '#'}>
                   <Text

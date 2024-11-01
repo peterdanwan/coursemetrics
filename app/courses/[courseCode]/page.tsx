@@ -20,7 +20,6 @@ import {
   Button,
   Stack,
   StackDivider,
-  Select,
   useDisclosure,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
@@ -97,7 +96,11 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
 
   // For review form modal
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isCourseReviewFormOpen,
+    onOpen: onCourseReviewFormOpen,
+    onClose: onCourseReviewFormClose,
+  } = useDisclosure();
 
   useEffect(() => {
     if (courseResponse) {
@@ -328,14 +331,14 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     // width="200px"
                     alignSelf="flex-end"
                     mt={5}
-                    onClick={onOpen}
+                    onClick={onCourseReviewFormOpen}
                   >
                     Add Review
                   </Button>
                   <CourseReviewForm
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    key={isOpen ? 'open' : 'closed'}
+                    isOpen={isCourseReviewFormOpen}
+                    onClose={onCourseReviewFormClose}
+                    key={isCourseReviewFormOpen ? 'open' : 'closed'}
                   />
                 </Flex>
               </CardBody>
