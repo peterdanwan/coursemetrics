@@ -30,9 +30,6 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
     log.info(`Fetching reviews for user with email: ${user.email}`);
 
     const reviews = await Review.findAll({
-      // where: {
-      //   review_status_id: 2,
-      // },
       include: [
         {
           model: User,
@@ -93,6 +90,89 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
   } catch (error: unknown) {
     console.error(error);
     log.error('Error fetching reviews', { error });
+    return NextResponse.json(
+      createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
+      { status: 500 }
+    );
+  }
+};
+
+export const POST = async function create_review(req: NextRequest): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/reviews/route.ts' });
+
+  try {
+    await connectDB();
+
+    // Authenticate the user
+    const { user }: any = await getSession();
+    if (!user) {
+      log.warn('User not authenticated');
+      return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
+    }
+
+    log.info(`Creating a new review for user with email: ${user.email}`);
+
+    // Parse the incoming request body
+    const body = await req.json();
+    const { professorCourseId, rating, comments, questionsAndAnswers } = body;
+
+    // Basic validation for required fields
+    if (!professorCourseId || !rating) {
+      log.warn('Missing required fields: professorCourseId or rating');
+      return NextResponse.json(
+        createErrorResponse(400, 'professorCourseId and rating are required'),
+        { status: 400 }
+      );
+    }
+
+    // Find the user in the database
+    const userRecord = await User.findOne({ where: { email: user.email } });
+    if (!userRecord) {
+      log.error('User record not found');
+      return NextResponse.json(createErrorResponse(404, 'User not found'), { status: 404 });
+    }
+
+    // Find the ProfessorCourse association
+    const professorCourse = await ProfessorCourse.findByPk(professorCourseId);
+    if (!professorCourse) {
+      log.error('ProfessorCourse record not found');
+      return NextResponse.json(createErrorResponse(404, 'ProfessorCourse not found'), {
+        status: 404,
+      });
+    }
+
+    // Create the new review
+    const review = await Review.create({
+      user_id: userRecord.user_id,
+      professor_course_id: professorCourseId,
+      rating,
+      comments,
+    });
+
+    // If there are questions and answers, add them as well
+    if (questionsAndAnswers && questionsAndAnswers.length > 0) {
+      for (const { questionId, answer } of questionsAndAnswers) {
+        await review.createReviewQuestion(
+          {
+            question_id: questionId,
+            reviewAnswers: [{ answer }],
+          },
+          {
+            include: [ReviewAnswer], // Assuming reviewAnswers association is correctly set up
+          }
+        );
+      }
+    }
+
+    log.info('Review created successfully', { reviewId: review.review_id });
+
+    return NextResponse.json(
+      createSuccessResponse({ message: 'Review created successfully', review }),
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    console.error(error);
+    log.error('Error creating review', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }

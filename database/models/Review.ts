@@ -64,29 +64,9 @@ Review.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    would_take_again: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    difficulty: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: 1,
-        max: 5,
-      },
-    },
-    course_load: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: 1,
-        max: 5,
-      },
-    },
     grade: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

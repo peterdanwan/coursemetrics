@@ -12,9 +12,6 @@ const seedReviews = async () => {
       rating: 5,
       title: 'Great Learning Experience',
       comment: 'Fantastic course! I learned a lot and enjoyed the hands-on projects.',
-      would_take_again: true,
-      difficulty: 3,
-      course_load: 4,
       grade: 'A',
     },
     {
@@ -25,9 +22,6 @@ const seedReviews = async () => {
       rating: 4,
       title: 'Solid Course with Room for Improvement',
       comment: 'Good course structure, but it could use more practical examples.',
-      would_take_again: true,
-      difficulty: 4,
-      course_load: 3,
       grade: 'B+',
     },
     {
@@ -38,9 +32,6 @@ const seedReviews = async () => {
       rating: 3,
       title: 'Fast-Paced but Relevant',
       comment: 'The content was relevant, but the pace was too fast.',
-      would_take_again: false,
-      difficulty: 5,
-      course_load: 5,
       grade: 'B',
     },
     {
@@ -51,10 +42,7 @@ const seedReviews = async () => {
       rating: 5,
       title: 'Outstanding Professor',
       comment: 'Excellent instructor! Very engaging and knowledgeable.',
-      would_take_again: true,
-      difficulty: 2,
-      course_load: 3,
-      grade: 'A+',
+      grade: null,
     },
     {
       review_type_id: 2,
@@ -64,10 +52,7 @@ const seedReviews = async () => {
       rating: 4,
       title: 'Good Professor with Limited Availability',
       comment: 'Great feedback on assignments, but could be more available for questions.',
-      would_take_again: true,
-      difficulty: 3,
-      course_load: 4,
-      grade: 'A-',
+      grade: null,
     },
     {
       review_type_id: 2,
@@ -77,10 +62,7 @@ const seedReviews = async () => {
       rating: 2,
       title: 'Communication Issues',
       comment: 'The professor was knowledgeable but had poor communication skills.',
-      would_take_again: false,
-      difficulty: 4,
-      course_load: 5,
-      grade: 'C+',
+      grade: null,
     },
   ]);
 };
