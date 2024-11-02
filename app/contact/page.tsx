@@ -5,8 +5,10 @@ import { EmailIcon, PhoneIcon, InfoIcon } from '@chakra-ui/icons';
 import Image from 'next/image';
 import React from 'react';
 import contactIllustration from '@/assets/images/customerService.jpg';
+import { useFlexStyle } from '@/styles/styles';
 
 export default function Contact() {
+  const flexStyle = useFlexStyle();
   return (
     <Flex
       direction={{ base: 'column', md: 'row' }}
@@ -14,7 +16,7 @@ export default function Contact() {
       justify="center"
       p={5}
       minHeight="100vh"
-      bg="gray.50" // use "gray.50" for light version and "bg-ourBG" for dark version
+      bg={flexStyle.bgColor}
     >
       <Box
         flex={{ base: '1', md: '0 1 40%' }}
@@ -27,8 +29,8 @@ export default function Contact() {
         p={8}
         borderRadius="lg"
         shadow="md"
-        bg="white"
-        color="black"
+        bgColor={flexStyle.bgColor}
+        color={flexStyle.color}
       >
         <Box>
           <Heading as="h1" size="2xl" mb={4}>

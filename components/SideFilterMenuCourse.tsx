@@ -58,7 +58,7 @@ export default function SideFilterMenuCourse({
           <DrawerHeader>Filter Reviews</DrawerHeader>
 
           <DrawerBody>
-            <VStack spacing={4} align="stretch" textColor={'black'}>
+            <VStack spacing={4} align="stretch">
               {terms.length > 0 && (
                 <Box>
                   <Select

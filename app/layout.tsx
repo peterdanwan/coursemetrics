@@ -36,7 +36,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <UserProvider>
-        <body className="bg-ourBG text-white min-h-screen">
+        <body className="min-h-screen">
           <Providers>
             <MainNav user={user} />
             <Container maxW="container.4xl" minHeight={'90vh'}>

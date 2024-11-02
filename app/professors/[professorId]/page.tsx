@@ -30,6 +30,7 @@ import { useSearchParams } from 'next/navigation';
 import ProfReviewForm from '@/components/ProfReviewForm';
 
 import SideMenu from '@/components/SideFilterMenuCourse';
+import { useFlexStyle } from '@/styles/styles';
 
 interface IProfessor {
   professor_id: number;
@@ -87,6 +88,7 @@ function getAllProfessorsURL() {
 }
 
 export default function ProfessorPage({ params }: { params: { professorId: string } }) {
+  const flexStyle = useFlexStyle();
   const professorId = params.professorId.toUpperCase();
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
   const [profCourses, setProfCourses] = useState<ICourse[]>([]);
@@ -163,7 +165,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
       p={{ base: '3', md: '3', lg: '5' }}
       margin="0 auto"
       w={{ base: '100%', '2xl': '80%' }}
-      bgColor={'gray.100'}
+      bgColor={flexStyle.bgColor}
     >
       {/* Course Details Section */}
       {professor ? (

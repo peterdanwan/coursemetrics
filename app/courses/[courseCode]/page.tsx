@@ -26,10 +26,9 @@ import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
-import { FaCropSimple } from 'react-icons/fa6';
-import Head from 'next/head';
 import SideMenu from '@/components/SideFilterMenuCourse';
 import CourseReviewForm from '@/components/CourseReviewForm';
+import { useFlexStyle } from '@/styles/styles';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -78,6 +77,7 @@ function getURL(
 }
 
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
+  const flexStyle = useFlexStyle();
   const courseCode = params.courseCode.toUpperCase();
   const [expandedReviewId, setExpandedReviewId] = useState(-1);
   const [courses, setCourses] = useState<ICourse[]>([]);
@@ -203,7 +203,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
       p={{ base: '3', md: '3', lg: '5' }}
       margin="0 auto"
       w={{ base: '100%', '2xl': '80%' }}
-      bgColor={'gray.100'}
+      bgColor={flexStyle.bgColor}
     >
       {/* Course Details Section */}
       {reviews ? (
