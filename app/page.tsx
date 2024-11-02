@@ -16,11 +16,13 @@ import {
 } from '@chakra-ui/react';
 import useFetchUser from '@/components/useFetchUser';
 import { Spinner } from '@nextui-org/react';
+import { useFlexStyle } from '@/styles/styles';
 
 export default function Home() {
   const router = useRouter();
   const { user, loading, error } = useFetchUser();
   const [isRedirecting, setIsRedirecting] = useState(true);
+  const flexStyle = useFlexStyle();
 
   useEffect(() => {
     if (loading) return;
@@ -55,8 +57,15 @@ export default function Home() {
         height={{ base: '85vh' }}
         alignContent={'center'}
         justifyContent={'center'}
+        bgColor={flexStyle.bgColor}
       >
-        <Stack as={Box} textAlign={'center'} spacing={{ base: 8, md: 14 }} width={{ base: '90%' }}>
+        <Stack
+          as={Box}
+          textAlign={'center'}
+          spacing={{ base: 8, md: 14 }}
+          width={{ base: '90%' }}
+          textColor={flexStyle.color}
+        >
           <Heading
             fontWeight={600}
             fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}

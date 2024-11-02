@@ -26,6 +26,7 @@ import {
   useToast,
   PopoverBody,
   PopoverCloseButton,
+  useColorMode,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
@@ -40,7 +41,8 @@ import { useFlexStyle } from '@/styles/styles';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { apiFetcher } from '@/utils';
-import { get } from 'http';
+import { CiLight } from 'react-icons/ci';
+import { MdDarkMode } from 'react-icons/md';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -89,6 +91,7 @@ export default function MainNav(props: { user: any }) {
   const { user, loading: userLoading, error: userError } = useFetchUser();
   const router = useRouter();
   const toast = useToast();
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const searchParams = useSearchParams();
   const [allCourses, setAllCourses] = useState<ICourse[]>([]);
@@ -268,6 +271,9 @@ export default function MainNav(props: { user: any }) {
               cursor={'pointer'}
               minW={0}
             />
+            <Button onClick={toggleColorMode}>
+              {colorMode === 'light' ? <CiLight /> : <MdDarkMode />}
+            </Button>
             <MenuList>
               {user ? (
                 <>

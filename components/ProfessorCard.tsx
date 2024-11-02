@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardHeader, Heading, Box, Flex, Spacer, Button, IconButton } from '@chakra-ui/react';
+import {
+  Card,
+  CardHeader,
+  Heading,
+  Box,
+  Flex,
+  Spacer,
+  Button,
+  IconButton,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { CiBookmark } from 'react-icons/ci';
 import Link from 'next/link';
+import { useFlexStyle } from '@/styles/styles';
 
 interface IProfessor {
   professor_id: number;
@@ -15,6 +26,7 @@ interface ProfessorCardProps {
 }
 
 export default function ProfessorCard({ professor }: ProfessorCardProps) {
+  const flexStyle = useFlexStyle();
   const router = useRouter();
   const [selectedProfessor, setSelectedProfessor] = useState<IProfessor>(professor); // Track selected professor
   const [selectedTermId, setSelectedTermId] = useState(''); // Track selected term ID
@@ -27,9 +39,9 @@ export default function ProfessorCard({ professor }: ProfessorCardProps) {
   const handleBookmark = () => {
     alert('Bookmark clicked - Still in development');
   };
-
+  const cardBgColor = useColorModeValue('white', 'grey.700');
   return (
-    <Card>
+    <Card bgColor={cardBgColor} border={flexStyle.borderColor} borderWidth={1} p={2}>
       <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
         <Flex align="center" gap={2} wrap="wrap">
           <Box>
@@ -52,7 +64,15 @@ export default function ProfessorCard({ professor }: ProfessorCardProps) {
           </Box>
         </Flex>
       </CardHeader>
-      <Button colorScheme="teal" variant="outline" size="sm" onClick={navigateToProfessor} mt={2}>
+      <Button
+        colorScheme="teal"
+        variant="outline"
+        size="sm"
+        onClick={navigateToProfessor}
+        mt={2}
+        w={'70%'}
+        mx={'auto'}
+      >
         View Reviews
       </Button>
     </Card>

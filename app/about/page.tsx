@@ -13,6 +13,7 @@ import {
   SimpleGrid,
   Divider,
 } from '@chakra-ui/react';
+import { useFlexStyle } from '@/styles/styles';
 
 import { FcAssistant, FcDonate, FcInTransit } from 'react-icons/fc';
 
@@ -23,6 +24,7 @@ interface FeatureProps {
 }
 
 const Feature = ({ title, text, icon }: FeatureProps) => {
+  const flexStyle = useFlexStyle();
   return (
     <Stack>
       <Flex
@@ -30,7 +32,7 @@ const Feature = ({ title, text, icon }: FeatureProps) => {
         h={16}
         align={'center'}
         justify={'center'}
-        color={'white'}
+        color={flexStyle.color}
         rounded={'full'}
         bg={'gray.100'}
         mb={1}
@@ -52,20 +54,17 @@ export default function About() {
     }
   };
 
+  const flexStyle = useFlexStyle();
+
   return (
     <>
-      <Container
-        minWidth={'95vw'}
-        height={{ base: '95vh' }}
-        alignContent={'center'}
-        justifyContent={'center'}
-      >
-        <Box bg={'gray.800'} height={'100%'} p={10} mt={5}>
+      <Container minWidth={'95vw'} alignContent={'center'} justifyContent={'center'}>
+        <Box bg={flexStyle.bgColor} height={{ base: '80%', sm: '80%', lg: '100%' }} p={10} mt={5}>
           <Container maxW={'4xl'} zIndex={10} position={'relative'} height={'95%'}>
             <Stack direction={{ base: 'column', lg: 'column' }} height={'100%'}>
               <Stack
                 flex={1}
-                color={'gray.400'}
+                color={flexStyle.color}
                 justify={{ lg: 'center' }}
                 py={{ base: 4, md: 20, xl: 60 }}
               >
@@ -77,21 +76,27 @@ export default function About() {
                     mb={3}
                     // fontSize={"xl"}
                     fontSize={{ base: 'lg', md: 'xl' }}
-                    color={'gray.500'}
+                    color={flexStyle.color}
                   >
                     ABOUT US
                   </Text>
-                  <Heading color={'white'} mb={5} fontSize={{ base: 'xl', md: '3xl' }}>
+                  <Heading color={flexStyle.color} mb={5} fontSize={{ base: 'xl', md: '3xl' }}>
                     Revolutionizing Course Selection
                   </Heading>
-                  <Text fontSize={{ base: 'md', md: 'xl' }} color={'gray.400'}>
+                  <Text fontSize={{ base: 'md', md: 'xl' }} color={flexStyle.color}>
                     At CourseMetrics, we understand the importance of choosing the right courses and
                     professors. Our platform is built by students, for students, to provide
                     transparent and reliable insights into the academic experience at Seneca
                     Polytechnic.
                   </Text>
                 </Box>
-                <Divider orientation="horizontal" height="30px" mx={1} mb={20} />
+                <Divider
+                  orientation="horizontal"
+                  height="30px"
+                  mx={1}
+                  mb={20}
+                  color={flexStyle.color}
+                />
 
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
                   {stats.map((stat) => (
@@ -99,7 +104,7 @@ export default function About() {
                       <Text
                         fontFamily={'heading'}
                         fontSize={{ base: 'lg', md: 'xl' }}
-                        color={'white'}
+                        color={flexStyle.color}
                         mb={3}
                       >
                         {stat.title}
@@ -132,7 +137,7 @@ export default function About() {
       <Container
         ref={teamSectionRef}
         minWidth={'95vw'}
-        height={{ base: '95vh' }}
+        my={10}
         alignContent={'center'}
         justifyContent={'center'}
       >
@@ -189,8 +194,11 @@ export default function About() {
   );
 }
 
-const StatsText = ({ children }: { children: ReactNode }) => (
-  <Text as={'span'} fontWeight={700} color={'white'}>
+const StatsText = (
+  { children }: { children: ReactNode },
+  flexStyle: ReturnType<typeof useFlexStyle>
+) => (
+  <Text as={'span'} fontWeight={700} color={flexStyle.color}>
     {children}
   </Text>
 );

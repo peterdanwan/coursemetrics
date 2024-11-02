@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import ProfessorCard from '@/components/ProfessorCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
+import { useFlexStyle } from '@/styles/styles';
 
 interface IProfessor {
   professor_id: number;
@@ -32,6 +33,7 @@ function getURL(page: string | null, limit: string) {
 }
 
 export default function ProfessorsPage() {
+  const flexStyle = useFlexStyle();
   const searchParams = useSearchParams();
   const [limit, setLimit] = useState<string>('2');
   const page = searchParams.get('page') || null;
@@ -60,7 +62,7 @@ export default function ProfessorsPage() {
         p={{ base: '3', md: '3', lg: '5' }}
         margin="0 auto"
         w={{ base: '100%', xl: '95%' }}
-        bgColor={'gray.100'}
+        bgColor={flexStyle.bgColor}
       >
         {professors.length > 0 && (
           <GridItem
@@ -71,8 +73,6 @@ export default function ProfessorsPage() {
           >
             <Box p={5} width={{ base: '30%', sm: '30%', md: '20%', lg: '12%' }}>
               <NumberInput
-                color="teal"
-                backgroundColor="white"
                 step={1}
                 defaultValue={2}
                 min={1}

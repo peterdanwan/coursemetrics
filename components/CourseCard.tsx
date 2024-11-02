@@ -12,9 +12,12 @@ import {
   Button,
   Select,
   IconButton,
+  useColorMode,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { CiBookmark } from 'react-icons/ci';
 import Link from 'next/link';
+import { useFlexStyle } from '@/styles/styles';
 
 interface ICourseTerm {
   season: string;
@@ -39,6 +42,7 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ courses }: CourseCardProps) {
+  const flexStyle = useFlexStyle();
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<ICourse>(courses[0]);
   const [selectedTermId, setSelectedTermId] = useState(''); // Track selected term ID
@@ -73,8 +77,10 @@ export default function CourseCard({ courses }: CourseCardProps) {
     alert('Bookmark clicked - Still in development');
   };
 
+  const cardBgColor = useColorModeValue('white', 'grey.700');
+
   return (
-    <Card>
+    <Card bgColor={cardBgColor} border={flexStyle.borderColor} borderWidth={1}>
       <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
         <Flex align="center" gap={2} wrap="wrap">
           <Box>

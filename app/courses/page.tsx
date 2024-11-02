@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
+import { useFlexStyle } from '@/styles/styles';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -54,6 +55,7 @@ function getURL(page: string | null, limit: string) {
 }
 
 export default function CoursesPage() {
+  const flexStyle = useFlexStyle();
   const searchParams = useSearchParams();
   const [groupedCourses, setGroupedCourses] = useState<Record<string, ICourse[]>>({});
   const [limit, setLimit] = useState<string>('2');
@@ -103,7 +105,6 @@ export default function CoursesPage() {
         p={{ base: '3', md: '3', lg: '5' }}
         margin="0 auto"
         w={{ base: '100%', xl: '95%' }}
-        bgColor={'gray.100'}
       >
         {uniqueCourseCodes.length > 0 && (
           <GridItem
@@ -114,8 +115,6 @@ export default function CoursesPage() {
           >
             <Box p={5} width={{ base: '30%', sm: '30%', md: '20%', lg: '12%' }}>
               <NumberInput
-                color="teal"
-                backgroundColor="white"
                 step={1}
                 defaultValue={2}
                 min={1}
