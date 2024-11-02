@@ -333,7 +333,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     mt={5}
                     onClick={onCourseReviewFormOpen}
                   >
-                    Submit Review
+                    Add a Review
                   </Button>
                   <CourseReviewForm
                     isOpen={isCourseReviewFormOpen}
