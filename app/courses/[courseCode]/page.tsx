@@ -21,6 +21,7 @@ import {
   Stack,
   StackDivider,
   useDisclosure,
+  Spinner,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
@@ -160,7 +161,8 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   useEffect(() => {
     const fetchTags = async () => {
-      if (reviewResponse) {
+      console.log(reviewResponse);
+      if (reviewResponse && reviewResponse.status === 'ok') {
         if (Array.isArray(reviewResponse.data)) {
           setReviews(reviewResponse.data);
 
@@ -213,17 +215,17 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   };
 
   return (
-    <Grid
-      gridTemplateColumns="repeat(12, 1fr)"
-      gap={{ base: '3', md: '3', lg: '6' }}
-      p={{ base: '3', md: '3', lg: '5' }}
-      margin="0 auto"
-      w={{ base: '100%', '2xl': '80%' }}
-      bgColor={flexStyle.bgColor}
-    >
+    <>
       {/* Course Details Section */}
       {reviews ? (
-        <>
+        <Grid
+          gridTemplateColumns="repeat(12, 1fr)"
+          gap={{ base: '3', md: '3', lg: '6' }}
+          p={{ base: '3', md: '3', lg: '5' }}
+          margin="0 auto"
+          w={{ base: '100%', '2xl': '80%' }}
+          bgColor={flexStyle.bgColor}
+        >
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
@@ -244,7 +246,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                     <Flex gap={5} alignItems="center">
-                      <Box color="pink.400">
+                      <Box color="red.500">
                         <FaHeart size={25} />
                       </Box>
                       <Text>4.5/5</Text>
@@ -478,10 +480,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardBody>
             </Card>
           </GridItem>
-        </>
+        </Grid>
       ) : (
-        <Text>Hello</Text> // Fallback message
+        <Flex justifyContent="center" alignItems="center" h="100vh">
+          <Spinner />
+        </Flex> // Fallback message
       )}
-    </Grid>
+    </>
   );
 }
