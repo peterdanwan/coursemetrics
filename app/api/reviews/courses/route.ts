@@ -1,3 +1,4 @@
+// app/api/reviews/courses/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { connectDB } from '@/database/connectDB';
@@ -20,7 +21,7 @@ import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog
 export const POST = async function post_review_to_course_code(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/reviews/courses/[courseCode]/route.ts' });
+  const log = logger.child({ module: 'app/api/reviews/courses/route.ts' });
 
   try {
     await connectDB();
