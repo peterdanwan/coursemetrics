@@ -1,9 +1,10 @@
 // components/Footer/MainFooter.tsx
 'use client';
-import { Box, Container, Text, Flex, Link, IconButton, useColorModeValue } from '@chakra-ui/react';
+import { Box, Container, Text, Flex, IconButton, useColorModeValue } from '@chakra-ui/react';
 import { FaFacebook, FaGithub, FaXTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa6';
 import React from 'react';
 import { useFlexStyle } from '@/styles/styles';
+import Link from 'next/link';
 
 export default function MainFooter() {
   const flexStyle = useFlexStyle();
@@ -29,18 +30,10 @@ export default function MainFooter() {
             align={{ base: 'center', md: 'flex-start' }}
             textAlign={{ base: 'center', md: 'left' }}
           >
-            <Link href="/about" mb={{ base: 2, md: 0 }}>
-              About
-            </Link>
-            <Link href="/contact" mb={{ base: 2, md: 0 }}>
-              Contact Us
-            </Link>
-            <Link href="/faq" mb={{ base: 2, md: 0 }}>
-              FAQ
-            </Link>
-            <Link href="/terms" mb={{ base: 2, md: 0 }}>
-              Terms & Conditions
-            </Link>
+            <Link href="/">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/contact">Contact Us</Link>
+            <Link href="/faq">FAQ</Link>
           </Flex>
 
           {/* Social Media Icons Section */}
