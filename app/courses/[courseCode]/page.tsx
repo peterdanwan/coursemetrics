@@ -136,7 +136,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
       }
 
       setCourse(initialCourse);
-      const initialTermKey = `${initialCourse.CourseTerm.season}_${initialCourse.CourseTerm.year}`;
+      const initialTermKey = `${initialCourse?.CourseTerm.season}_${initialCourse?.CourseTerm.year}`;
       const initialSections = coursesArray.filter(
         (courseItem: ICourse) =>
           `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}` === initialTermKey
