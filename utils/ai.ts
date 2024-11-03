@@ -80,19 +80,22 @@ class ReviewEvaluator {
   private constructPrompt(reviewContent: string, policies: string[]): string {
     const policyList = policies.map((policy, index) => `Policy ${index + 1}: ${policy}`).join(', ');
 
+    /*
+     * Policy list looks like this: ['Policy1 Name: Description1', 'Policy2 Name: Description2']
+     */
+
     return `
-      You are analyzing whether the following review content adheres to a set of clearly defined policies. 
-      Carefully review each policy against the content and provide a strictly JSON-formatted response as shown below:
+      You are analyzing whether the following review content adheres to a set of clearly defined policies given below. 
+
+      Here are the policies. Policy list looks like this: ['Policy1 Name: Description1', 'Policy2 Name: Description2']:
+      Policies: [${policyList}]
       
+      Carefully review each policy against the content below and provide a strictly JSON-formatted response as shown below:
+      Review Content: "${reviewContent}"
       {
         "approvedByModel": true/false,
         "reason": "If approved, omit this field. If disapproved, specify which policy was violated (e.g., 'Policy 2 violated') and explain why the content was flagged, focusing on the detected violation."
       }
-      
-      Review Content: "${reviewContent}"
-      
-      Policies: [${policyList}]
-      
       Important: Only respond with a JSON object in the specified format. Avoid any additional commentary or information outside the JSON structure.
     `;
   }
@@ -194,7 +197,7 @@ class ReviewEvaluator {
       }
 
       Important: Only respond with a JSON object in the specified format. Focus on generating relevant and meaningful one-word tags, 
-      and NEVER USE placeholders or vague terms such as 'N/A' or 'no information.' Ensure that each tag reflects a valuable insight 
+      and NEVER USE placeholders like 'N/A', 'undefined' or 'no information.'. Make sure to only have relevant stuff. Ensure that each tag reflects a valuable insight 
       from the review and does not repeat or contain generic responses. 
       Do not include any additional commentary or information outside the JSON structure.
     `;
