@@ -123,3 +123,45 @@ export const GET = async function fetch_reviews_by_course_code(
     );
   }
 };
+
+export const POST = async function fetch_reviews_by_course_code(
+  req: NextRequest
+): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/reviews/courses/[courseCode]/route.ts' });
+
+  try {
+    await connectDB();
+
+    const { user }: any = await getSession();
+
+    if (!user) {
+      log.warn('User not authenticated');
+    }
+
+    // Can throw
+    const profReviewData = await req.json();
+
+    if (!profReviewData) {
+      log.warn('No data in the body of the request');
+    }
+
+    log.info('profReviewData', profReviewData);
+
+    // const url = new URL(req.url);
+    // const courseCode = url.pathname.split('/').pop();
+
+    return NextResponse.json(
+      createSuccessResponse({ message: 'Professor review successfully created. ' }),
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error(error);
+
+    log.error('Error posting the review', { error });
+
+    return NextResponse.json(
+      createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
+      { status: 500 }
+    );
+  }
+};
