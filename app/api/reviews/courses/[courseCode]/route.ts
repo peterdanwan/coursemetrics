@@ -53,6 +53,8 @@ export const GET = async function fetch_reviews_by_course_code(
     const reviews = await Review.findAll({
       where: {
         review_type_id: 1,
+        // Commenting out this filter to show all results including the flagged reviews for testing purposes
+        // review_status_id: 2,
       },
       include: [
         {
