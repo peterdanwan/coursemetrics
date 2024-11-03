@@ -28,3 +28,16 @@ export const getReviewResponses = (data: any): string[] => {
 
   return reviews;
 };
+
+const shuffleArray = <T>(array: T[]): T[] => {
+  return array.sort(() => Math.random() - 0.5);
+};
+
+export const getFirstFiveComments = (reviews: any[]): string[] => {
+  if (reviews.length <= 5) {
+    return reviews.map((review: any) => review.comment).slice(0, 5);
+  } else {
+    const shuffledReviews = shuffleArray(reviews);
+    return shuffledReviews.map((review: any) => review.comment).slice(0, 5);
+  }
+};

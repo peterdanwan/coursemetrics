@@ -7,8 +7,6 @@ import User from '@/database/models/User';
 import ReviewQuestion from '@/database/models/ReviewQuestion';
 import ReviewAnswer from '@/database/models/ReviewAnswer';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
-import Professor from '@/database/models/Professor';
-import Question from '@/database/models/Question';
 import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
@@ -62,8 +60,7 @@ export const POST = async function post_review_to_course_code(
       });
     }
 
-    const apiKey = process.env['GOOGLE_GEMINI_API_KEY'] || '';
-    const reviewEvaluator = new ReviewEvaluator(apiKey);
+    const reviewEvaluator = new ReviewEvaluator();
 
     // Start a transaction to ensure all operations succeed or fail together
     const transaction = await sequelizeInstance.transaction();
@@ -144,16 +141,6 @@ export const POST = async function post_review_to_course_code(
 
       const reviewJson = review.toJSON();
 
-      // Log the violation if any at the end when everything is created
-      // if (reviewStatus === 4) {
-      //   const reason = evaluationResult.reason || 'No specific reason provided.';
-      //   await ReviewPolicyViolationLog.create({
-      //     review_id: reviewJson.review_id,
-      //     policy_id: evaluationResult.violatedPolicyIndex + 1,
-      //     reason: reason,
-      //   });
-      // }
-
       log.error(reviewJson);
 
       // Add questions and answers if provided
@@ -180,6 +167,16 @@ export const POST = async function post_review_to_course_code(
       }
 
       await transaction.commit();
+
+      // Log the violation if any at the end when everything is created
+      if (reviewStatus === 4) {
+        const reason = evaluationResult.reason || 'No specific reason provided.';
+        await ReviewPolicyViolationLog.create({
+          review_id: reviewJson.review_id,
+          policy_id: evaluationResult.violatedPolicyIndex + 1,
+          reason: reason,
+        });
+      }
 
       log.info('Review successfully created and associated with course and professor.');
       return NextResponse.json(

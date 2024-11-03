@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 
+const apiKey = process.env['NEXT_PUBLIC_GOOGLE_GEMINI_API_KEY'] || '';
+
 // Interfaces
 interface ReviewEvaluationResponse {
   approvedByModel: boolean;
@@ -40,7 +42,7 @@ const safetySettings = [
 class GoogleGenerativeAIService {
   private model: any;
 
-  constructor(apiKey: string) {
+  constructor() {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     // Ref Doc: https://ai.google.dev/gemini-api/docs/text-generation?lang=node
@@ -71,8 +73,8 @@ class GoogleGenerativeAIService {
 class ReviewEvaluator {
   private aiService: GoogleGenerativeAIService;
 
-  constructor(apiKey: string) {
-    this.aiService = new GoogleGenerativeAIService(apiKey);
+  constructor() {
+    this.aiService = new GoogleGenerativeAIService();
   }
 
   private constructPrompt(reviewContent: string, policies: string[]): string {
@@ -168,9 +170,9 @@ class ReviewEvaluator {
 
   private constructTagPrompt(reviews: string[]): string {
     return `
-      You are tasked with generating insightful and relevant tags for each of the following student reviews. 
-      The tags should capture the essence of the review and reflect the educational experience, learning outcomes, 
-      and aspects that would be beneficial for students considering this course or professor.
+      You are tasked with generating concise and insightful one to two word tags for each of the following student reviews. 
+      The tags should encapsulate the key themes or insights of the review, focusing on relevant aspects of the educational experience, 
+      learning outcomes, and features that would be beneficial for students considering this course or professor.
  
       Provide a list of tags in the format below:
 
@@ -191,7 +193,10 @@ class ReviewEvaluator {
         ]
       }
 
-      Important: Only respond with a JSON object in the specified format. Avoid any additional commentary or information outside the JSON structure.
+      Important: Only respond with a JSON object in the specified format. Focus on generating relevant and meaningful one-word tags, 
+      and NEVER USE placeholders or vague terms such as 'N/A' or 'no information.' Ensure that each tag reflects a valuable insight 
+      from the review and does not repeat or contain generic responses. 
+      Do not include any additional commentary or information outside the JSON structure.
     `;
   }
 
@@ -217,8 +222,7 @@ class ReviewEvaluator {
   }
 }
 
-// const apiKey = process.env['GOOGLE_GEMINI_API_KEY'] || '';
-// const reviewEvaluator = new ReviewEvaluator(apiKey);
+// const reviewEvaluator = new ReviewEvaluator();
 
 // const reviewContent = 'This prof is a motherfucker jackass at grading.';
 // const policies = ['No offensive language.', 'Avoid personal attacks.', 'Ensure factual accuracy.'];
