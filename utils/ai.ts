@@ -5,6 +5,7 @@ import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 interface ReviewEvaluationResponse {
   approvedByModel: boolean;
   reason?: string;
+  violatedPolicyIndex?: number | null;
 }
 
 interface TagGenerationResponse {
@@ -83,7 +84,7 @@ class ReviewEvaluator {
       
       {
         "approvedByModel": true/false,
-        "reason": "If approved, omit this field. If disapproved, specify which policy was violated and explain why the content was flagged, focusing on the detected violation."
+        "reason": "If approved, omit this field. If disapproved, specify which policy was violated (e.g., 'Policy 2 violated') and explain why the content was flagged, focusing on the detected violation."
       }
       
       Review Content: "${reviewContent}"
@@ -102,13 +103,29 @@ class ReviewEvaluator {
 
     try {
       const jsonResponse = await this.aiService.evaluateContent(prompt);
-      return JSON.parse(jsonResponse) as ReviewEvaluationResponse;
+      const parsedResponse = JSON.parse(jsonResponse) as ReviewEvaluationResponse;
+
+      // Check if the response contains the index of the violated policy
+      if (!parsedResponse.approvedByModel && parsedResponse.reason) {
+        // Extract the index from the reason if it's included
+        const indexMatch = parsedResponse.reason.match(/Policy (\d+)/);
+        const violatedPolicyIndex = indexMatch ? parseInt(indexMatch[1], 10) - 1 : null; // Adjust to 0-based index
+
+        return {
+          approvedByModel: false,
+          reason: parsedResponse.reason,
+          violatedPolicyIndex: violatedPolicyIndex,
+        };
+      }
+
+      return parsedResponse;
     } catch (error) {
       if (this.isErrorWithMessage(error)) {
         if (error.message.includes('Candidate was blocked due to SAFETY')) {
           return {
             approvedByModel: false,
             reason: 'Content too explicit.',
+            violatedPolicyIndex: null,
           };
         }
       }
@@ -117,8 +134,36 @@ class ReviewEvaluator {
       return {
         approvedByModel: false,
         reason: 'An error occurred during policy evaluation.',
+        violatedPolicyIndex: null,
       };
     }
+  }
+
+  public async evaluateMultipleReviews(
+    comments: string[],
+    policies: string[]
+  ): Promise<{
+    violatedPolicyIndex?: any;
+    approvedByModel: boolean;
+    reason?: string;
+  }> {
+    const nonRatingComments = comments.filter((comment) => isNaN(Number(comment.trim())));
+
+    for (const reviewContent of nonRatingComments) {
+      const result = await this.evaluateReview(reviewContent, policies);
+      if (!result.approvedByModel) {
+        const flaggedReason = result.reason || 'No specific reason provided.';
+        return {
+          approvedByModel: false,
+          reason: `Comment: "${reviewContent}" was flagged. Reason: ${flaggedReason}`,
+          violatedPolicyIndex: result.violatedPolicyIndex,
+        };
+      }
+    }
+
+    return {
+      approvedByModel: true,
+    };
   }
 
   private constructTagPrompt(reviews: string[]): string {
@@ -172,20 +217,23 @@ class ReviewEvaluator {
   }
 }
 
-const apiKey = process.env['GOOGLE_GEMINI_API_KEY'] || '';
-const reviewEvaluator = new ReviewEvaluator(apiKey);
+// const apiKey = process.env['GOOGLE_GEMINI_API_KEY'] || '';
+// const reviewEvaluator = new ReviewEvaluator(apiKey);
 
-const reviewContent = 'This prof is a motherfucker jackass at grading.';
-const policies = ['No offensive language.', 'Avoid personal attacks.', 'Ensure factual accuracy.'];
+// const reviewContent = 'This prof is a motherfucker jackass at grading.';
+// const policies = ['No offensive language.', 'Avoid personal attacks.', 'Ensure factual accuracy.'];
 
-reviewEvaluator.evaluateReview(reviewContent, policies).then((result) => console.log(result));
+// reviewEvaluator.evaluateReview(reviewContent, policies).then((result) => console.log(result));
 
-const reviews = [
-  'Excellent course! Used AWS a lot',
-  'The course was too difficult. Javascript was hard.',
-  'Loved the group projects.',
-  'The lectures were boring.',
-];
-reviewEvaluator.generateTags(reviews).then((result) => console.log(result));
+// const reviews = [
+//   'Excellent course! Used AWS a lot',
+//   'The course was too difficult. Javascript was hard.',
+//   'Loved the group projects.',
+//   'The lectures were boring.',
+// ];
+
+// reviewEvaluator.evaluateMultipleReviews(reviews, policies).then((result) => console.log(result));
+
+// reviewEvaluator.generateTags(reviews).then((result) => console.log(result));
 
 export { ReviewEvaluator };
