@@ -233,7 +233,9 @@ export default function MainNav(props: { user: any }) {
         </Flex>
 
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Image src={logo} priority alt="Course Metrics Logo" width={50} height={50} />
+          <Link href="/">
+            <Image src={logo} priority alt="Course Metrics Logo" width={50} height={50} />
+          </Link>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
             <DesktopNav
