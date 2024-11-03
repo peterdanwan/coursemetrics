@@ -171,11 +171,24 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen, reset, setValue]);
 
-  const submitForm: SubmitHandler<FormValues> = (data) => {
+  const submitForm: SubmitHandler<FormValues> = async (data) => {
     console.log(`Submitting form with the following data:`);
     console.log(data);
-    // If submitted successfully, display success modal:
-    openSuccessConfirmModal();
+
+    // Make a fetch call to the api to POST the professor review:
+    try {
+      await fetch(`/api/reviews/professors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      // If submitted successfully, display success modal:
+      openSuccessConfirmModal();
+    } catch (error) {
+      console.error('Error', { error });
+    }
   };
 
   const handleFormModalClose = () => {
