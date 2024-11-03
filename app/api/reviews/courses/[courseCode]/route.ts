@@ -124,7 +124,7 @@ export const GET = async function fetch_reviews_by_course_code(
   }
 };
 
-export const POST = async function fetch_reviews_by_course_code(
+export const POST = async function post_review_to_course_code(
   req: NextRequest
 ): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/reviews/courses/[courseCode]/route.ts' });
@@ -136,27 +136,40 @@ export const POST = async function fetch_reviews_by_course_code(
 
     if (!user) {
       log.warn('User not authenticated');
+      return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
     }
 
-    // Can throw
-    const profReviewData = await req.json();
+    // Parse the request body
+    const courseReviewData = await req.json();
 
-    if (!profReviewData) {
-      log.warn('No data in the body of the request');
+    if (!courseReviewData) {
+      log.error('No course review data sent in body');
+      return NextResponse.json(createErrorResponse(400, 'No data provided in request body'), {
+        status: 400,
+      });
     }
 
-    log.info('profReviewData', profReviewData);
+    log.error(`Received review data`);
+    log.error(courseReviewData);
 
-    // const url = new URL(req.url);
-    // const courseCode = url.pathname.split('/').pop();
+    // Get the course code from the URL
+    const url = new URL(req.url);
+    const courseCode = url.pathname.split('/').pop();
+
+    if (!courseCode) {
+      return NextResponse.json(createErrorResponse(400, 'Course code not provided'), {
+        status: 400,
+      });
+    }
+
+    // TODO: Add logic to save the review data to the database
 
     return NextResponse.json(
-      createSuccessResponse({ message: 'Professor review successfully created. ' }),
+      createSuccessResponse({ message: 'Course review successfully created.' }),
       { status: 201 }
     );
   } catch (error) {
     console.error(error);
-
     log.error('Error posting the review', { error });
 
     return NextResponse.json(
