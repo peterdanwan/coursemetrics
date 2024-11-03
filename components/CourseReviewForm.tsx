@@ -174,11 +174,23 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     }
   }, [isOpen, reset]);
 
-  const submitForm: SubmitHandler<FormValues> = (data) => {
+  const submitForm: SubmitHandler<FormValues> = async (data) => {
     console.log(`Submitting form with the following data:`);
     console.log(data);
-    // If submitted successfully, display success modal:
-    openSuccessConfirmModal();
+
+    try {
+      await fetch(`/api/reviews/courses/${courseName}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      // If submitted successfully, display success modal:
+      openSuccessConfirmModal();
+    } catch (error) {
+      console.error('Error', { error });
+    }
   };
 
   const handleFormModalClose = () => {
