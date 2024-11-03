@@ -179,7 +179,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     console.log(data);
 
     try {
-      await fetch(`/api/reviews/courses/${courseName}`, {
+      await fetch(`/api/reviews/courses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -29,6 +29,8 @@ import { useSearchParams } from 'next/navigation';
 import SideMenu from '@/components/SideFilterMenuCourse';
 import CourseReviewForm from '@/components/CourseReviewForm';
 import { useFlexStyle } from '@/styles/styles';
+import { getFirstFiveComments } from '@/utils/funcs';
+import { ReviewEvaluator } from '@/utils/ai';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -85,6 +87,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [terms, setTerms] = useState<ICourseTerm[]>([]);
   const [reviews, setReviews]: any = useState(null);
   const [sections, setSections] = useState<ICourse[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
 
   // Get year and season from query params, with fallback to current values
@@ -104,7 +107,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   useEffect(() => {
     if (courseResponse) {
-      console.log(courseResponse);
       const coursesArray = courseResponse.data.courses;
       setCourses(coursesArray);
 
@@ -155,16 +157,30 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     : null;
 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
-  // console.log(reviewResponse);
 
   useEffect(() => {
-    if (reviewResponse) {
-      if (Array.isArray(reviewResponse.data)) {
-        setReviews(reviewResponse.data);
-      } else {
-        setReviews([]);
+    const fetchTags = async () => {
+      if (reviewResponse) {
+        if (Array.isArray(reviewResponse.data)) {
+          setReviews(reviewResponse.data);
+
+          const reviewEvaluator = new ReviewEvaluator();
+
+          const dynamicTags = await reviewEvaluator.generateTags(
+            getFirstFiveComments(reviewResponse.data)
+          );
+
+          const uniqueTags = Array.from(new Set(dynamicTags.tags));
+          const topUniqueTags = uniqueTags.slice(0, 5);
+
+          setTags(topUniqueTags);
+        } else {
+          setReviews([]);
+        }
       }
-    }
+    };
+
+    fetchTags();
   }, [reviewResponse]);
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -250,29 +266,22 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardBody>
             </Card>
           </GridItem>
-          {/* Skills Section */}
+          {/* Tags Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
-                  Skills
+                  Tags
                 </Heading>
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
                 <List listStyleType="none">
                   <Flex wrap="wrap" gap={5}>
-                    <ListItem>
-                      <Tag colorScheme="cyan">AWS</Tag>
-                    </ListItem>
-                    <ListItem>
-                      <Tag colorScheme="cyan">Cloud Computing</Tag>
-                    </ListItem>
-                    <ListItem>
-                      <Tag colorScheme="cyan">JavaScript</Tag>
-                    </ListItem>
-                    <ListItem>
-                      <Tag colorScheme="cyan">HTML</Tag>
-                    </ListItem>
+                    {tags.map((tag: any, index: number) => (
+                      <ListItem key={index}>
+                        <Tag colorScheme="cyan">{tag}</Tag>
+                      </ListItem>
+                    ))}
                   </Flex>
                 </List>
               </CardBody>

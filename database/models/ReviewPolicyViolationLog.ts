@@ -25,11 +25,15 @@ ReviewPolicyViolationLog.init(
     },
     policy_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: Policy,
         key: 'policy_id',
       },
+    },
+    reason: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
   },
   {
