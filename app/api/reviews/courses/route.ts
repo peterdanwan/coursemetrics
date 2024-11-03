@@ -141,8 +141,6 @@ export const POST = async function post_review_to_course_code(
 
       const reviewJson = review.toJSON();
 
-      log.error(reviewJson);
-
       // Add questions and answers if provided
       if (courseReviewData.questions && courseReviewData.questions.length > 0) {
         for (const { question_id, answer } of courseReviewData.questions) {
