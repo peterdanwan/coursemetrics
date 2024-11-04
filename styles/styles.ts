@@ -1,4 +1,5 @@
 // styles/styles.ts
+'use client';
 import { useColorModeValue } from '@chakra-ui/react';
 
 export const useFlexStyle = () => {

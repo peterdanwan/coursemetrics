@@ -51,71 +51,72 @@ export default function Home() {
 
   return (
     <>
-      <Container
-        // maxW={{ base: "container.sm", md: "container.lg", lg: "container.xl" }}
-        width={'100vw'}
-        height={{ base: '85vh' }}
-        alignContent={'center'}
-        justifyContent={'center'}
-        bgColor={flexStyle.bgColor}
-      >
-        <Stack
-          as={Box}
-          textAlign={'center'}
-          spacing={{ base: 8, md: 14 }}
-          width={{ base: '90%' }}
-          textColor={flexStyle.color}
+      <Box bgColor={flexStyle.bgColor}>
+        <Container
+          // maxW={{ base: "container.sm", md: "container.lg", lg: "container.xl" }}
+          width={'100vw'}
+          height={{ base: '100vh' }}
+          alignContent={'center'}
+          justifyContent={'center'}
+          bgColor={flexStyle.bgColor}
         >
-          <Heading
-            fontWeight={600}
-            fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}
-            lineHeight={'110%'}
-          >
-            Course
-            <br />
-            <Text
-              as={'span'}
-              bgGradient="linear(to-l, #FFDC4D, #FF6464)"
-              bgClip="text"
-              fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}
-              fontWeight="extrabold"
-            >
-              Metrics
-            </Text>
-          </Heading>
-          <Box>
-            <Heading as="h3" fontSize={{ base: 'xl', sm: 'xl', md: '2xl' }}>
-              Unlock Course Insights
-            </Heading>
-            <Text color={'gray.500'} mt={4}>
-              Explore real student reviews and ratings for courses and professors at Seneca
-              Polytechnic. Make informed decisions and tailor your educational journey with
-              confidence.
-            </Text>
-          </Box>
-
           <Stack
-            direction={'column'}
-            spacing={3}
-            align={'center'}
-            alignSelf={'center'}
-            position={'relative'}
+            as={Box}
+            textAlign={'center'}
+            spacing={{ base: 8, md: 14 }}
+            width={{ base: '90%' }}
+            textColor={flexStyle.color}
           >
-            <Button
-              colorScheme={'green'}
-              bg={'#F45B69'}
-              rounded={'full'}
-              px={6}
-              _hover={{
-                bg: '#F67984',
-              }}
+            <Heading
+              fontWeight={600}
+              fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}
+              lineHeight={'110%'}
             >
-              Get Started
-            </Button>
-            {/* <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
+              Course
+              <br />
+              <Text
+                as={'span'}
+                bgGradient="linear(to-l, #FFDC4D, #FF6464)"
+                bgClip="text"
+                fontSize={{ base: '4xl', sm: '4xl', md: '6xl' }}
+                fontWeight="extrabold"
+              >
+                Metrics
+              </Text>
+            </Heading>
+            <Box>
+              <Heading as="h3" fontSize={{ base: 'xl', sm: 'xl', md: '2xl' }}>
+                Unlock Course Insights
+              </Heading>
+              <Text color={'gray.500'} mt={4}>
+                Explore real student reviews and ratings for courses and professors at Seneca
+                Polytechnic. Make informed decisions and tailor your educational journey with
+                confidence.
+              </Text>
+            </Box>
+
+            <Stack
+              direction={'column'}
+              spacing={3}
+              align={'center'}
+              alignSelf={'center'}
+              position={'relative'}
+            >
+              <Button
+                colorScheme={'green'}
+                bg={'#F45B69'}
+                rounded={'full'}
+                px={6}
+                _hover={{
+                  bg: '#F67984',
+                }}
+              >
+                Get Started
+              </Button>
+              {/* <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
               Learn more
             </Button> */}
-            {/* <Box>
+              {/* <Box>
               <Icon
                 as={Arrow}
                 color={useColorModeValue("gray.800", "gray.300")}
@@ -135,9 +136,10 @@ export default function Home() {
                 Starting at $15/mo
               </Text>
             </Box> */}
+            </Stack>
           </Stack>
-        </Stack>
-      </Container>
+        </Container>
+      </Box>
     </>
   );
 }
