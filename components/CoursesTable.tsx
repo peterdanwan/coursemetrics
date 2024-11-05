@@ -1,9 +1,10 @@
 // components/CoursesTable.tsx
+'use client';
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import useSWR from 'swr';
-import { apiFetcher } from '@/utils';
 
+// We are passing the courses data from the admin/manage page so we don't have to
+// specifically fetch courses data in this component
 const CoursesTable: React.FC<{ courses: any[]; onRemove: (index: number) => void }> = ({
   courses,
   onRemove,
@@ -11,19 +12,20 @@ const CoursesTable: React.FC<{ courses: any[]; onRemove: (index: number) => void
   // More logic would need to be added here to remove the course from the database
   const router = useRouter();
 
-  // Fetch all courses data URL
-  // until they fix the pagination to actually fetch all instead of only the top 10 when we have /api/courses
-  const { data: courseData, error: courseError } = useSWR('/api/courses?limit=1000', apiFetcher);
-  console.log('Courses Data: ', courseData);
+  const displayedCourses = courses;
+  // console.log('Displayed Courses: ', displayedCourses);
 
-  const displayedCourses = courseData?.data.courses || courses;
+  if (!displayedCourses || displayedCourses.length === 0) {
+    return <div>No courses available</div>;
+  }
 
   const handleEditClick = (courseId: any) => {
     router.push(`/admin/manage/edit-course/${courseId}`);
   };
 
-  if (courseError) return <div>Failed to load courses</div>;
-  if (!courseData) return <div>Loading...</div>;
+  //if (courseError) return <div>Failed to load courses</div>;
+  if (!courses) return <div>Loading...</div>;
+
   return (
     <>
       {/* Table Header */}

@@ -1,24 +1,27 @@
+// components/ProfessorsTable.tsx
+'use client';
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import useSWR from 'swr';
-import { apiFetcher } from '@/utils';
 
 const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: number) => void }> = ({
   professors,
   onRemove,
 }) => {
   const router = useRouter();
-  const { data: professorData, error: professorError } = useSWR('/api/professors', apiFetcher);
-  console.log('Professors Data: ', professorData);
+  console.log('Professors Data: ', professors);
 
-  const displayedProfessors = professorData?.data.professors || professors;
+  const displayedProfessors = professors;
+  console.log('Displayed Professors: ', displayedProfessors);
 
   const handleEditClick = (professorId: number) => {
     router.push(`/admin/manage/edit-professor/${professorId}`);
   };
 
-  if (professorError) return <div>Failed to load professors</div>;
-  if (!professorData) return <div>Loading...</div>;
+  if (!displayedProfessors || displayedProfessors.length === 0) {
+    return <div>No professors available</div>;
+  }
+
+  if (!professors) return <div>Loading...</div>;
 
   // More logic would need to be added here to remove the professor from the database
   return (

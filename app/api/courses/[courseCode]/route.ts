@@ -105,7 +105,18 @@ export const DELETE = withApiAuthRequired(async function delete_course_by_course
       return NextResponse.json(createErrorResponse(404, 'Course not found'), { status: 404 });
     }
 
-    await course.destroy();
+    try {
+      await course.destroy();
+    } catch (error) {
+      log.error(error);
+      return NextResponse.json(
+        createErrorResponse(
+          409,
+          "Could not delete course record since it's associated with other records"
+        ),
+        { status: 409 }
+      );
+    }
 
     log.info('Course deleted successfully', { courseCode });
     return NextResponse.json(createSuccessResponse({ message: 'Course deleted successfully' }), {
