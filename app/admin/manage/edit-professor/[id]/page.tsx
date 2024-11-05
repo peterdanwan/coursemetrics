@@ -16,77 +16,88 @@ import { useState, useEffect } from 'react';
 import Select, { MultiValue } from 'react-select';
 import withAdminAuth from '@/components/withAdminAuth';
 import customStyles from '@/styles/customStyles';
-
-// ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const sampleProfessors = [
-  { value: '1', label: 'Professor A' },
-  { value: '2', label: 'Professor B' },
-  { value: '3', label: 'Professor C' },
-  { value: '4', label: 'Professor D' },
-  { value: '5', label: 'Professor E' },
-  { value: '6', label: 'Professor F' },
-  { value: '7', label: 'Professor G' },
-];
-
-const sampleCourses = [
-  { value: '1', label: 'Course A' },
-  { value: '2', label: 'Course B' },
-  { value: '3', label: 'Course C' },
-  { value: '4', label: 'Course D' },
-  { value: '5', label: 'Course E' },
-  { value: '6', label: 'Course F' },
-  { value: '7', label: 'Course G' },
-  { value: '8', label: 'Course H' },
-  { value: '9', label: 'Course I' },
-  { value: '10', label: 'Course J' },
-  // Add more professors as needed
-];
-
-const sampleTerms = [
-  { value: 'Winter 2024', label: 'Winter 2024' },
-  { value: 'Summer 2024', label: 'Summer 2024' },
-  { value: 'Fall 2024', label: 'Fall 2024' },
-  { value: 'Winter 2025', label: 'Winter 2025' },
-  { value: 'Summer 2025', label: 'Summer 2025' },
-  { value: 'Fall 2025', label: 'Fall 2025' },
-];
+import { apiFetcher } from '@/utils';
+import useSWR from 'swr';
+import { useParams } from 'next/navigation';
 
 // ******************************************************************************************************************************************************************
 
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const professorId = searchParams.get('id');
-
+  const { id: professorId } = useParams();
   const [selectedCourses, setSelectedCourses] = useState<{ value: string; label: string }[]>([]);
-  const [professorData, setProfessorData] = useState({ first_name: '', last_name: '' });
+  const [courseOptions, setCourseOptions] = useState<{ value: string; label: string }[]>([]);
+  // Local state to manage the form inputs
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const { data: professorsID, error: professorError } = useSWR(
+    `/api/professors/${professorId}`,
+    apiFetcher
+  );
+  const { data: courses, error: courseError } = useSWR('/api/courses', apiFetcher);
+  console.log('Professors Data:', professorsID);
+  console.log('Courses Data:', courses);
 
   useEffect(() => {
-    // Fetch the professor data from the backend using professorId
-    const fetchProfessorData = async () => {
-      const professor = {
-        id: '1',
-        first_name: 'John',
-        last_name: 'Doe',
-        courses: [
-          { value: '1', label: 'Course A' },
-          { value: '2', label: 'Course B' },
-        ],
-      };
-      setProfessorData(professor);
-      setSelectedCourses(professor.courses);
+    if (professorsID) {
+      // Set initial form state when professors data is loaded
+      setFirstName(professorsID.data.professor.first_name);
+      setLastName(professorsID.data.professor.last_name);
+
+      // Map courses associated with the professor to the format required by the select input
+      const professorCourses = professorsID.data.professorCourses.map((professorCourse: any) => {
+        // Format label similarly to available courses (course_code + term)
+        //const termInitial = getSeasonInitial(professorCourse.Course.CourseTerm.season);
+        const termInitial = professorCourse.Course.CourseTerm.season;
+        const label = `${professorCourse.Course.course_code}${professorCourse.Course.course_section} (${termInitial}${professorCourse.Course.CourseTerm.year})`;
+
+        return {
+          value: professorCourse.Course.course_id,
+          label: label, // Now includes course code + term (season and year)
+        };
+      });
+
+      setSelectedCourses(professorCourses); // Set the courses that the professor is teaching
+    }
+  }, [professorsID]);
+
+  useEffect(() => {
+    if (courses) {
+      // Map all courses to match the format of { value: course_id, label: course_code }
+      const allAvailableCourses = courses.data.courses.map((course: any) => {
+        // Format the label to include both course_code and CourseTerm (season and year)
+        //const termInitial = getSeasonInitial(course.CourseTerm.season);
+        const termInitial = course.CourseTerm.season;
+        const label = `${course.course_code}${course.course_section} (${termInitial}${course.CourseTerm.year})`;
+
+        return {
+          value: course.course_id,
+          label: label, // Now includes course code + term (season and year)
+        };
+      });
+
+      // Filter out courses already assigned to this professor from the available options
+      const availableCourses = allAvailableCourses.filter(
+        (course: any) => !selectedCourses.some((selected) => selected.value === course.value)
+      );
+
+      setCourseOptions(availableCourses); // Set remaining available courses for selection
+    }
+  }, [courses, selectedCourses]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const updatedProfessor = {
+      first_name: firstName,
+      last_name: lastName,
+      courses: selectedCourses.map((course) => course.value), // so this is completed but I think I need to actually add it to the ProfessorCourse table
     };
 
-    fetchProfessorData();
-  }, [professorId]);
+    console.log('Submitting the following data to the API:', updatedProfessor);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle the update course logic here
-    console.log({
-      ...professorData,
-      selectedCourses,
-    });
+    // Put the Update API endpoint here
   };
 
   const handleCancel = () => {
@@ -96,6 +107,9 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const handleCoursesChange = (newValue: MultiValue<{ value: string; label: string }>) => {
     setSelectedCourses(newValue as { value: string; label: string }[]);
   };
+
+  if (professorError || courseError) return <div>Failed to load data</div>;
+  if (!professorsID || !courses) return <div>Loading...</div>;
 
   return (
     <Flex direction="column" align="center" justify="center" minHeight="100vh" bg="gray.50" p={5}>
@@ -110,8 +124,12 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 First Name:
               </FormLabel>
               <Input
-                value={professorData.first_name}
-                onChange={(e) => setProfessorData({ ...professorData, first_name: e.target.value })}
+                id="first-name"
+                value={firstName}
+                onChange={(e) => {
+                  console.log('Updating firstName to:', e.target.value);
+                  setFirstName(e.target.value);
+                }}
                 required
                 color="black"
                 focusBorderColor="teal"
@@ -122,8 +140,12 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 Last Name:
               </FormLabel>
               <Input
-                value={professorData.last_name}
-                onChange={(e) => setProfessorData({ ...professorData, last_name: e.target.value })}
+                id="last-name"
+                value={lastName}
+                onChange={(e) => {
+                  console.log('Updating lastName to:', e.target.value);
+                  setLastName(e.target.value);
+                }}
                 required
                 color="black"
                 focusBorderColor="teal"
@@ -135,7 +157,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               </FormLabel>
               <Select
                 isMulti
-                options={sampleCourses}
+                options={courseOptions}
                 value={selectedCourses}
                 onChange={handleCoursesChange}
                 styles={customStyles}

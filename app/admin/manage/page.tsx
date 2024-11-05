@@ -1,3 +1,4 @@
+// app/admin/manage/page.tsx
 'use client';
 import {
   Select,
@@ -36,7 +37,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
     if (!initialOption) {
-      setSelectedOption(initialOption);
+      setSelectedOption(initialOption); // to be changed to null
     }
   }, [initialOption]);
 
@@ -45,6 +46,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Search Value:', event.target.value);
     setSearchValue(event.target.value);
   };
 
@@ -55,14 +57,15 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
         method: 'DELETE',
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to delete professor');
-      }
+      const data = await response.json();
 
-      // Optionally, you can trigger a refetch or update state here to refresh the data
+      if (!response.ok) {
+        // For error responses, throw the error message from the backend
+        throw new Error(data.error.message);
+      }
       mutate('/api/professors');
     } catch (error) {
-      console.error('Error removing professor:', error);
+      console.error(error);
     }
   };
 
@@ -73,13 +76,16 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
         method: 'DELETE',
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to delete course');
+        throw new Error(data.error.message);
       }
 
       // Optionally, you can trigger a refetch or update state here to refresh the data
+      mutate('/api/courses');
     } catch (error) {
-      console.error('Error removing course:', error);
+      console.error(error);
     }
   };
 
@@ -87,24 +93,32 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
   if (!courses || !professors || !reviews) return <div>Loading...</div>;
 
-  // Function to filter courses based on search value
-  const filteredCourses = Array.isArray(courses)
-    ? (courses as any[]).filter(
-        (course) =>
-          course.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          course.section.toLowerCase().includes(searchValue.toLowerCase()) ||
-          course.term.toLowerCase().includes(searchValue.toLowerCase()) ||
-          course.description.toLowerCase().includes(searchValue.toLowerCase())
-      )
+  const filteredCourses = Array.isArray(courses?.data?.courses)
+    ? courses.data.courses.filter((course: any) => {
+        const searchTerm = searchValue.toLowerCase().trim();
+
+        const combinedSeasonYear =
+          `${course.CourseTerm.season} ${course.CourseTerm.year}`.toLowerCase();
+
+        return (
+          course.course_code.toLowerCase().includes(searchTerm) ||
+          course.course_section.toLowerCase().includes(searchTerm) ||
+          course.CourseDetail.course_description.toLowerCase().includes(searchTerm) ||
+          course.CourseTerm.season.toLowerCase().includes(searchTerm) ||
+          String(course.CourseTerm.year).includes(searchTerm) ||
+          combinedSeasonYear.includes(searchTerm)
+        );
+      })
     : [];
 
   // Safely filter professors if defined
-  const filteredProfessors = Array.isArray(professors)
-    ? professors.filter((professor) => {
+  const filteredProfessors = Array.isArray(professors?.data?.professors)
+    ? professors.data.professors.filter((professor: any) => {
+        const searchTerm = searchValue.toLowerCase().trim();
         const fullName = `${professor.first_name} ${professor.last_name}`.toLowerCase();
         return (
-          professor.first_name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          professor.last_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          professor.first_name.toLowerCase().includes(searchTerm) ||
+          professor.last_name.toLowerCase().includes(searchTerm) ||
           fullName.includes(searchValue.toLowerCase())
         );
       })

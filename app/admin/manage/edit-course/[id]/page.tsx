@@ -1,6 +1,6 @@
 // app/admin/manage/edit-course/[id]/page.tsx
 'use client';
-
+// Backend not done here yet
 import {
   Box,
   Button,
@@ -17,79 +17,36 @@ import { useState, useEffect } from 'react';
 import Select, { MultiValue } from 'react-select';
 import withAdminAuth from '@/components/withAdminAuth';
 import customStyles from '@/styles/customStyles';
-
-// ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const sampleProfessors = [
-  { value: '1', label: 'Professor A' },
-  { value: '2', label: 'Professor B' },
-  { value: '3', label: 'Professor C' },
-  { value: '4', label: 'Professor D' },
-  { value: '5', label: 'Professor E' },
-  { value: '6', label: 'Professor F' },
-  { value: '7', label: 'Professor G' },
-];
-
-const sampleTerms = [
-  { value: 'Winter 2024', label: 'Winter 2024' },
-  { value: 'Summer 2024', label: 'Summer 2024' },
-  { value: 'Fall 2024', label: 'Fall 2024' },
-  { value: 'Winter 2025', label: 'Winter 2025' },
-  { value: 'Summer 2025', label: 'Summer 2025' },
-  { value: 'Fall 2025', label: 'Fall 2025' },
-];
-
-// ******************************************************************************************************************************************************************
+import { apiFetcher } from '@/utils';
+import useSWR from 'swr';
 
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const courseId = searchParams.get('id');
-
-  const [selectedProfessors, setSelectedProfessors] = useState<{ value: string; label: string }[]>(
-    []
+  const { data: courseData, error: courseError } = useSWR(
+    courseId ? `/api/courses/${courseId}` : null, // Fetch only if courseId exists
+    apiFetcher
   );
-  const [selectedTerm, setSelectedTerm] = useState('');
-  const [courseData, setCourseData] = useState({ name: '', section: '', description: '' });
+  console.log('Course Data Edit Page:', courseData);
 
-  useEffect(() => {
-    // Fetch the course data from the backend using courseId
-    const fetchCourseData = async () => {
-      const course = {
-        id: '1',
-        name: 'Course 1',
-        section: 'A',
-        description: 'Introductory course to programming.',
-        term: 'Fall 2024',
-        professors: [
-          { value: '1', label: 'John Doe' },
-          { value: '2', label: 'Jane Smith' },
-        ],
-      };
-      setCourseData(course);
-      setSelectedProfessors(course.professors);
-      setSelectedTerm(course.term);
-    };
-
-    fetchCourseData();
-  }, [courseId]);
+  // Error handling for courses
+  if (courseError) return <div>Failed to load data</div>;
+  if (!courseData) return <div>Loading...</div>;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle the update course logic here
-    console.log({
-      ...courseData,
-      selectedProfessors,
-      selectedTerm,
-    });
+    console.log('Course Data:', courseData);
   };
 
   const handleCancel = () => {
-    router.push('/admin/manage');
+    router.push('/admin/manage?option=courses');
   };
 
-  const handleProfessorChange = (newValue: MultiValue<{ value: string; label: string }>) => {
-    setSelectedProfessors(newValue as { value: string; label: string }[]);
-  };
+  // const handleProfessorChange = (newValue: MultiValue<{ value: string; label: string }>) => {
+  //   setSelectedProfessors(newValue as { value: string; label: string }[]);
+  // };
 
   return (
     <Flex direction="column" align="center" justify="center" minHeight="100vh" bg="gray.50" p={5}>
@@ -105,7 +62,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               </FormLabel>
               <Input
                 value={courseData.name}
-                onChange={(e) => setCourseData({ ...courseData, name: e.target.value })}
+                // onChange={(e) => setCourseData({ ...courseData, name: e.target.value })}
                 required
                 color="black"
                 focusBorderColor="teal"
@@ -117,7 +74,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               </FormLabel>
               <Input
                 value={courseData.section}
-                onChange={(e) => setCourseData({ ...courseData, section: e.target.value })}
+                // onChange={(e) => setCourseData({ ...courseData, section: e.target.value })}
                 required
                 color="black"
                 focusBorderColor="teal"
@@ -129,9 +86,9 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               </FormLabel>
               <Select
                 isMulti
-                options={sampleProfessors}
-                value={selectedProfessors}
-                onChange={handleProfessorChange}
+                // options={sampleProfessors}
+                // value={selectedProfessors}
+                // onChange={handleProfessorChange}
                 styles={customStyles}
               />
             </FormControl>
@@ -140,9 +97,9 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 Select Term
               </FormLabel>
               <Select
-                options={sampleTerms}
-                value={{ value: selectedTerm, label: selectedTerm }}
-                onChange={(option) => setSelectedTerm(option?.value || '')}
+                // options={sampleTerms}
+                // value={{ value: selectedTerm, label: selectedTerm }}
+                // onChange={(option) => setSelectedTerm(option?.value || '')}
                 styles={customStyles}
               />
             </FormControl>
@@ -152,7 +109,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               </FormLabel>
               <Textarea
                 value={courseData.description}
-                onChange={(e) => setCourseData({ ...courseData, description: e.target.value })}
+                // onChange={(e) => setCourseData({ ...courseData, description: e.target.value })}
                 required
                 color="black"
                 focusBorderColor="teal"
