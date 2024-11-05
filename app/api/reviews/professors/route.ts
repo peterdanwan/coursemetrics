@@ -18,8 +18,8 @@ import { ReviewEvaluator } from '@/utils/ai';
 import { getReviewResponses } from '@/utils/funcs';
 import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
 
-export const POST = async function post_course_review(req: NextRequest): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/reviews/courses/route.ts' });
+export const POST = async function post_professor_review(req: NextRequest): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/reviews/professors/route.ts' });
 
   try {
     await connectDB();
@@ -34,10 +34,10 @@ export const POST = async function post_course_review(req: NextRequest): Promise
     const userEmail = user.email;
 
     // Parse the request body
-    const courseReviewData = await req.json();
+    const professorReviewData = await req.json();
 
-    if (!courseReviewData) {
-      log.error('No course review data sent in body');
+    if (!professorReviewData) {
+      log.error('No professor review data sent in body');
       return NextResponse.json(createErrorResponse(400, 'No data provided in request body'), {
         status: 400,
       });
@@ -45,13 +45,13 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
     log.error(
       {
-        courseReviewData,
+        professorReviewData,
       },
-      'Received course review data'
+      'Received professor review data'
     );
 
-    const courseCode = courseReviewData.courseName;
-    const [season, year] = courseReviewData.term.split(' ');
+    const courseCode = professorReviewData.courseName;
+    const [season, year] = professorReviewData.term.split(' ');
 
     if (!courseCode) {
       return NextResponse.json(createErrorResponse(400, 'Course code not provided'), {
@@ -85,7 +85,7 @@ export const POST = async function post_course_review(req: NextRequest): Promise
         return `${policy.policy_name}: ${policy.policy_description}`;
       });
 
-      const reviewResponses = getReviewResponses(courseReviewData);
+      const reviewResponses = getReviewResponses(professorReviewData);
 
       const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
         reviewResponses,
@@ -121,19 +121,18 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
       const professorCourseJson = professorCourse.toJSON();
 
-      const averageRating: number = calculateAverageRating(courseReviewData?.questions);
+      const averageRating: number = calculateAverageRating(professorReviewData?.questions);
 
-      // Create the primary review entry
       const review = await Review.create(
         {
-          review_type_id: 1,
+          review_type_id: 2,
           review_status_id: reviewStatus,
           professor_course_id: professorCourseJson.professor_course_id,
           user_id: userInstanceJson.user_id,
           rating: averageRating,
-          title: courseReviewData.commentTitle,
-          comment: courseReviewData.comment,
-          grade: courseReviewData.grade,
+          title: professorReviewData.commentTitle,
+          comment: professorReviewData.comment,
+          grade: professorReviewData.grade,
         },
         { transaction }
       );
@@ -141,8 +140,8 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       const reviewJson = review.toJSON();
 
       // Add questions and answers if provided
-      if (courseReviewData.questions && courseReviewData.questions.length > 0) {
-        for (const { question_id, answer } of courseReviewData.questions) {
+      if (professorReviewData.questions && professorReviewData.questions.length > 0) {
+        for (const { question_id, answer } of professorReviewData.questions) {
           const reviewQuestion = await ReviewQuestion.create(
             {
               review_id: reviewJson.review_id,
@@ -177,20 +176,20 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
       log.info('Review successfully created and associated with course and professor.');
       return NextResponse.json(
-        createSuccessResponse({ message: 'Course review successfully created.' }),
+        createSuccessResponse({ message: 'Professor review successfully created.' }),
         { status: 201 }
       );
     } catch (error) {
       await transaction.rollback();
       log.error(`Transaction rolled back due to error, ${error}`);
       return NextResponse.json(
-        createErrorResponse(500, 'Failed to create course review. Transaction rolled back.'),
+        createErrorResponse(500, 'Failed to create professor review. Transaction rolled back.'),
         { status: 500 }
       );
     }
   } catch (error) {
     console.error(error);
-    log.error('Error posting the course review', { error });
+    log.error('Error posting the professor review', { error });
 
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
