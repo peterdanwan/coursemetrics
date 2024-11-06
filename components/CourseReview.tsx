@@ -18,10 +18,12 @@ export default function CourseReview({
   review,
   expandedReviewId,
   toggleExpandedReview,
+  // isFormOpen,
 }: {
   review: any;
   expandedReviewId: number;
   toggleExpandedReview: (id: number) => void;
+  // isFormOpen: any;
 }) {
   const [isTruncated, setIsTruncated] = useState(false); // Track whether the text is truncated
   const textRef = useRef<HTMLParagraphElement>(null); // Reference to the Text element
