@@ -2,7 +2,7 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import {
   Grid,
   GridItem,
@@ -160,11 +160,17 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
 
   useEffect(() => {
+    console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
     const fetchTags = async () => {
       console.log(reviewResponse);
       if (reviewResponse && reviewResponse.status === 'ok') {
         if (Array.isArray(reviewResponse.data)) {
-          setReviews(reviewResponse.data);
+          const reviewsFromDB = reviewResponse.data;
+          const sortedReviews = [...reviewsFromDB].sort(
+            (r1: any, r2: any) => parseInt(r1.review_id) - parseInt(r2.review_id)
+          );
+
+          setReviews(sortedReviews);
 
           const reviewEvaluator = new ReviewEvaluator();
 
@@ -181,9 +187,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         }
       }
     };
-
+    // fetch reviews after submitting new one to update Course Review UI
+    if (!isCourseReviewFormOpen) {
+      mutate(reviewsURL);
+    }
     fetchTags();
-  }, [reviewResponse]);
+  }, [reviewResponse, isCourseReviewFormOpen]);
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTermKey = e.target.value;
@@ -318,7 +327,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex direction="column" gap={5}>
-                  <Stack divider={<StackDivider />} height="700px" overflowY="scroll" spacing="4">
+                  <Stack
+                    divider={<StackDivider />}
+                    height="700px"
+                    overflowY="scroll"
+                    spacing="4"
+                    key={isCourseReviewFormOpen ? 'form-open' : 'form-closed-refresh'}
+                  >
                     {/**** Course Review Component starts here ****/}
                     {/* Check if reviews array exist before calling .map */}
                     {Array.isArray(reviews) ? (
@@ -328,6 +343,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                           review={review}
                           expandedReviewId={expandedReviewId}
                           toggleExpandedReview={toggleExpandedReview}
+                          // isFormOpen={isCourseReviewFormOpen}
                         />
                       ))
                     ) : (

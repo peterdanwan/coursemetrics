@@ -74,6 +74,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     handleSubmit,
     control,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: defaultFormVal,
@@ -85,20 +86,36 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   // Course name passed from course page
   const courseName = courseResponse?.data.courses[0].course_code;
 
+  // get current values of all fields
+  const currValues = getValues();
+
   // To access "questions" fields in form
   const { fields } = useFieldArray({ name: 'questions', control });
 
   // const [courseName, setCourseName] = useState<string>("");
-  const [courses, setCourses] = useState<any>(null);
+  const [courses, setCourses] = useState<any>([]);
   const [courseProfessors, setCourseProfessors] = useState<any>(null);
   const [courseQuestions, setCourseQuestions] = useState<any>(null);
   const [courseTerms, setCourseTerms] = useState<any>(null);
-  // const [sectionCodes, setSectionCodes] = useState<any>(null);
   const [courseSectionsByTerm, setCourseSectionsByTerm] = useState<any>(null);
-  // const [selectedSectionCode, setSelectedSectionCode] = useState<any>(null);
+  const [coursesByTerm, setCoursesByTerm] = useState<any>([]);
+
+  // Track the selected value of Term and Section Codes
+  const selectedTerm = watch('term');
+  const selectedSectionCode = watch('sectionCode');
+
+  // Fetch data from API
+  const { data: courseProfessorResponse, error: courseProfessorResponseError } = useSWR(
+    `/api/professors/course/${courseResponse?.data.courses[0].course_code}`,
+    apiFetcher
+  );
+
+  const { data: courseQuestionsResponse, error: courseQuestionsResponseError } = useSWR(
+    `/api/questions?type=1`,
+    apiFetcher
+  );
 
   // Courses
-  // setCourses(courseResponse?.data.courses);
   useEffect(() => {
     if (courseResponse && courseResponse.status === 'ok') {
       const coursesFromDB = courseResponse.data.courses;
@@ -112,74 +129,57 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
       );
       setCourseTerms(uniqueTerms);
     }
-  }, []);
+  }, [courseResponse]);
 
-  // Terms and Section Codes
-  // useEffect(() => {
-  //   console.log(courses);
-
-  //   const uniqueSectionCodes = Array.from(
-  //     new Set(courses?.map((course: any) => `${course.course_section}`))
-  //   );
-  //   setSectionCodes(uniqueSectionCodes);
-  // }, [courseTerms]);
-
-  const { data: courseProfessorResponse, error: courseProfessorResponseError } = useSWR(
-    `/api/professors/course/${courseResponse?.data.courses[0].course_code}`,
-    apiFetcher
-  );
-
-  const { data: courseQuestionsResponse, error: courseQuestionsResponseError } = useSWR(
-    `/api/questions?type=1`,
-    apiFetcher
-  );
-
-  // Track the selected value of Term to determine and update Section Codes
-  const selectedTerm = watch('term');
-  const selectedSectionCode = watch('sectionCode');
-
+  // Filter courses by selected term
   useEffect(() => {
-    if (!courses) return;
-    // console.log(selectedTerm, selectedSectionCode);
+    if (!selectedTerm.length) return;
+
     const [selectedSeason, selectedYear] = selectedTerm.split(' ');
-    // console.log('season', selectedSeason);
-    // console.log('year', selectedYear);
-    const updatedCoursesByTerm = courses.filter((course: any) => {
+    const updatedCoursesByTerm = courses?.filter((course: any) => {
       return (
         course.CourseTerm.season === selectedSeason &&
         course.CourseTerm.year === parseInt(selectedYear)
       );
     });
-    console.log('updated courses by term');
-    console.log(updatedCoursesByTerm);
+
     if (updatedCoursesByTerm.length > 0) {
       const sectionCodes = updatedCoursesByTerm.map((course: any) => {
         return course.course_section;
       });
       setCourseSectionsByTerm(sectionCodes);
+      setCoursesByTerm(updatedCoursesByTerm);
+      setCourseProfessors([]);
+      reset({ ...currValues, sectionCode: '', professor: '' });
     }
-  }, [selectedTerm]);
+  }, [selectedTerm, setCourseSectionsByTerm, setCoursesByTerm, setCourseProfessors, reset]);
 
+  // filter courses by selected section code
   useEffect(() => {
-    if (courseProfessorResponse && courseProfessorResponse.status === 'ok') {
-      const courseProfessorsFromDB = courseProfessorResponse.data.professors;
-      console.log(courseProfessorsFromDB);
-      console.log(courses);
-      const uniqueProfs = Array.from(
-        new Set(
-          courseProfessorResponse.data.professors.map(
-            (professor: any) => `${professor.first_name} ${professor.last_name}`
-          )
-        )
-      );
+    if (!selectedSectionCode.length) return;
 
-      
-      // const courseProfsByTermSection = courseProfessorsFromDB?.map((cf: any) => {
-      //   return (cf.ProfessorCourses);
-      // });
-      setCourseProfessors(uniqueProfs);
+    const updatedCoursesBySection = coursesByTerm?.filter((course: any) => {
+      return course.course_section === selectedSectionCode;
+    });
+
+    // update professor options by course section
+    if (updatedCoursesBySection.length > 0) {
+      if (courseProfessorResponse && courseProfessorResponse.status === 'ok') {
+        const courseProfessorsFromDB = courseProfessorResponse.data.professors;
+
+        const uniqueProfs = courseProfessorsFromDB
+          .filter((prof: any) =>
+            prof.ProfessorCourses.some(
+              (course: any) => course.course_id === updatedCoursesBySection[0].course_id
+            )
+          )
+          .map((prof: any) => `${prof.first_name} ${prof.last_name}`);
+
+        setCourseProfessors(uniqueProfs);
+        reset({ ...currValues, professor: '' });
+      }
     }
-  }, [selectedSectionCode]);
+  }, [selectedSectionCode, courseProfessorResponse, setCourseProfessors, reset]);
 
   useEffect(() => {
     if (courseQuestionsResponse && courseQuestionsResponse.status === 'ok') {
@@ -271,7 +271,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
           </ModalHeader>
           <ModalCloseButton color="black" bgColor="gray.200" m={2} />
           <ModalBody color="black">
-            {courseProfessors && courseQuestions ? (
+            {courseQuestions ? (
               <form onSubmit={handleSubmit(submitForm)}>
                 <Flex
                   gap={{ base: '5', sm: '2', md: '2', lg: '10' }}
