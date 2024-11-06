@@ -1,15 +1,14 @@
+// components/ReviewsTable.tsx
+'use client';
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import ReviewsStatusIcon from './ReviewsStatusIcon';
-import useSWR from 'swr';
-import { apiFetcher } from '@/utils';
 
 const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
   const router = useRouter();
-  const { data: reviewData, error: reviewError } = useSWR('/api/reviews', apiFetcher);
-  console.log('Reviews Data: ', reviewData);
 
-  const displayedReviews = reviewData?.data || reviews;
+  const displayedReviews = reviews;
+  console.log('Reviews Data In Table: ', displayedReviews);
 
   const sortedReviews = [...displayedReviews].sort((a, b) => {
     // Check the review status based on review_status_id
@@ -33,8 +32,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
     return review_status_id === 1 ? 'pending' : review_status_id === 2 ? 'approved' : 'rejected';
   };
 
-  if (reviewError) return <div>Failed to load reviews</div>;
-  if (!reviewData) return <div>Loading...</div>;
+  if (!reviews) return <div>Loading...</div>;
 
   return (
     <>
@@ -142,7 +140,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
 
                 {/* Status Icon */}
                 <Text flex="1" textAlign="center" ml={5}>
-                  <ReviewsStatusIcon status={getStatus(review)} />
+                  <ReviewsStatusIcon status={review.review_status_id} />
                 </Text>
               </Flex>
             </Box>

@@ -15,10 +15,6 @@ const seedReviewStatuses = async () => {
       review_status_id: 3,
       status: 'Rejected',
     },
-    {
-      review_status_id: 4,
-      status: 'Under Review',
-    },
   ]);
 };
 

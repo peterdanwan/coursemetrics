@@ -1,101 +1,29 @@
 // app/user/reviews/courses/page.tsx
 'use client';
 import { Box, Flex, Stack, Text, Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
-import StatusIcon from '@/components/StatusIcon';
-import { useState } from 'react';
-
-// ************************************************** SAMPLE DATA TO BE REMOVED WHEN BACKEND FINISH **************************************************
-const reviews = [
-  {
-    category: 'Course Review',
-    course_code: 'CSC101',
-    term: 'Fall 2024',
-    review_text:
-      'This course provides a solid introduction to computer science, with a focus on programming fundamentals. Highly recommended for beginners!',
-    average_rate: 4.5,
-    status: 'approved',
-    created_date: new Date('2024-01-15'),
-  },
-  {
-    category: 'Course Review',
-    course_code: 'MTH202',
-    term: 'Fall 2024',
-    review_text:
-      'The content was quite challenging, but the professor was very helpful. I struggled with some concepts, but overall, it was a good learning experience.',
-    average_rate: 3.8,
-    status: 'pending',
-    created_date: new Date('2024-02-10'),
-  },
-  {
-    category: 'Professor Review',
-    course_code: 'PHY303',
-    review_text:
-      'Professor Smith explains difficult concepts clearly and is always available to answer questions. However, the exams were much harder than expected.',
-    average_rate: 4.2,
-    status: 'approved',
-    created_date: new Date('2024-02-10'),
-  },
-  {
-    category: 'Course Review',
-    course_code: 'ENG104',
-    term: 'Winter 2022',
-    review_text:
-      'I didn’t enjoy the lectures, but the assignments were interesting. The course material felt outdated, and there was little class interaction.',
-    average_rate: 2.5,
-    status: 'rejected',
-    created_date: new Date('2024-01-15'),
-  },
-  {
-    category: 'Professor Review',
-    course_code: 'CHE201',
-    review_text:
-      'Dr. Thompson is a brilliant professor but can be very strict. If you want to succeed in this class, you need to work hard and follow all the guidelines.',
-    average_rate: 4.0,
-    status: 'pending',
-    created_date: new Date('2024-05-15'),
-  },
-  {
-    category: 'Course Review',
-    course_code: 'CSC101',
-    term: 'Summer 2024',
-    review_text:
-      'This course provides a solid introduction to computer science, with a focus on programming fundamentals. Highly recommended for beginners!',
-    average_rate: 4.5,
-    status: 'approved',
-    created_date: new Date('2024-08-15'),
-  },
-  {
-    category: 'Course Review',
-    course_code: 'MTH202',
-    term: 'Winter 2023',
-    review_text:
-      'The content was quite challenging, but the professor was very helpful. I struggled with some concepts, but overall, it was a good learning experience.',
-    average_rate: 3.8,
-    status: 'pending',
-    created_date: new Date('2024-10-31'),
-  },
-];
-
-// ******************************************************************************************************************************************************************
+import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
+import { useState, useEffect } from 'react';
+import { apiFetcher } from '@/utils';
+import useSWR from 'swr';
 
 export default function Courses() {
-  // Make sure to add a logic that fetches the reviews of the specific user
+  const { data: reviewCourseData, error: reviewCourseError } = useSWR('/api/users', apiFetcher);
 
-  const sortedReviews = [...reviews]
-    // Filter by Course Review category
-    .filter((review) => review.category === 'Course Review')
+  console.log('Review Course Data:', reviewCourseData);
+
+  const sortedReviews = [...(reviewCourseData?.data?.user?.Reviews || [])]
+    .filter((review) => review.review_type_id === 1)
     .sort((a, b) => {
-      // Sort by recent date first
-      const dateComparison =
-        new Date(b.created_date).getTime() - new Date(a.created_date).getTime();
-
+      // Sort by the most recent review first
+      const dateComparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       if (dateComparison !== 0) {
         return dateComparison;
       }
-
-      // secondary sort
-      return b.average_rate - a.average_rate;
+      // Secondary sort by rating (descending)
+      return b.rating - a.rating;
     });
+
+  console.log('Sorted Reviews:', sortedReviews);
 
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -104,16 +32,18 @@ export default function Courses() {
   };
 
   const filteredReviews = sortedReviews.filter((review) => {
-    const normalizedRate = review.average_rate.toFixed(1);
+    const normalizedRate = review.rating?.toFixed(1);
     return (
-      review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
-      normalizedRate.includes(searchValue)
+      review.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+      review.comment.toLowerCase().includes(searchValue.toLowerCase()) ||
+      normalizedRate?.includes(searchValue)
     );
   });
 
+  console.log('Filtered Reviews:', filteredReviews);
+
+  if (reviewCourseError) return <Text color="red.500">Failed to load course reviews</Text>;
+  if (!reviewCourseData) return <Text>Loading...</Text>;
   return (
     <>
       <Box p={4}>
@@ -199,22 +129,22 @@ export default function Courses() {
               <Flex justify="space-between" align="center">
                 {/* Course Code */}
                 <Text flex="1" color="black" m={1}>
-                  {review.course_code}
+                  {review.ProfessorCourse?.Course?.course_code}
                 </Text>
 
                 {/* Term */}
                 <Text flex="2" color="black" isTruncated m={1}>
-                  {review.term}
+                  {`${review.ProfessorCourse?.Course?.CourseTerm?.season} ${review.ProfessorCourse?.Course?.CourseTerm?.year}`}
                 </Text>
 
                 {/* Truncated Review */}
                 <Text flex="2" color="black" isTruncated m={1}>
-                  {review.review_text}
+                  {review.comment}
                 </Text>
 
                 {/* Average Rating */}
                 <Text flex="1" color="black" m={1} textAlign="center">
-                  {review.average_rate.toFixed(1)} / 5
+                  {review.rating?.toFixed(1)} / 5
                 </Text>
 
                 {/* Options Buttons */}
@@ -247,7 +177,7 @@ export default function Courses() {
 
                 {/* Status Icon */}
                 <Text flex="1" textAlign="center" m={1}>
-                  <StatusIcon status={review.status} />
+                  <ReviewsStatusIcon status={review.review_status_id} />
                 </Text>
               </Flex>
             </Box>

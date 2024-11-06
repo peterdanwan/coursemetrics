@@ -16,7 +16,7 @@ const seedReviews = async () => {
     },
     {
       review_type_id: 1,
-      review_status_id: 4,
+      review_status_id: 1,
       professor_course_id: 2,
       user_id: 2,
       rating: 4,
