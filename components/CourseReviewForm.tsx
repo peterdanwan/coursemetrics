@@ -86,9 +86,6 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   // Course name passed from course page
   const courseName = courseResponse?.data.courses[0].course_code;
 
-  // get current values of all fields
-  const currValues = getValues();
-
   // To access "questions" fields in form
   const { fields } = useFieldArray({ name: 'questions', control });
 
@@ -147,6 +144,10 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
       const sectionCodes = updatedCoursesByTerm.map((course: any) => {
         return course.course_section;
       });
+
+      // get current values of all fields
+      const currValues = getValues();
+
       setCourseSectionsByTerm(sectionCodes);
       setCoursesByTerm(updatedCoursesByTerm);
       setCourseProfessors([]);
@@ -159,7 +160,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     setCoursesByTerm,
     setCourseProfessors,
     reset,
-    currValues,
+    getValues,
   ]);
 
   // filter courses by selected section code
@@ -183,6 +184,9 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
           )
           .map((prof: any) => `${prof.first_name} ${prof.last_name}`);
 
+        // get current values of all fields
+        const currValues = getValues();
+
         setCourseProfessors(uniqueProfs);
         reset({ ...currValues, professor: '' });
       }
@@ -193,7 +197,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     courseProfessorResponse,
     setCourseProfessors,
     reset,
-    currValues,
+    getValues,
   ]);
 
   useEffect(() => {
