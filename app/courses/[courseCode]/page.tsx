@@ -192,7 +192,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
       mutate(reviewsURL);
     }
     fetchTags();
-  }, [reviewResponse, isCourseReviewFormOpen]);
+  }, [reviewResponse, isCourseReviewFormOpen, reviewsURL]);
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTermKey = e.target.value;

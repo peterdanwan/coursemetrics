@@ -152,7 +152,15 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
       setCourseProfessors([]);
       reset({ ...currValues, sectionCode: '', professor: '' });
     }
-  }, [selectedTerm, setCourseSectionsByTerm, setCoursesByTerm, setCourseProfessors, reset]);
+  }, [
+    selectedTerm,
+    courses,
+    setCourseSectionsByTerm,
+    setCoursesByTerm,
+    setCourseProfessors,
+    reset,
+    currValues,
+  ]);
 
   // filter courses by selected section code
   useEffect(() => {
@@ -179,7 +187,14 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
         reset({ ...currValues, professor: '' });
       }
     }
-  }, [selectedSectionCode, courseProfessorResponse, setCourseProfessors, reset]);
+  }, [
+    selectedSectionCode,
+    coursesByTerm,
+    courseProfessorResponse,
+    setCourseProfessors,
+    reset,
+    currValues,
+  ]);
 
   useEffect(() => {
     if (courseQuestionsResponse && courseQuestionsResponse.status === 'ok') {
