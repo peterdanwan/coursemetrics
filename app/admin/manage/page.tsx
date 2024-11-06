@@ -30,9 +30,9 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   const { data: professors, error: professorError } = useSWR('/api/professors', apiFetcher);
   const { data: reviews, error: reviewError } = useSWR('/api/reviews', apiFetcher);
   const { data: courses, error: courseError } = useSWR('/api/courses', apiFetcher);
-  console.log('Professors Data:', professors);
-  console.log('Reviews Data Manage Page:', reviews);
-  console.log('Courses Data:', courses);
+  //console.log('Professors Data:', professors);
+  //console.log('Reviews Data Manage Page:', reviews);
+  //console.log('Courses Data:', courses);
 
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
@@ -46,7 +46,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Search Value:', event.target.value);
+    //console.log('Search Value:', event.target.value);
     setSearchValue(event.target.value);
   };
 

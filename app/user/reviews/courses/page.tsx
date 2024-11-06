@@ -9,7 +9,7 @@ import useSWR from 'swr';
 export default function Courses() {
   const { data: reviewCourseData, error: reviewCourseError } = useSWR('/api/users', apiFetcher);
 
-  console.log('Review Course Data:', reviewCourseData);
+  //console.log('Review Course Data:', reviewCourseData);
 
   const sortedReviews = [...(reviewCourseData?.data?.user?.Reviews || [])]
     .filter((review) => review.review_type_id === 1)
@@ -23,7 +23,7 @@ export default function Courses() {
       return b.rating - a.rating;
     });
 
-  console.log('Sorted Reviews:', sortedReviews);
+  //console.log('Sorted Reviews:', sortedReviews);
 
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -40,7 +40,7 @@ export default function Courses() {
     );
   });
 
-  console.log('Filtered Reviews:', filteredReviews);
+  //console.log('Filtered Reviews:', filteredReviews);
 
   if (reviewCourseError) return <Text color="red.500">Failed to load course reviews</Text>;
   if (!reviewCourseData) return <Text>Loading...</Text>;

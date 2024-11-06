@@ -12,7 +12,7 @@ export default function Professors() {
     apiFetcher
   );
 
-  console.log('Review Course Data:', reviewProfessorData);
+  //console.log('Review Course Data:', reviewProfessorData);
 
   const sortedReviews = [...(reviewProfessorData?.data?.user?.Reviews || [])]
     .filter((review) => review.review_type_id === 2)
@@ -28,7 +28,7 @@ export default function Professors() {
       return b.rating - a.rating;
     });
 
-  console.log('Sorted Reviews:', sortedReviews);
+  //console.log('Sorted Reviews:', sortedReviews);
 
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -45,7 +45,7 @@ export default function Professors() {
     );
   });
 
-  console.log('Filtered Reviews:', filteredReviews);
+  //console.log('Filtered Reviews:', filteredReviews);
 
   if (reviewProfessorError) return <Text color="red.500">Failed to load professor reviews</Text>;
   if (!reviewProfessorData) return <Text>Loading...</Text>;

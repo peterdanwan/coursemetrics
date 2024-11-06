@@ -8,10 +8,10 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
   onRemove,
 }) => {
   const router = useRouter();
-  console.log('Professors Data: ', professors);
+  //console.log('Professors Data: ', professors);
 
   const displayedProfessors = professors;
-  console.log('Displayed Professors: ', displayedProfessors);
+  //console.log('Displayed Professors: ', displayedProfessors);
 
   const handleEditClick = (professorId: number) => {
     router.push(`/admin/manage/edit-professor/${professorId}`);

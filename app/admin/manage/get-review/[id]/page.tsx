@@ -33,8 +33,8 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
   // State to hold the selected policy when it's a pending review
   const [selectedPolicies, setSelectedPolicies] = useState<any[]>([]);
 
-  console.log('Review Data Get Page:', reviewData);
-  console.log('Policy Data Get Page:', policyData);
+  //console.log('Review Data Get Page:', reviewData);
+  //console.log('Policy Data Get Page:', policyData);
 
   // Handle the change event when a policy is selected
   const handlePolicyChange = (selectedOptions: any) => {
@@ -58,7 +58,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       });
 
       const data = await response.json();
-      console.log('Response Review Approved:', data);
+      //console.log('Response Review Approved:', data);
 
       if (response.ok) {
         // Handle success (e.g., navigate back or show success message)
@@ -87,7 +87,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       });
 
       const data = await response.json();
-      console.log('Response Review Rejected:', data);
+      //console.log('Response Review Rejected:', data);
 
       if (response.ok) {
         // Handle success (e.g., navigate back or show success message)

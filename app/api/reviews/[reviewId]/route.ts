@@ -86,7 +86,6 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
 
   // Get the review ID from the URL params
   const reviewId = req.nextUrl.pathname.split('/').pop();
-  console.log('Review ID PUT API Route:', reviewId);
 
   try {
     await connectDB();

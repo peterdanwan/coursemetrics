@@ -8,7 +8,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
   const router = useRouter();
 
   const displayedReviews = reviews;
-  console.log('Reviews Data In Table: ', displayedReviews);
+  //console.log('Reviews Data In Table: ', displayedReviews);
 
   const sortedReviews = [...displayedReviews].sort((a, b) => {
     // Check the review status based on review_status_id
