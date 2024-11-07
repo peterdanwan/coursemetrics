@@ -22,29 +22,29 @@ const seedReviewAnswers = async () => {
     },
     {
       review_question_id: 5,
-      answer: 'The materials were somewhat engaging; more interactive elements could help.',
+      answer: '3',
     },
     {
       review_question_id: 6,
-      answer: 'I might recommend it, but with some caveats about the pacing.',
+      answer: '4',
     },
 
     {
       review_question_id: 7,
-      answer: 'Yes, very applicable to my learning goals and career objectives.',
+      answer: '1',
     },
     {
       review_question_id: 8,
-      answer: 'The lectures were engaging, but the reading materials were a bit dry.',
+      answer: '3',
     },
     {
       review_question_id: 9,
-      answer: 'Yes, I would recommend this course for its practical insights.',
+      answer: '2',
     },
 
     {
       review_question_id: 10,
-      answer: 'The instructor was very approachable and always available for support.',
+      answer: '4',
     },
     {
       review_question_id: 11,
@@ -65,20 +65,20 @@ const seedReviewAnswers = async () => {
     },
     {
       review_question_id: 15,
-      answer: 'They could engage more with students during lectures to foster discussion.',
+      answer: '4',
     },
 
     {
       review_question_id: 16,
-      answer: 'The instructor was very approachable and encouraged questions from all students.',
+      answer: '1',
     },
     {
       review_question_id: 17,
-      answer: 'The feedback was detailed and very helpful for my learning process.',
+      answer: '2',
     },
     {
       review_question_id: 18,
-      answer: 'Incorporating more group activities could enhance learning experiences.',
+      answer: '3',
     },
   ]);
 };

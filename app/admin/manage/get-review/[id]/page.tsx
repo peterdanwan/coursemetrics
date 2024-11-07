@@ -102,6 +102,12 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
     }
   };
 
+  const sortedReviewQuestions = reviewData?.data?.ReviewQuestions?.sort(
+    (a: any, b: any) => a.question_id - b.question_id
+  );
+
+  console.log('Sorted Review Questions:', sortedReviewQuestions);
+
   if (reviewError || policyError) return <div>Failed to load data</div>;
   if (!reviewData || !policyData) return <div>Loading...</div>;
 

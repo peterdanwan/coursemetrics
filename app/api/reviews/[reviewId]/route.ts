@@ -7,6 +7,7 @@ import Review from '@/database/models/Review';
 import User from '@/database/models/User';
 import ReviewQuestion from '@/database/models/ReviewQuestion';
 import ReviewAnswer from '@/database/models/ReviewAnswer';
+import ReviewStatus from '@/database/models/ReviewStatus';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
 import Question from '@/database/models/Question';
@@ -46,6 +47,7 @@ export const GET = async function get_review_by_id(req: NextRequest): Promise<Ne
             { model: Question, attributes: ['question_text'] },
           ],
           attributes: ['review_question_id', 'question_id'],
+          order: [['question_id', 'ASC']],
         },
         {
           model: ReviewPolicyViolationLog,
@@ -106,7 +108,17 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
     }
 
     // Fetch the review by its ID
-    const review = await Review.findOne({ where: { review_id: reviewId } });
+    const review = await Review.findOne({
+      where: {
+        review_id: reviewId,
+      },
+      include: [
+        {
+          model: ReviewStatus,
+          attributes: ['review_status_id'],
+        },
+      ],
+    });
 
     if (!review) {
       log.info('Review not found');
@@ -114,7 +126,7 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
     }
 
     // Update the review status (either approved or rejected)
-    review.review_status_id = review_status_id;
+    review.setDataValue('review_status_id', review_status_id); // review.review_status_id <-- Property 'review_status_id' does not exist on type 'Review'.
     await review.save();
 
     // Handle Policy Violation Logs (add/update them)
