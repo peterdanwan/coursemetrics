@@ -160,14 +160,14 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
 
   useEffect(() => {
-    console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
+    // console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
     const fetchTags = async () => {
       console.log(reviewResponse);
       if (reviewResponse && reviewResponse.status === 'ok') {
         if (Array.isArray(reviewResponse.data)) {
           const reviewsFromDB = reviewResponse.data;
           const sortedReviews = [...reviewsFromDB].sort(
-            (r1: any, r2: any) => parseInt(r1.review_id) - parseInt(r2.review_id)
+            (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
           );
 
           setReviews(sortedReviews);
@@ -193,6 +193,22 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     }
     fetchTags();
   }, [reviewResponse, isCourseReviewFormOpen, reviewsURL]);
+
+  // Hide page's scrollbar when form modal is open:
+  useEffect(() => {
+    if (isCourseReviewFormOpen) {
+      // Hide page scrollbar when modal is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore page scrollbar when modal is closed
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup to restore scroll behavior when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isCourseReviewFormOpen]);
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTermKey = e.target.value;
