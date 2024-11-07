@@ -96,7 +96,7 @@ const ReviewDetailModal = ({
     <Modal isOpen={isReviewDetailOpen} onClose={onReviewDetailClose} isCentered size="xl">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader color="teal">{review.title}</ModalHeader>
+        <ModalHeader color="teal" pr={8}>{review.title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Box>
@@ -116,7 +116,8 @@ const ReviewDetailModal = ({
             </Box>
 
             <Box my={4}>
-              {feedbackQuestions && <Text as="b">Additional Feedback:</Text> && (
+              {feedbackQuestions && <Text as="b">Additional Feedback:</Text>}
+              {feedbackQuestions && (
                 <List>
                   {feedbackQuestions.map((q: QnA) => {
                     return (
