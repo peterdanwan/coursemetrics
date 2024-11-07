@@ -14,6 +14,8 @@ import {
   ListItem,
 } from '@chakra-ui/react';
 
+import RatingIcons from './RatingIcons';
+
 interface QnA {
   question_id: number;
   question: string;
@@ -43,7 +45,8 @@ const ReviewDetailModal = ({
     if (courseQuestionsResponse && courseQuestionsResponse.status === 'ok') {
       if (!review) return;
 
-      // Helper function
+      // Helper function: match questions from db and answers from review
+      // Returns an array of QnA objects
       const extractQnAsForUI = (reviewQuestions: any, reviewAnswers: any) => {
         const qnaForUI: QnA[] = [];
 
@@ -64,24 +67,28 @@ const ReviewDetailModal = ({
         }
         return qnaForUI;
       };
-
-      const courseQuestionsFromDB = courseQuestionsResponse.data.questions;
-
+      // get review answers
       const reviewQnA = review.ReviewQuestions;
+
+      // get all questions from DB that indicate whether they're rating or feedback questions
+      // by review_type_id (which review answers do not)
+      const courseQuestionsFromDB = courseQuestionsResponse.data.questions;
 
       const ratingQuestionsFromDB = courseQuestionsFromDB.filter((q: any) => {
         return q.is_rating;
       });
 
+      // match rating questions with answers
       const ratingQnA: QnA[] = extractQnAsForUI(ratingQuestionsFromDB, reviewQnA);
-
       setRatingQuestions(ratingQnA);
 
+      // filter out feedback questions
       const feedbackQuestionsFromDB = courseQuestionsFromDB.filter((q: any) => {
         return !q.is_rating;
       });
-      const feedbackQnA: QnA[] = extractQnAsForUI(feedbackQuestionsFromDB, reviewQnA);
 
+      // match feedback questions with answers
+      const feedbackQnA: QnA[] = extractQnAsForUI(feedbackQuestionsFromDB, reviewQnA);
       setFeedbackQuestions(feedbackQnA.length > 0 ? feedbackQnA : null);
     }
   }, [
@@ -96,25 +103,25 @@ const ReviewDetailModal = ({
     <Modal isOpen={isReviewDetailOpen} onClose={onReviewDetailClose} isCentered size="xl">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader color="teal" pr={8}>{review.title}</ModalHeader>
+        <ModalHeader color="teal" pr={8}>
+          {review.title}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Box>
             <Text mb={4}> {review.comment}</Text>
-            <Box>
-              <Box>
-                <Text as="b">Would take again:</Text> {review.would_take_again ? 'Yes' : 'No'}
-              </Box>
+            <Box my={4}>
+              <Text as="b">Course Evaluations:</Text>
               {ratingQuestions &&
                 ratingQuestions.map((q: QnA) => {
                   return (
-                    <Box key={q.question_id}>
-                      <Text as="b">{q.question}:</Text> {q.answer}/5
+                    <Box key={q.question_id} my={3}>
+                      <Text as="i">{q.question}: </Text>
+                      <RatingIcons rating={q.answer} />
                     </Box>
                   );
                 })}
             </Box>
-
             <Box my={4}>
               {feedbackQuestions && <Text as="b">Additional Feedback:</Text>}
               {feedbackQuestions && (
