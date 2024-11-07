@@ -30,9 +30,9 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   const { data: professors, error: professorError } = useSWR('/api/professors', apiFetcher);
   const { data: reviews, error: reviewError } = useSWR('/api/reviews', apiFetcher);
   const { data: courses, error: courseError } = useSWR('/api/courses', apiFetcher);
-  console.log('Professors Data:', professors);
-  console.log('Reviews Data:', reviews);
-  console.log('Courses Data:', courses);
+  //console.log('Professors Data:', professors);
+  //console.log('Reviews Data Manage Page:', reviews);
+  //console.log('Courses Data:', courses);
 
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
@@ -46,7 +46,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Search Value:', event.target.value);
+    //console.log('Search Value:', event.target.value);
     setSearchValue(event.target.value);
   };
 
@@ -125,15 +125,17 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
     : [];
 
   // Safely filter reviews if defined
-  const filteredReviews = Array.isArray(reviews)
-    ? reviews.filter((review) => {
-        const normalizedRate = review.average_rate.toFixed(1); // Keep one decimal place
+  const filteredReviews = Array.isArray(reviews?.data)
+    ? reviews.data.filter((review: any) => {
+        const searchTerm = searchValue.toLowerCase().trim();
+        const normalizedRate = review.rating.toFixed(1);
+
         return (
-          review.review_text.toLowerCase().includes(searchValue.toLowerCase()) ||
-          review.category.toLowerCase().includes(searchValue.toLowerCase()) ||
-          review.course_code.toLowerCase().includes(searchValue.toLowerCase()) ||
-          review.status.toLowerCase().includes(searchValue.toLowerCase()) ||
-          normalizedRate.includes(searchValue)
+          review.title.toLowerCase().includes(searchTerm) ||
+          review.comment.toLowerCase().includes(searchTerm) ||
+          review.ProfessorCourse.Course.course_code.toLowerCase().includes(searchTerm) ||
+          review.status.toLowerCase().includes(searchTerm) ||
+          normalizedRate.includes(searchTerm)
         );
       })
     : [];

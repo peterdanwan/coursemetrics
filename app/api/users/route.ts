@@ -7,6 +7,11 @@ import { createSuccessResponse, createErrorResponse } from '@/utils';
 import User from '@/database/models/User';
 import UserProfile from '@/database/models/UserProfile';
 import { logger } from '@/utils';
+import Review from '@/database/models/Review';
+import ProfessorCourse from '@/database/models/ProfessorCourse';
+import Course from '@/database/models/Course';
+import CourseTerm from '@/database/models/CourseTerm';
+import Professor from '@/database/models/Professor';
 
 // ===== API ROUTE TO CREATE A NEW USER IF THEY DON'T EXIST ALREADY =====
 export const POST = async function create_user(req: NextRequest): Promise<NextResponse> {
@@ -88,7 +93,43 @@ export const GET = async function get_user(req: NextRequest): Promise<NextRespon
       include: [
         {
           model: UserProfile,
-          attributes: ['user_id'], // Add any other UserProfile fields you need
+          attributes: ['user_id'],
+        },
+        {
+          model: Review,
+          attributes: [
+            'review_id',
+            'review_type_id',
+            'review_status_id',
+            'professor_course_id',
+            'user_id',
+            'rating',
+            'title',
+            'comment',
+            'grade',
+          ],
+          include: [
+            {
+              model: ProfessorCourse,
+              attributes: ['professor_course_id'],
+              include: [
+                {
+                  model: Professor,
+                  attributes: ['professor_id', 'first_name', 'last_name'],
+                },
+                {
+                  model: Course,
+                  attributes: ['course_code', 'course_section'],
+                  include: [
+                    {
+                      model: CourseTerm,
+                      attributes: ['season', 'year'],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
     });
