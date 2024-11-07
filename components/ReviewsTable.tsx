@@ -19,17 +19,12 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
     if (statusA === 1 && statusB !== 1) return -1; // a is pending, b is not
     if (statusB === 1 && statusA !== 1) return 1; // b is pending, a is not
 
-    // Secondary sort by rating (assuming rating is a numerical value)
-    return b.rating - a.rating; // Sort by rating in descending order
+    // Sort by rating in descending order
+    return b.rating - a.rating;
   });
 
   const handleViewDetailsClick = (reviewId: string) => {
     router.push(`/admin/manage/get-review/${reviewId}`);
-  };
-
-  const getStatus = (review: any) => {
-    const review_status_id = review.review_status_id;
-    return review_status_id === 1 ? 'pending' : review_status_id === 2 ? 'approved' : 'rejected';
   };
 
   if (!reviews) return <div>Loading...</div>;
@@ -71,7 +66,6 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
         mt={4}
         maxHeight="65vh"
         overflowY="auto"
-        p={2}
         css={{
           '&::-webkit-scrollbar': {
             width: '6px',

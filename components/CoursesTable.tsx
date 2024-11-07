@@ -60,7 +60,6 @@ const CoursesTable: React.FC<{ courses: any[]; onRemove: (index: number) => void
         mt={4}
         maxHeight="65vh"
         overflowY="auto"
-        p={2}
         css={{
           '&::-webkit-scrollbar': {
             width: '6px',

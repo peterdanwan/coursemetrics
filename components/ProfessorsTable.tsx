@@ -49,7 +49,6 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
         mt={4}
         maxHeight="65vh"
         overflowY="auto"
-        p={2}
         css={{
           '&::-webkit-scrollbar': {
             width: '6px',

@@ -42,6 +42,9 @@ export default function Courses() {
 
   //console.log('Filtered Reviews:', filteredReviews);
 
+  // Check if there are any reviews
+  const hasReviews = filteredReviews.length > 0;
+
   if (reviewCourseError) return <Text color="red.500">Failed to load course reviews</Text>;
   if (!reviewCourseData) return <Text>Loading...</Text>;
   return (
@@ -102,88 +105,99 @@ export default function Courses() {
       </Flex>
 
       {/* Scrollable Stack Container */}
-      <Box
-        mt={4}
-        maxHeight="65vh"
-        overflowY="auto"
-        p={2}
-        css={{
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888',
-            borderRadius: '10px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: '#555',
-          },
-        }}
-      >
-        <Stack spacing={4}>
-          {filteredReviews.map((review, index) => (
-            <Box key={index} borderWidth="1px" borderRadius="lg" padding={2} bg="gray.50">
-              <Flex justify="space-between" align="center">
-                {/* Course Code */}
-                <Text flex="1" color="black" m={1}>
-                  {review.ProfessorCourse?.Course?.course_code}
-                </Text>
+      {!hasReviews ? (
+        <>
+          <Box mt={4} p={4} bg="gray.100" borderRadius="md">
+            <Text color="gray.500" fontSize="lg" textAlign="center">
+              No course reviews added yet.
+            </Text>
+          </Box>
+        </>
+      ) : (
+        <>
+          <Box
+            mt={4}
+            maxHeight="65vh"
+            overflowY="auto"
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: '#888',
+                borderRadius: '10px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#555',
+              },
+            }}
+          >
+            <Stack spacing={4}>
+              {filteredReviews.map((review, index) => (
+                <Box key={index} borderWidth="1px" borderRadius="lg" padding={2} bg="gray.50">
+                  <Flex justify="space-between" align="center">
+                    {/* Course Code */}
+                    <Text flex="1" color="black" m={1}>
+                      {review.ProfessorCourse?.Course?.course_code}
+                    </Text>
 
-                {/* Term */}
-                <Text flex="2" color="black" isTruncated m={1}>
-                  {`${review.ProfessorCourse?.Course?.CourseTerm?.season} ${review.ProfessorCourse?.Course?.CourseTerm?.year}`}
-                </Text>
+                    {/* Term */}
+                    <Text flex="2" color="black" isTruncated m={1}>
+                      {`${review.ProfessorCourse?.Course?.CourseTerm?.season} ${review.ProfessorCourse?.Course?.CourseTerm?.year}`}
+                    </Text>
 
-                {/* Truncated Review */}
-                <Text flex="2" color="black" isTruncated m={1}>
-                  {review.comment}
-                </Text>
+                    {/* Truncated Review */}
+                    <Text flex="2" color="black" isTruncated m={1}>
+                      {review.comment}
+                    </Text>
 
-                {/* Average Rating */}
-                <Text flex="1" color="black" m={1} textAlign="center">
-                  {review.rating?.toFixed(1)} / 5
-                </Text>
+                    {/* Average Rating */}
+                    <Text flex="1" color="black" m={1} textAlign="center">
+                      {review.rating?.toFixed(1)} / 5
+                    </Text>
 
-                {/* Options Buttons */}
-                <Flex
-                  flexDirection={{ base: 'column', md: 'row' }}
-                  justifyContent="space-between"
-                  m={1}
-                  gap={4}
-                  flex="1"
-                >
-                  <Button
-                    colorScheme="teal"
-                    color="white"
-                    flex="1"
-                    mr={{ base: 0, md: 1 }}
-                    mb={{ base: 1, md: 0 }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    colorScheme="teal"
-                    color="white"
-                    flex="1"
-                    mr={{ base: 0, md: 1 }}
-                    mb={{ base: 1, md: 0 }}
-                  >
-                    Delete
-                  </Button>
-                </Flex>
+                    {/* Options Buttons */}
+                    <Flex
+                      flexDirection={{ base: 'column', md: 'row' }}
+                      justifyContent="space-between"
+                      m={1}
+                      gap={4}
+                      flex="1"
+                    >
+                      <Button
+                        colorScheme="teal"
+                        color="white"
+                        flex="1"
+                        mr={{ base: 0, md: 1 }}
+                        mb={{ base: 1, md: 0 }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        colorScheme="teal"
+                        color="white"
+                        flex="1"
+                        mr={{ base: 0, md: 1 }}
+                        mb={{ base: 1, md: 0 }}
+                      >
+                        Delete
+                      </Button>
+                    </Flex>
 
-                {/* Status Icon */}
-                <Text flex="1" textAlign="center" m={1}>
-                  <ReviewsStatusIcon status={review.review_status_id} />
-                </Text>
-              </Flex>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+                    {/* Status Icon */}
+                    <Text flex="1" textAlign="center" m={1}>
+                      <ReviewsStatusIcon status={review.review_status_id} />
+                    </Text>
+                  </Flex>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        </>
+      )}
     </>
   );
 }
