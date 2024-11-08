@@ -24,7 +24,6 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
   const { id: courseId } = useParams();
 
-  // API Fetch
   const { data: coursesID, error: courseError } = useSWR(`/api/courses/id/${courseId}`, apiFetcher);
   const { data: professorData, error: professorError } = useSWR('/api/professors', apiFetcher);
   const { data: courseDeliveryFormats, error: courseDeliveryFormatsError } = useSWR(
@@ -102,21 +101,19 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
     setIsSubmitting(true);
     console.log('Data to be sent:', formValues);
 
-    // Prepare the data to be sent in the PATCH request
     const updatedCourseData = {
-      course_id: courseId, // Pass the course ID from the URL
+      course_id: courseId,
       course_code: formValues.courseCode,
       name: formValues.courseName,
       description: formValues.description,
       course_section: formValues.courseSection,
-      termSeason: formValues.termSeason.value, // Ensure the value is passed
+      termSeason: formValues.termSeason.value,
       termYear: formValues.termYear.value,
       deliveryFormatId: formValues.deliveryFormat.value,
-      professorIds: formValues.professors.map((professor: any) => professor.value), // Map to professor IDs
+      professorIds: formValues.professors.map((professor: any) => professor.value),
     };
 
     try {
-      // Make the PATCH request to update the course
       const response = await fetch(`/api/courses/id/${courseId}`, {
         method: 'PATCH',
         headers: {
@@ -125,22 +122,16 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
         body: JSON.stringify(updatedCourseData),
       });
 
-      // Check if the response is successful
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Course updated successfully:', result);
-        // Optionally, redirect to another page (e.g., course list or course details)
-        router.push('/admin/manage?option=courses'); // Redirect to the courses page
-      } else {
-        const errorData = await response.json();
-        console.error('Error updating course:', errorData);
-        alert(`Error: ${errorData.message || 'Something went wrong'}`);
+      const data = await response.json();
+      console.log('Course updated successfully:', data);
+      router.push('/admin/manage?option=courses');
+
+      if (!response.ok) {
+        throw new Error(data.error.message);
       }
     } catch (error) {
-      console.error('Request failed:', error);
-      alert('An error occurred while updating the course. Please try again.');
+      console.error(error);
     } finally {
-      // Reset the submitting state
       setIsSubmitting(false);
     }
   };

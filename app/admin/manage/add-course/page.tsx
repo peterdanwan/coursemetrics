@@ -18,50 +18,6 @@ import customStyles from '@/styles/customStyles';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
 
-/* I need th POST API to be able to post something like the following JSON:
-{
-  "status": "ok",
-  "data": {
-    "course": {
-      "course_id": 1,
-      "course_code": "WEB222",
-      "course_detail_id": 1,
-      "course_term_id": 1,
-      "course_section": "NAA",
-      "course_delivery_format_id": 1,
-      "createdAt": "2024-11-08T00:53:42.901Z",
-      "updatedAt": "2024-11-08T00:53:42.901Z",
-      "CourseDetail": {
-        "course_name": "Introduction to Web Programming",
-        "course_description": "Learn HTML, JS, and CSS to build modern web applications."
-      },
-      "CourseTerm": {
-        "season": "Fall",
-        "year": 2023
-      },
-      "CourseDeliveryFormat": {
-        "format": "Online Async",
-        "description": "Students learn remotely and are not required to come to campus. No scheduled class time and learning is independent."
-      },
-      "ProfessorCourses": [
-        {
-          "professor_course_id": 1,
-          "professor_id": 1,
-          "course_id": 1,
-          "createdAt": "2024-11-08T00:53:42.913Z",
-          "updatedAt": "2024-11-08T00:53:42.913Z",
-          "Professor": {
-            "professor_id": 1,
-            "first_name": "Alice",
-            "last_name": "Johnson"
-          }
-        }
-      ]
-    }
-  }
-}
-*/
-
 export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
   const router = useRouter();
   const [courseName, setCourseName] = useState('');
@@ -90,14 +46,14 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
   );
 
   const formattedProfessors = professorData?.data?.professors?.map((professor: any) => ({
-    value: professor.professor_id, // Assuming `professor_id` is the value you want to use
-    label: `${professor.first_name} ${professor.last_name}`, // Concatenate first and last name
+    value: professor.professor_id,
+    label: `${professor.first_name} ${professor.last_name}`,
   }));
 
   const formattedDeliveryFormats = courseDeliveryFormats?.data?.courseDeliveryFormats?.map(
     (courseDelivery: any) => ({
-      value: courseDelivery.course_delivery_format_id, // Assuming `course_delivery_format_id` is the value you want to use
-      label: courseDelivery.format, // Assuming `format` is the label
+      value: courseDelivery.course_delivery_format_id,
+      label: courseDelivery.format,
     })
   );
 
@@ -107,51 +63,38 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
     e.preventDefault();
 
     setIsSubmitting(true);
-    // Prepare the data in the desired structure
     const courseData = {
-      course_code: courseCode, // Assuming sectionCode is the course code
+      course_code: courseCode,
       name: courseName,
       course_section: courseSection,
       description: description,
       termSeason: selectedTermSeason,
       termYear: selectedTermYear,
-      deliveryFormatId: selectedDeliveryFormat?.value, // Assuming you are passing the id from selected delivery format
-      professorIds: selectedProfessors.map((prof) => prof.value), // Assuming the selected professors are an array of { value, label }
+      deliveryFormatId: selectedDeliveryFormat?.value,
+      professorIds: selectedProfessors.map((prof) => prof.value),
     };
 
-    // You can log the courseData here to check what is being sent
-    console.log('Course Data being sent:', JSON.stringify(courseData, null, 2));
+    //console.log('Course Data being sent:', JSON.stringify(courseData, null, 2));
 
-    // POST API
     try {
-      // Make the POST request to the backend API
       const response = await fetch('/api/courses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(courseData), // Send the course data as a JSON string
+        body: JSON.stringify(courseData),
       });
 
-      if (response.ok) {
-        // If the response is successful (status 200)
-        const data = await response.json();
-        console.log('Course created successfully:', data);
+      const data = await response.json();
+      console.log('Course created successfully:', data);
+      router.push('/admin/manage');
 
-        // Optionally, redirect to another page or show a success message
-        router.push('/admin/manage'); // Redirect to the manage courses page
-      } else {
-        // Handle errors (e.g., invalid data, server errors)
-        const errorData = await response.json();
-        console.error('Error creating course:', errorData);
-        alert('Error creating course: ' + errorData.message);
+      if (!response.ok) {
+        throw new Error(data.error.message);
       }
     } catch (error) {
-      // Handle network errors or unexpected issues
-      console.error('Error during API call:', error);
-      alert('An error occurred while creating the course.');
+      console.error(error);
     } finally {
-      // Reset the submitting state
       setIsSubmitting(false);
     }
   };

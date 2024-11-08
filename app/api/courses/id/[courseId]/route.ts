@@ -178,3 +178,49 @@ export const PATCH = withApiAuthRequired(async function update_course(
     );
   }
 });
+
+// ===== API ROUTE TO DELETE COURSE BY COURSE ID =====
+export const DELETE = withApiAuthRequired(async function delete_course_by_id(
+  req: NextRequest
+): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/courses/id/[courseId]/route.ts' });
+
+  try {
+    await connectDB();
+    const url = new URL(req.url);
+
+    const courseId = url.pathname.split('/').pop();
+
+    const course = await Course.findByPk(courseId);
+
+    if (!course) {
+      log.warn('Course not found', { courseId });
+      return NextResponse.json(createErrorResponse(404, 'Course not found'), { status: 404 });
+    }
+
+    try {
+      await course.destroy();
+    } catch (error) {
+      log.error(error);
+      return NextResponse.json(
+        createErrorResponse(
+          409,
+          "Could not delete course record since it's associated with other records"
+        ),
+        { status: 409 }
+      );
+    }
+
+    log.info('Course deleted successfully', { courseId });
+    return NextResponse.json(createSuccessResponse({ message: 'Course deleted successfully' }), {
+      status: 200,
+    });
+  } catch (error: unknown) {
+    console.error(error);
+    log.error('Error deleting course by courseCode', { error });
+    return NextResponse.json(
+      createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
+      { status: 500 }
+    );
+  }
+});

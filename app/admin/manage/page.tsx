@@ -37,7 +37,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
     if (!initialOption) {
-      setSelectedOption(initialOption); // to be changed to null
+      setSelectedOption(initialOption);
     }
   }, [initialOption]);
 
@@ -60,7 +60,6 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
       const data = await response.json();
 
       if (!response.ok) {
-        // For error responses, throw the error message from the backend
         throw new Error(data.error.message);
       }
       mutate('/api/professors');
@@ -72,7 +71,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   // Fix this when the BY ID and DELETE API is implemented
   const removeCourse = async (courseId: number) => {
     try {
-      const response = await fetch(`/api/courses/${courseId}`, {
+      const response = await fetch(`/api/courses/id/${courseId}`, {
         method: 'DELETE',
       });
 
@@ -82,7 +81,6 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
         throw new Error(data.error.message);
       }
 
-      // Optionally, you can trigger a refetch or update state here to refresh the data
       mutate('/api/courses');
     } catch (error) {
       console.error(error);
