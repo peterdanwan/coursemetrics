@@ -1,4 +1,4 @@
-// app/api/courses/route.ts
+// app/api/courses/id/[courseId]/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { withApiAuthRequired } from '@auth0/nextjs-auth0';
@@ -8,43 +8,30 @@ import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 import CourseDetail from '@/database/models/CourseDetail';
 import CourseTerm from '@/database/models/CourseTerm';
-import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
+import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
 
-// ===== API ROUTE TO FETCH ALL COURSES =====
-export const GET = withApiAuthRequired(async function get_courses(
+// ===== API ROUTE TO FETCH COURSE BY COURSE ID =====
+export const GET = withApiAuthRequired(async function get_course_by_course_id(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/courses/route.ts' });
+  const log = logger.child({ module: 'app/api/courses/id/[courseId]/route.ts' });
 
   try {
     await connectDB();
     const url = new URL(req.url);
 
-    // const queryParams: { page: string; limit: string } = {
-    //   page: url.searchParams.get('page') || '1',
-    //   limit: url.searchParams.get('limit') || '10',
-    // };
+    const courseId = Number(url.pathname.split('/').pop()); // Get the course_id from the URL
 
-    // Ref Doc: https://www.shecodes.io/athena/60744-what-is-parseint-in-javascript#
-    // const pageNumber: number = parseInt(queryParams.page, 10);
-    // const limit: number = parseInt(queryParams.limit, 10);
+    if (isNaN(courseId)) {
+      return NextResponse.json(createErrorResponse(400, 'Invalid course_id'), { status: 400 });
+    }
 
-    // Validate pagination parameters
-    // if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 1 || limit < 1) {
-    //   log.error('Invalid pagination parameters', { pageNumber, limit });
-    //   return NextResponse.json(createErrorResponse(400, 'Invalid pagination parameters'), {
-    //     status: 400,
-    //   });
-    // }
+    log.info(`Fetching course with ID: ${courseId}`);
 
-    // log.info('Fetching courses', { pageNumber, limit });
-
-    const { count: totalCourses, rows: courses } = await Course.findAndCountAll({
-      // offset: (pageNumber - 1) * limit,
-      // limit,
-      order: [['course_code', 'ASC']],
+    const course = await Course.findOne({
+      where: { course_id: courseId },
       include: [
         {
           model: CourseDetail,
@@ -58,35 +45,30 @@ export const GET = withApiAuthRequired(async function get_courses(
           model: CourseDeliveryFormat,
           attributes: ['format', 'description'],
         },
+        {
+          model: ProfessorCourse,
+          include: [
+            {
+              model: Professor,
+              attributes: ['professor_id', 'first_name', 'last_name'],
+            },
+          ],
+        },
       ],
     });
 
-    // const totalPages = Math.ceil(totalCourses / limit);
+    if (!course) {
+      log.warn('Course not found', { courseId });
+      return NextResponse.json(createErrorResponse(404, 'Course not found'), { status: 404 });
+    }
 
-    log.debug(
-      {
-        courses,
-        // totalPages,
-        // currentPage: pageNumber,
-        totalCourses,
-      },
-      'Courses fetched from DB'
-    );
+    log.debug({ course }, 'Course fetched from DB');
+    log.info('Course fetched successfully');
 
-    log.info('Courses fetched successfully');
-
-    return NextResponse.json(
-      createSuccessResponse({
-        courses,
-        // totalPages,
-        // currentPage: pageNumber,
-        totalCourses,
-      }),
-      { status: 200 }
-    );
+    return NextResponse.json(createSuccessResponse({ course }), { status: 200 });
   } catch (error: unknown) {
     console.error(error);
-    log.error('Error fetching courses', { error });
+    log.error('Error fetching course by ID', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }
@@ -94,17 +76,18 @@ export const GET = withApiAuthRequired(async function get_courses(
   }
 });
 
-// ===== API ROUTE TO CREATE A NEW COURSE =====
-export const POST = withApiAuthRequired(async function create_course(
+// ===== API ROUTE TO UPDATE AN EXISTING COURSE =====
+export const PATCH = withApiAuthRequired(async function update_course(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/courses/route.ts' });
+  const log = logger.child({ module: 'app/api/courses/id/[courseId]/route.ts' });
 
   // Log the incoming request for debugging and auditing
-  log.info('Received POST request to create course', { body: req.body });
+  log.info('Received PATCH request to update course', { body: req.body });
   const body = await req.json();
 
   const {
+    course_id, // Assuming you are passing the course ID in the body for updating
     course_code,
     name,
     description,
@@ -112,11 +95,12 @@ export const POST = withApiAuthRequired(async function create_course(
     termSeason,
     termYear,
     deliveryFormatId,
-    professorIds,
+    professorIds, // Array of professor IDs to be associated
   } = body;
 
   // Check if all required fields are provided
   if (
+    !course_id ||
     !course_code ||
     !name ||
     !description ||
@@ -130,8 +114,15 @@ export const POST = withApiAuthRequired(async function create_course(
   }
 
   try {
-    // Step 1: Create CourseDetail
-    const [courseDetail] = await CourseDetail.findOrCreate({
+    // Step 1: Find the existing course by course_id
+    const course = await Course.findByPk(course_id);
+    if (!course) {
+      return NextResponse.json(createErrorResponse(404, 'Course not found'), { status: 404 });
+    }
+    log.info('Course found', { course });
+
+    // Step 2: Find or update CourseDetail
+    const [courseDetail, created] = await CourseDetail.findOrCreate({
       where: {
         course_name: name,
         course_description: description,
@@ -139,7 +130,7 @@ export const POST = withApiAuthRequired(async function create_course(
     });
     log.info('CourseDetail found or created', { courseDetail });
 
-    // Step 2: Find or create CourseTerm
+    // Step 3: Find or update CourseTerm
     const [courseTerm] = await CourseTerm.findOrCreate({
       where: {
         season: termSeason,
@@ -148,35 +139,39 @@ export const POST = withApiAuthRequired(async function create_course(
     });
     log.info('CourseTerm found or created', { courseTerm });
 
-    // Step 3: Create Course
-    const course = await Course.create({
+    // Step 4: Update the Course model with the new data
+    await course.update({
       course_code,
       course_section,
       course_detail_id: courseDetail.course_detail_id,
       course_term_id: courseTerm.course_term_id,
       course_delivery_format_id: deliveryFormatId,
     });
-    log.info('Course created successfully', { course });
+    log.info('Course updated successfully', { course });
 
-    // Step 4: Associate Professors
+    // Step 5: Update the Professor associations (if professorIds have changed)
+    await ProfessorCourse.destroy({ where: { course_id: course_id } }); // Remove all current associations
     for (const professorId of professorIds) {
       await ProfessorCourse.create({
         professor_id: professorId,
         course_id: course.course_id,
       });
-      log.info('Professor associated with course', { professorId, courseId: course.course_id });
+      log.info('Professor associated with updated course', {
+        professorId,
+        courseId: course.course_id,
+      });
     }
 
     return NextResponse.json(
       createSuccessResponse({
-        message: 'Course created successfully',
+        message: 'Course updated successfully',
         course,
       }),
       { status: 200 }
     );
   } catch (error) {
     console.error(error);
-    log.error('Error fetching courses', { error });
+    log.error('Error updating course', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }
