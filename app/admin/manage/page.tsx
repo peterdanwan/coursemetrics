@@ -20,8 +20,10 @@ import ReviewsTable from '@/components/ReviewsTable';
 import withAdminAuth from '@/components/withAdminAuth';
 import useSWR, { mutate } from 'swr';
 import { apiFetcher } from '@/utils';
+import { useFlexStyle } from '@/styles/styles';
 
 export default withAdminAuth(function Manage({ user }: { user: any }) {
+  const styles = useFlexStyle();
   const searchParams = useSearchParams();
   const initialOption = searchParams.get('option') || '';
   const [selectedOption, setSelectedOption] = useState<string>(initialOption);
@@ -139,7 +141,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
     : [];
 
   return (
-    <Box p={4}>
+    <Box p={4} bg={styles.bgColor} color={styles.color}>
       <Flex justify="space-between" align="center" mb={4}>
         <Stack direction="row" spacing={4} flex="1" maxW="50%">
           <FormControl>
@@ -152,7 +154,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
               value={selectedOption}
               onChange={handleSelectChange}
               sx={{
-                color: 'white',
+                color: styles.color,
                 '& option': {
                   color: 'black',
                 },
@@ -175,27 +177,29 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
               type="search"
               value={searchValue}
               onChange={handleInputChange}
+              bg={styles.cardBg}
+              color={styles.color}
             />
           </FormControl>
         </Stack>
         {/* Conditionally render Add button only for 'courses' and 'professors' */}
         {selectedOption === 'courses' && (
           <Link href="/admin/manage/add-course">
-            <Button as="a" colorScheme="teal" color="white" px={6}>
+            <Button as="a" colorScheme="teal" px={6}>
               Add
             </Button>
           </Link>
         )}
         {selectedOption === 'professors' && (
           <Link href="/admin/manage/add-professor">
-            <Button as="a" colorScheme="teal" color="white" px={6}>
+            <Button as="a" colorScheme="teal" px={6}>
               Add
             </Button>
           </Link>
         )}
       </Flex>
 
-      <Divider mb={4} />
+      <Divider mb={4} borderColor={styles.borderColor} />
       {/* Conditionally render appropriate category when it is selected */}
       {selectedOption === 'professors' && (
         <ProfessorsTable professors={filteredProfessors} onRemove={removeProfessor} />

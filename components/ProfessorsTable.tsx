@@ -87,7 +87,6 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
                 >
                   <Button
                     colorScheme="teal"
-                    color="white"
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
@@ -97,7 +96,6 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
                   </Button>
                   <Button
                     colorScheme="teal"
-                    color="white"
                     flex="1"
                     ml={{ base: 0, md: 1 }}
                     onClick={() => onRemove(professor.professor_id)}

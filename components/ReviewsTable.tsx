@@ -122,7 +122,6 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
                 >
                   <Button
                     colorScheme="teal"
-                    color="white"
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
