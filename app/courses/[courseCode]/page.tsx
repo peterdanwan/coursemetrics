@@ -32,6 +32,7 @@ import CourseReviewForm from '@/components/CourseReviewForm';
 import { useFlexStyle } from '@/styles/styles';
 import { getFirstFiveComments } from '@/utils/funcs';
 import { ReviewEvaluator } from '@/utils/ai';
+import RatingIcons from '@/components/RatingIcons';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -82,7 +83,6 @@ function getURL(
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
   const flexStyle = useFlexStyle();
   const courseCode = params.courseCode.toUpperCase();
-  const [expandedReviewId, setExpandedReviewId] = useState(-1);
   const [courses, setCourses] = useState<ICourse[]>([]);
   const [course, setCourse] = useState<ICourse | null>(null);
   const [terms, setTerms] = useState<ICourseTerm[]>([]);
@@ -139,6 +139,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
       }
 
       setCourse(initialCourse);
+      console.log(initialCourse);
       const initialTermKey = `${initialCourse?.CourseTerm.season}_${initialCourse?.CourseTerm.year}`;
       const initialSections = coursesArray.filter(
         (courseItem: ICourse) =>
@@ -160,14 +161,14 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
 
   useEffect(() => {
-    console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
+    // console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
     const fetchTags = async () => {
       console.log(reviewResponse);
       if (reviewResponse && reviewResponse.status === 'ok') {
         if (Array.isArray(reviewResponse.data)) {
           const reviewsFromDB = reviewResponse.data;
           const sortedReviews = [...reviewsFromDB].sort(
-            (r1: any, r2: any) => parseInt(r1.review_id) - parseInt(r2.review_id)
+            (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
           );
 
           setReviews(sortedReviews);
@@ -194,6 +195,22 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     fetchTags();
   }, [reviewResponse, isCourseReviewFormOpen, reviewsURL]);
 
+  // Hide page's scrollbar when form modal is open:
+  useEffect(() => {
+    if (isCourseReviewFormOpen) {
+      // Hide page scrollbar when modal is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore page scrollbar when modal is closed
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup to restore scroll behavior when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isCourseReviewFormOpen]);
+
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTermKey = e.target.value;
     const [selectedSeason, selectedYear] = selectedTermKey.split('_');
@@ -217,10 +234,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     if (selectedCourse) {
       setCourse(selectedCourse);
     }
-  };
-
-  const toggleExpandedReview = (reviewId: number) => {
-    setExpandedReviewId((prevId) => (prevId === reviewId ? -1 : reviewId));
   };
 
   return (
@@ -338,13 +351,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     {/* Check if reviews array exist before calling .map */}
                     {Array.isArray(reviews) ? (
                       reviews.map((review: any, index: number) => (
-                        <CourseReview
-                          key={index}
-                          review={review}
-                          expandedReviewId={expandedReviewId}
-                          toggleExpandedReview={toggleExpandedReview}
-                          // isFormOpen={isCourseReviewFormOpen}
-                        />
+                        <CourseReview key={index} review={review} />
                       ))
                     ) : (
                       <Text>No reviews available</Text>
@@ -355,7 +362,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     colorScheme="teal"
                     variant="solid"
                     size="lg"
-                    // width="200px"
                     alignSelf="flex-end"
                     mt={5}
                     onClick={onCourseReviewFormOpen}
@@ -387,92 +393,28 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     <Text as="b">Difficulty:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="3" iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Course Load:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Average Grade:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="4" iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Would Take Again:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
                   </GridItem>
                 </Grid>
               </CardBody>
