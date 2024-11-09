@@ -9,6 +9,8 @@ import { logger } from '@/utils';
 import CourseDetail from '@/database/models/CourseDetail';
 import CourseTerm from '@/database/models/CourseTerm';
 import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
+import ProfessorCourse from '@/database/models/ProfessorCourse';
+import Professor from '@/database/models/Professor';
 
 // ===== API ROUTE TO FETCH ALL COURSES =====
 export const GET = withApiAuthRequired(async function get_courses(
@@ -83,6 +85,96 @@ export const GET = withApiAuthRequired(async function get_courses(
       { status: 200 }
     );
   } catch (error: unknown) {
+    console.error(error);
+    log.error('Error fetching courses', { error });
+    return NextResponse.json(
+      createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
+      { status: 500 }
+    );
+  }
+});
+
+// ===== API ROUTE TO CREATE A NEW COURSE =====
+export const POST = withApiAuthRequired(async function create_course(
+  req: NextRequest
+): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/courses/route.ts' });
+
+  // Log the incoming request for debugging and auditing
+  log.info('Received POST request to create course', { body: req.body });
+  const body = await req.json();
+
+  const {
+    course_code,
+    name,
+    description,
+    course_section,
+    termSeason,
+    termYear,
+    deliveryFormatId,
+    professorIds,
+  } = body;
+
+  // Check if all required fields are provided
+  if (
+    !course_code ||
+    !name ||
+    !description ||
+    !course_section ||
+    !termSeason ||
+    !termYear ||
+    !deliveryFormatId ||
+    !professorIds
+  ) {
+    return NextResponse.json(createErrorResponse(400, 'Missing required fields'), { status: 400 });
+  }
+
+  try {
+    // Step 1: Create CourseDetail
+    const [courseDetail] = await CourseDetail.findOrCreate({
+      where: {
+        course_name: name,
+        course_description: description,
+      },
+    });
+    log.info('CourseDetail found or created', { courseDetail });
+
+    // Step 2: Find or create CourseTerm
+    const [courseTerm] = await CourseTerm.findOrCreate({
+      where: {
+        season: termSeason,
+        year: termYear,
+      },
+    });
+    log.info('CourseTerm found or created', { courseTerm });
+
+    // Step 3: Create Course
+    const course = await Course.create({
+      course_code,
+      course_section,
+      course_detail_id: courseDetail.course_detail_id,
+      course_term_id: courseTerm.course_term_id,
+      course_delivery_format_id: deliveryFormatId,
+    });
+    log.info('Course created successfully', { course });
+
+    // Step 4: Associate Professors
+    for (const professorId of professorIds) {
+      await ProfessorCourse.create({
+        professor_id: professorId,
+        course_id: course.course_id,
+      });
+      log.info('Professor associated with course', { professorId, courseId: course.course_id });
+    }
+
+    return NextResponse.json(
+      createSuccessResponse({
+        message: 'Course created successfully',
+        course,
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
     console.error(error);
     log.error('Error fetching courses', { error });
     return NextResponse.json(
