@@ -23,8 +23,11 @@ import withAdminAuth from '@/components/withAdminAuth';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
 import { useParams } from 'next/navigation';
+import { useFlexStyle } from '@/styles/styles';
+import customStyles from '@/styles/customStyles';
 
 export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
+  const styles = useFlexStyle();
   const router = useRouter();
   const { id: reviewId } = useParams();
   const { data: reviewData, error: reviewError } = useSWR(`/api/reviews/${reviewId}`, apiFetcher);
@@ -112,11 +115,17 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
   if (!reviewData || !policyData) return <div>Loading...</div>;
 
   return (
-    <Flex direction={['column', 'row']} minHeight="auto" bg="gray.50" p={8} alignItems="flex-start">
+    <Flex
+      direction={['column', 'row']}
+      minHeight="auto"
+      bg={styles.bgColor}
+      p={8}
+      alignItems="flex-start"
+    >
       {/* Left section: Review Details */}
-      <Box flex="2" borderRadius="lg" shadow="md" bg="white" p={8} mr={[0, 16]} mb={[8, 0]}>
+      <Box flex="2" borderRadius="lg" shadow="md" bg={styles.cardBg} p={8} mr={[0, 16]} mb={[8, 0]}>
         <Flex justify="space-between" align="center" mb={4}>
-          <Heading as="h1" size="lg" mb={6} color="teal">
+          <Heading as="h1" size="lg" mb={6} color={styles.headingColor}>
             Review #{reviewData.data.review_id}
           </Heading>
           <Box mb={4}>
@@ -124,33 +133,33 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
           </Box>
         </Flex>
         <Box mb={4}>
-          <Heading as="h2" size="md" mb={4} color="teal">
+          <Heading as="h2" size="md" mb={4} color={styles.headingColor}>
             Student Information
           </Heading>
-          <Text color="black">
+          <Text color={styles.color}>
             <Box as="span" fontWeight="bold">
               Name:{' '}
             </Box>
             {reviewData?.data?.User?.full_name}
           </Text>
-          <Text color="black">
+          <Text color={styles.color}>
             <Box as="span" fontWeight="bold">
               Email:{' '}
             </Box>
             {reviewData?.data?.User?.email}
           </Text>
         </Box>
-        <Heading as="h2" size="md" mb={4} color="teal">
+        <Heading as="h2" size="md" mb={4} color={styles.headingColor}>
           Review Details
         </Heading>
         <Table variant="simple">
           <Tbody>
             {reviewData?.data?.ReviewQuestions?.map((review: any, index: number) => (
               <Tr key={index}>
-                <Td color="black" fontWeight="bold">
+                <Td color={styles.color} fontWeight="bold">
                   {review.Question.question_text}
                 </Td>
-                <Td color="black">{review.ReviewAnswers[0]?.answer}</Td>
+                <Td color={styles.color}>{review.ReviewAnswers[0]?.answer}</Td>
               </Tr>
             ))}
           </Tbody>
@@ -159,11 +168,11 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
 
       {/* Right section: Policy Violation and Buttons */}
       <Flex direction="column" flex="1" maxWidth="400px" alignSelf="stretch">
-        <Box borderRadius="lg" shadow="md" bg="white" p={8} mb={8}>
-          <Heading as="h2" size="lg" mb={6} color="teal">
+        <Box borderRadius="lg" shadow="md" bg={styles.cardBg} p={8} mb={8}>
+          <Heading as="h2" size="lg" mb={6} color={styles.headingColor}>
             Policy Violation
           </Heading>
-          <FormControl color="black" mb={6}>
+          <FormControl color={styles.color} mb={6}>
             {isPendingReview ? (
               <>
                 <FormLabel>Select Type of Violation:</FormLabel>
@@ -185,19 +194,28 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
                   getOptionLabel={(e) => e.label} // Return the label as string for React-Select
                   getOptionValue={(e) => e.value.toString()}
                   placeholder="Select Violation Type"
+                  styles={customStyles}
                 />
 
                 {/* Display descriptions for each selected policy */}
                 {selectedPolicies.length > 0 && (
-                  <Box mt={4} p={4} bg="gray.100" borderRadius="md">
-                    <Heading as="h3" size="md">
+                  <Box mt={4} p={4} bg={styles.bgColor} borderRadius="md">
+                    <Heading as="h3" size="md" color={styles.headingColor}>
                       Description:
                     </Heading>
                     <VStack align="start" spacing={4}>
                       {selectedPolicies.map((policy) => (
-                        <Box key={policy.value} p={4} bg="gray.200" borderRadius="md" width="full">
-                          <Text fontWeight="bold">{policy.label}</Text>
-                          <Text>{policy.description}</Text>
+                        <Box
+                          key={policy.value}
+                          p={4}
+                          bg={styles.policyBgColor}
+                          borderRadius="md"
+                          width="full"
+                        >
+                          <Text fontWeight="bold" color={styles.color}>
+                            {policy.label}
+                          </Text>
+                          <Text color={styles.color}>{policy.description}</Text>
                         </Box>
                       ))}
                     </VStack>
@@ -205,18 +223,20 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
                 )}
               </>
             ) : (
-              <Box mt={4}>
+              <Box mt={4} bg={styles.bgColor}>
                 <VStack align="start" spacing={4} width="full">
                   {reviewData.data.ReviewPolicyViolationLogs?.map((violation: any) => (
                     <Box
                       key={violation.policy_id}
                       p={4}
-                      bg="gray.100"
+                      bg={styles.policyBgColor}
                       borderRadius="md"
                       width="full"
                     >
-                      <Text fontWeight="bold">{violation.Policy.policy_name}</Text>
-                      <Text>{violation.Policy.policy_description}</Text>
+                      <Text fontWeight="bold" color={styles.color}>
+                        {violation.Policy.policy_name}
+                      </Text>
+                      <Text color={styles.color}>{violation.Policy.policy_description}</Text>
                     </Box>
                   ))}
                 </VStack>

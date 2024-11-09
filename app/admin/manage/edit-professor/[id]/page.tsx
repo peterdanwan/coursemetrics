@@ -1,27 +1,19 @@
+// app/admin/manage/edit-professor/[id]/page.tsx
 'use client';
-
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Flex,
-  Heading,
-  Textarea,
-} from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, Stack, Flex, Heading } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import withAdminAuth from '@/components/withAdminAuth';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
 import { useParams } from 'next/navigation';
+import { useFlexStyle } from '@/styles/styles';
 
 // ******************************************************************************************************************************************************************
 
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
+  const styles = useFlexStyle();
   const { id: professorId } = useParams();
 
   // Local state to manage the form inputs
@@ -113,15 +105,28 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   if (!professorsID) return <div>Loading...</div>;
 
   return (
-    <Flex direction="column" align="center" justify="center" minHeight="100vh" bg="gray.50" p={5}>
-      <Box width={{ base: '90%', sm: '500px' }} borderRadius="lg" shadow="md" bg="white" p={8}>
-        <Heading as="h1" size="lg" mb={6} textAlign="center" color="teal">
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      minHeight="100vh"
+      bg={styles.bgColor}
+      p={5}
+    >
+      <Box
+        width={{ base: '90%', sm: '500px' }}
+        borderRadius="lg"
+        shadow="md"
+        bg={styles.cardBg}
+        p={8}
+      >
+        <Heading as="h1" size="lg" mb={6} textAlign="center" color={styles.headingColor}>
           Edit Professor
         </Heading>
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <FormControl>
-              <FormLabel htmlFor="first-name" color="black">
+              <FormLabel htmlFor="first-name" color={styles.color}>
                 First Name:
               </FormLabel>
               <Input
@@ -132,12 +137,12 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                   setFirstName(e.target.value);
                 }}
                 required
-                color="black"
-                focusBorderColor="teal"
+                color={styles.color}
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="last-name" color="black">
+              <FormLabel htmlFor="last-name" color={styles.color}>
                 Last Name:
               </FormLabel>
               <Input
@@ -148,11 +153,11 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                   setLastName(e.target.value);
                 }}
                 required
-                color="black"
-                focusBorderColor="teal"
+                color={styles.color}
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
-            <Button type="submit" colorScheme="teal" color="white" isLoading={loading}>
+            <Button type="submit" colorScheme="teal" isLoading={loading}>
               Update Professor
             </Button>
             <Button onClick={handleCancel} colorScheme="gray">

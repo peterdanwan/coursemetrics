@@ -15,8 +15,10 @@ import {
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import withAdminAuth from '@/components/withAdminAuth';
+import { useFlexStyle } from '@/styles/styles';
 
 export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
+  const styles = useFlexStyle();
   const router = useRouter();
 
   // State to manage form input and possible error/success messages
@@ -98,15 +100,28 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
   };
 
   return (
-    <Flex direction="column" align="center" justify="center" minHeight="100vh" bg="gray.50" p={5}>
-      <Box width={{ base: '90%', sm: '500px' }} borderRadius="lg" shadow="md" bg="white" p={8}>
-        <Heading as="h1" size="lg" mb={6} textAlign="center" color="teal">
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      minHeight="100vh"
+      bg={styles.bgColor}
+      p={5}
+    >
+      <Box
+        width={{ base: '90%', sm: '500px' }}
+        borderRadius="lg"
+        shadow="md"
+        bg={styles.cardBg}
+        p={8}
+      >
+        <Heading as="h1" size="lg" mb={6} textAlign="center" color={styles.headingColor}>
           Add New Professor
         </Heading>
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <FormControl>
-              <FormLabel htmlFor="professor-first-name" color="black">
+              <FormLabel htmlFor="professor-first-name" color={styles.color}>
                 First Name:
               </FormLabel>
               <Input
@@ -114,13 +129,13 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
                 placeholder="Enter professor first name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                color="black"
+                color={styles.color}
                 required
-                focusBorderColor="#008080"
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="professor-last-name" color="black">
+              <FormLabel htmlFor="professor-last-name" color={styles.color}>
                 Last Name:
               </FormLabel>
               <Input
@@ -128,15 +143,14 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
                 placeholder="Enter professor last name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                color="black"
+                color={styles.color}
                 required
-                focusBorderColor="#008080"
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <Button
               type="submit"
               colorScheme="teal"
-              color="white"
               isLoading={loading}
               loadingText="Adding Professor"
             >
