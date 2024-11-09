@@ -9,6 +9,7 @@ import { withApiAuthRequired } from '@auth0/nextjs-auth0';
 import Course from '@/database/models/Course';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
 import CourseTerm from '@/database/models/CourseTerm';
+import { Op } from 'sequelize';
 
 export const GET = withApiAuthRequired(async function get_professor_by_professor_id(
   req: NextRequest
@@ -99,5 +100,69 @@ export const DELETE = withApiAuthRequired(async function delete_professor_by_pro
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }
     );
+  }
+});
+
+export const PATCH = withApiAuthRequired(async function update_professor_by_id(
+  req: NextRequest
+): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/professors/[id]/route.ts' });
+
+  try {
+    await connectDB();
+    const url = new URL(req.url);
+    const professorId = url.pathname.split('/').pop();
+    const body = await req.json();
+    const { first_name, last_name, forceUpdate } = body;
+
+    if (!first_name || !last_name) {
+      return NextResponse.json(
+        { error: 'Both first name and last name are required for update.' },
+        { status: 400 }
+      );
+    }
+
+    // Find the professor by ID
+    const professor = await Professor.findByPk(professorId);
+
+    if (!professor) {
+      return NextResponse.json({ error: 'Professor not found' }, { status: 404 });
+    }
+
+    // Check if another professor already exists with the same name, but exclude the current professor
+    if (!forceUpdate) {
+      const existingProfessor = await Professor.findOne({
+        where: {
+          first_name,
+          last_name,
+          professor_id: { [Op.ne]: professorId },
+        },
+      });
+
+      if (existingProfessor) {
+        return NextResponse.json(
+          {
+            error:
+              'Professor with this name already exists. Are you sure you want to proceed with this update?',
+          },
+          { status: 409 }
+        );
+      }
+    }
+
+    // Update the professor fields using `update`
+    await professor.update({
+      first_name,
+      last_name,
+    });
+    log.info('Professor updated successfully', { professor });
+
+    return NextResponse.json(
+      { message: 'Professor updated successfully', professor: professor.toJSON() },
+      { status: 200 }
+    );
+  } catch (error) {
+    log.error('Error updating professor', { error });
+    return NextResponse.json({ error: 'Failed to update professor' }, { status: 500 });
   }
 });
