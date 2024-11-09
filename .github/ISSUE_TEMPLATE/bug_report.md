@@ -13,7 +13,9 @@ assignees: ''
 **Date reported**: [MM/DD/YYYY]  
 **Priority**: [High/Medium/Low]
 **Issue #**: [link to issue]  
-**Status**: [Open/In Progress/Closed]  
+**Status**: [Open/In Progress/Closed] 
+
+> This new issue is progress towards issue #56 
 
 ---
 
