@@ -46,11 +46,6 @@ export default function ProfessorsPage() {
     setProfessors(professorsResponse?.data.professors || []);
   }, [professorsResponse]);
 
-  const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newLimit = e.target.value;
-    setLimit(newLimit);
-  };
-
   if (error) return <Text>Error loading courses</Text>;
   if (!professorsResponse) return <Text>Loading professors...</Text>;
 
@@ -70,30 +65,7 @@ export default function ProfessorsPage() {
             display="flex"
             justifyContent="flex-end"
             alignItems="center"
-          >
-            <Box p={5} width={{ base: '30%', sm: '30%', md: '20%', lg: '12%' }}>
-              <NumberInput
-                step={1}
-                defaultValue={2}
-                min={1}
-                max={5}
-                value={limit}
-                onChange={(valueString) => {
-                  handleLimitChange({
-                    target: { value: valueString },
-                  } as React.ChangeEvent<HTMLInputElement>);
-                }}
-                keepWithinRange
-                clampValueOnBlur
-              >
-                <NumberInputField readOnly css={{ cursor: 'default' }} />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </Box>
-          </GridItem>
+          ></GridItem>
         )}
         {professors.length > 0 ? (
           professors.map((professor) => (
