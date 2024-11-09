@@ -11,7 +11,7 @@ import {
   Heading,
   Textarea,
 } from '@chakra-ui/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Select, { MultiValue } from 'react-select';
 import withAdminAuth from '@/components/withAdminAuth';
@@ -19,8 +19,10 @@ import customStyles from '@/styles/customStyles';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
 import { useParams } from 'next/navigation';
+import { useFlexStyle } from '@/styles/styles';
 
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
+  const styles = useFlexStyle();
   const router = useRouter();
   const { id: courseId } = useParams();
 
@@ -146,15 +148,28 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   if (!coursesID || !professorData || !courseDeliveryFormats) return <div>Loading...</div>;
 
   return (
-    <Flex direction="column" align="center" justify="center" minHeight="100vh" bg="gray.50" p={5}>
-      <Box width={{ base: '90%', sm: '500px' }} borderRadius="lg" shadow="md" bg="white" p={8}>
-        <Heading as="h1" size="lg" mb={6} textAlign="center" color="teal">
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      minHeight="100vh"
+      bg={styles.bgColor}
+      p={5}
+    >
+      <Box
+        width={{ base: '90%', sm: '500px' }}
+        borderRadius="lg"
+        shadow="md"
+        bg={styles.cardBg}
+        p={8}
+      >
+        <Heading as="h1" size="lg" mb={6} textAlign="center" color={styles.headingColor}>
           Edit Course
         </Heading>
         <form onSubmit={handleSubmit}>
           <Stack spacing={4}>
             <FormControl>
-              <FormLabel htmlFor="course-name" color="black">
+              <FormLabel htmlFor="course-name" color={styles.color}>
                 Course Name:
               </FormLabel>
               <Input
@@ -162,13 +177,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 placeholder="Enter course name"
                 value={formValues.courseName}
                 onChange={(e) => setFormValues({ ...formValues, courseName: e.target.value })}
-                color="black"
+                color={styles.color}
                 required
-                focusBorderColor="#008080"
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="section-code" color="black">
+              <FormLabel htmlFor="section-code" color={styles.color}>
                 Course Code:
               </FormLabel>
               <Input
@@ -176,13 +191,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 placeholder="Enter course code"
                 value={formValues.courseCode}
                 onChange={(e) => setFormValues({ ...formValues, courseCode: e.target.value })}
-                color="black"
+                color={styles.color}
                 required
-                focusBorderColor="#008080"
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="course-section" color="black">
+              <FormLabel htmlFor="course-section" color={styles.color}>
                 Course Section:
               </FormLabel>
               <Input
@@ -190,13 +205,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 placeholder="Enter course section"
                 value={formValues.courseSection}
                 onChange={(e) => setFormValues({ ...formValues, courseSection: e.target.value })}
-                color="black"
+                color={styles.color}
                 required
-                focusBorderColor="#008080"
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="description" color="black">
+              <FormLabel htmlFor="description" color={styles.color}>
                 Description
               </FormLabel>
               <Textarea
@@ -204,13 +219,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 placeholder="Enter course description"
                 value={formValues.description}
                 onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                color="black"
+                color={styles.color}
                 required
-                focusBorderColor="#008080"
+                focusBorderColor={styles.hoverBg}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="term-season" color="black">
+              <FormLabel htmlFor="term-season" color={styles.color}>
                 Select Term Season
               </FormLabel>
               <Select
@@ -226,7 +241,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="term-year" color="black">
+              <FormLabel htmlFor="term-year" color={styles.color}>
                 Select Term Year
               </FormLabel>
               <Select
@@ -242,7 +257,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="delivery-format" color="black">
+              <FormLabel htmlFor="delivery-format" color={styles.color}>
                 Select Delivery Format
               </FormLabel>
               <Select
@@ -258,7 +273,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="professor-name" color="black">
+              <FormLabel htmlFor="professor-name" color={styles.color}>
                 Select Professors:
               </FormLabel>
               <Select
@@ -277,7 +292,6 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             <Button
               type="submit"
               colorScheme="teal"
-              color="white"
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >

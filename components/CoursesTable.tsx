@@ -107,7 +107,6 @@ const CoursesTable: React.FC<{ courses: any[]; onRemove: (index: number) => void
                 >
                   <Button
                     colorScheme="teal"
-                    color="white"
                     flex="1"
                     mr={{ base: 0, md: 1 }}
                     mb={{ base: 1, md: 0 }}
@@ -117,7 +116,6 @@ const CoursesTable: React.FC<{ courses: any[]; onRemove: (index: number) => void
                   </Button>
                   <Button
                     colorScheme="teal"
-                    color="white"
                     flex="1"
                     ml={{ base: 0, md: 1 }}
                     onClick={() => onRemove(course.course_id)}

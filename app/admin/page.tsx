@@ -5,6 +5,7 @@ import React from 'react';
 import NextLink from 'next/link';
 import withAdminAuth from '@/components/withAdminAuth';
 import useSWR from 'swr';
+import { useFlexStyle } from '@/styles/styles';
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -13,6 +14,7 @@ const fetcher = async (url: string) => {
 };
 
 export default withAdminAuth(function Admin({ user }: { user: any }) {
+  const styles = useFlexStyle();
   const adminName = user?.full_name || 'Admin';
 
   const { data: professorData, error: professorError } = useSWR('/api/professors', fetcher);
@@ -39,6 +41,8 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
       width="100%"
       height="90vh"
       padding={4}
+      bg={styles.bgColor}
+      color={styles.color}
     >
       {/* Welcome Message */}
       <Text fontSize="2xl" fontWeight="bold" textAlign="center" mt={8} mb={4}>
@@ -61,18 +65,24 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
             _hover={{ textDecoration: 'none' }}
           >
             <Card
-              bg="gray.700"
+              bg={styles.cardBg}
               boxShadow="lg"
               borderRadius="md"
-              _hover={{ cursor: 'pointer', bg: 'teal.600' }}
+              _hover={{ cursor: 'pointer', bg: styles.cardHoverBg }}
             >
               <CardHeader>
-                <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
+                <Text
+                  fontSize="5xl"
+                  fontWeight="bold"
+                  color={styles.cardColor}
+                  textAlign="center"
+                  my={2}
+                >
                   {courseData ? numberOfCourses : 'Loading...'}
                 </Text>
               </CardHeader>
               <CardBody>
-                <Heading size="md" color="gray.200" textAlign="center">
+                <Heading size="md" color={styles.cardColor} textAlign="center">
                   Courses
                 </Heading>
               </CardBody>
@@ -87,18 +97,24 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
             _hover={{ textDecoration: 'none' }}
           >
             <Card
-              bg="gray.700"
+              bg={styles.cardBg}
               boxShadow="lg"
               borderRadius="md"
-              _hover={{ cursor: 'pointer', bg: 'teal.600' }}
+              _hover={{ cursor: 'pointer', bg: styles.cardHoverBg }}
             >
               <CardHeader>
-                <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
+                <Text
+                  fontSize="5xl"
+                  fontWeight="bold"
+                  color={styles.cardColor}
+                  textAlign="center"
+                  my={2}
+                >
                   {professorData ? numberOfProfessors : 'Loading...'}
                 </Text>
               </CardHeader>
               <CardBody>
-                <Heading size="md" color="gray.200" textAlign="center">
+                <Heading size="md" color={styles.cardColor} textAlign="center">
                   Professors
                 </Heading>
               </CardBody>
@@ -113,18 +129,24 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
             _hover={{ textDecoration: 'none' }}
           >
             <Card
-              bg="gray.700"
+              bg={styles.cardBg}
               boxShadow="lg"
               borderRadius="md"
-              _hover={{ cursor: 'pointer', bg: 'teal.600' }}
+              _hover={{ cursor: 'pointer', bg: styles.cardHoverBg }}
             >
               <CardHeader>
-                <Text fontSize="5xl" fontWeight="bold" color="white" textAlign="center" my={2}>
+                <Text
+                  fontSize="5xl"
+                  fontWeight="bold"
+                  color={styles.cardColor}
+                  textAlign="center"
+                  my={2}
+                >
                   {reviewData ? numberOfPendingReviews : 'Loading...'}
                 </Text>
               </CardHeader>
               <CardBody>
-                <Heading size="md" color="gray.200" textAlign="center">
+                <Heading size="md" color={styles.cardColor} textAlign="center">
                   In Progress Reviews
                 </Heading>
               </CardBody>
