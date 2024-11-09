@@ -86,16 +86,11 @@ export default function CoursesPage() {
     }
   }, [coursesResponse]);
 
-  const handleLimitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newLimit = e.target.value;
-    setLimit(newLimit);
-  };
-
   if (error) return <Text>Error loading courses</Text>;
   if (!coursesResponse) return <Text>Loading courses...</Text>;
 
   const uniqueCourseCodes = Object.keys(groupedCourses);
-  const displayedCourseCodes = uniqueCourseCodes.slice(0, parseInt(limit, 10));
+  const displayedCourseCodes = uniqueCourseCodes;
 
   return (
     <>
@@ -112,30 +107,7 @@ export default function CoursesPage() {
             display="flex"
             justifyContent="flex-end"
             alignItems="center"
-          >
-            <Box p={5} width={{ base: '30%', sm: '30%', md: '20%', lg: '12%' }}>
-              <NumberInput
-                step={1}
-                defaultValue={2}
-                min={1}
-                max={5}
-                value={limit}
-                onChange={(valueString) => {
-                  handleLimitChange({
-                    target: { value: valueString },
-                  } as React.ChangeEvent<HTMLInputElement>);
-                }}
-                keepWithinRange
-                clampValueOnBlur
-              >
-                <NumberInputField readOnly css={{ cursor: 'default' }} />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </Box>
-          </GridItem>
+          ></GridItem>
         )}
         {uniqueCourseCodes.length > 0 ? (
           displayedCourseCodes.map((courseCode) => (
