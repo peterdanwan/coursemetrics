@@ -147,7 +147,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
               </CardHeader>
               <CardBody>
                 <Heading size="md" color={styles.cardColor} textAlign="center">
-                  In Progress Reviews
+                  Pending Reviews
                 </Heading>
               </CardBody>
             </Card>
