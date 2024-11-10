@@ -134,7 +134,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
           review.title.toLowerCase().includes(searchTerm) ||
           review.comment.toLowerCase().includes(searchTerm) ||
           review.ProfessorCourse.Course.course_code.toLowerCase().includes(searchTerm) ||
-          review.status.toLowerCase().includes(searchTerm) ||
+          String(review.review_status_id).includes(searchTerm) ||
           normalizedRate.includes(searchTerm)
         );
       })
