@@ -67,16 +67,22 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
     setIsSubmitting(true);
     const courseData = {
       course_code: courseCode,
-      name: courseName,
       course_section: courseSection,
-      description: description,
-      termSeason: selectedTermSeason,
-      termYear: selectedTermYear,
-      deliveryFormatId: selectedDeliveryFormat?.value,
-      professorIds: selectedProfessors.map((prof) => prof.value),
+      course_detail: {
+        course_name: courseName,
+        course_description: description,
+      },
+      course_term: {
+        season: selectedTermSeason,
+        year: parseInt(selectedTermYear, 10),
+      },
+      course_delivery_format_id: selectedDeliveryFormat?.value,
+      professors: selectedProfessors.map((prof) => ({
+        professor_id: parseInt(prof.value, 10),
+      })),
     };
 
-    //console.log('Course Data being sent:', JSON.stringify(courseData, null, 2));
+    console.log('Course Data being sent:', JSON.stringify(courseData, null, 2));
 
     try {
       const response = await fetch('/api/courses', {
@@ -89,7 +95,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
 
       const data = await response.json();
       console.log('Course created successfully:', data);
-      router.push('/admin/manage');
+      router.push('/admin/manage?option=courses');
 
       if (!response.ok) {
         throw new Error(data.error.message);
@@ -102,11 +108,17 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
   };
 
   const handleCancel = () => {
-    router.push('/admin/manage');
+    router.push('/admin/manage?option=courses');
   };
 
   const handleProfessorChange = (newValue: MultiValue<{ value: string; label: string }>) => {
-    setSelectedProfessors(newValue as { value: string; label: string }[]);
+    const professorsWithIds = newValue.map((prof) => ({
+      value: prof.value,
+      label: prof.label,
+      professor_id: parseInt(prof.value, 10),
+    }));
+
+    setSelectedProfessors(professorsWithIds);
   };
 
   if (professorError || courseDeliveryFormatsError) return <div>Failed to load data</div>;
@@ -166,7 +178,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
                 Course Section:
               </FormLabel>
               <Input
-                id="section-code"
+                id="section-section"
                 placeholder="Enter course section"
                 value={courseSection}
                 onChange={(e) => setCourseSection(e.target.value)}
@@ -257,7 +269,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             >
               Add Course
             </Button>
-            <Button onClick={handleCancel} colorScheme="gray">
+            <Button type="button" onClick={handleCancel} colorScheme="gray">
               Cancel
             </Button>
           </Stack>
