@@ -106,25 +106,22 @@ export const POST = withApiAuthRequired(async function create_course(
 
   const {
     course_code,
-    name,
-    description,
     course_section,
-    termSeason,
-    termYear,
-    deliveryFormatId,
-    professorIds,
+    course_detail: { course_name, course_description },
+    course_term: { season, year },
+    course_delivery_format_id,
+    professors,
   } = body;
 
   // Check if all required fields are provided
   if (
     !course_code ||
-    !name ||
-    !description ||
     !course_section ||
-    !termSeason ||
-    !termYear ||
-    !deliveryFormatId ||
-    !professorIds
+    !course_name ||
+    !course_description ||
+    !course_delivery_format_id ||
+    !season ||
+    !year
   ) {
     return NextResponse.json(createErrorResponse(400, 'Missing required fields'), { status: 400 });
   }
@@ -133,8 +130,8 @@ export const POST = withApiAuthRequired(async function create_course(
     // Step 1: Create CourseDetail
     const [courseDetail] = await CourseDetail.findOrCreate({
       where: {
-        course_name: name,
-        course_description: description,
+        course_name: course_name,
+        course_description: course_description,
       },
     });
     log.info('CourseDetail found or created', { courseDetail });
@@ -142,8 +139,8 @@ export const POST = withApiAuthRequired(async function create_course(
     // Step 2: Find or create CourseTerm
     const [courseTerm] = await CourseTerm.findOrCreate({
       where: {
-        season: termSeason,
-        year: termYear,
+        season: season,
+        year: year,
       },
     });
     log.info('CourseTerm found or created', { courseTerm });
@@ -154,17 +151,17 @@ export const POST = withApiAuthRequired(async function create_course(
       course_section,
       course_detail_id: courseDetail.course_detail_id,
       course_term_id: courseTerm.course_term_id,
-      course_delivery_format_id: deliveryFormatId,
+      course_delivery_format_id: course_delivery_format_id,
     });
     log.info('Course created successfully', { course });
 
     // Step 4: Associate Professors
-    for (const professorId of professorIds) {
+    for (const { professor_id } of professors) {
       await ProfessorCourse.create({
-        professor_id: professorId,
+        professor_id,
         course_id: course.course_id,
       });
-      log.info('Professor associated with course', { professorId, courseId: course.course_id });
+      log.info('Professor associated with course', { professor_id, courseId: course.course_id });
     }
 
     return NextResponse.json(
