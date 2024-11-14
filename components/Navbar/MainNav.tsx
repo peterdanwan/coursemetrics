@@ -262,8 +262,18 @@ export default function MainNav(props: { user: any }) {
           </Flex>
         </Flex>
 
-        <Stack flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'} spacing={6}>
-          <Divider orientation="vertical" height="30px" mx={3} />
+        <Stack
+          flex={{ base: 1, md: 0 }}
+          justify={'flex-end'}
+          direction={'row'}
+          spacing={{ base: 4, md: 6 }}
+        >
+          <Divider
+            orientation="vertical"
+            height="30px"
+            mx={3}
+            display={{ base: 'none', md: 'block' }}
+          />
           <Menu>
             <MenuButton
               as={IconButton}

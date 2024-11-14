@@ -116,16 +116,24 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
 
   return (
     <Flex
-      direction={['column', 'row']}
+      direction={['column', 'column', 'row']}
       minHeight="auto"
       bg={styles.bgColor}
       p={8}
       alignItems="flex-start"
     >
       {/* Left section: Review Details */}
-      <Box flex="2" borderRadius="lg" shadow="md" bg={styles.cardBg} p={8} mr={[0, 16]} mb={[8, 0]}>
+      <Box
+        flex="2"
+        borderRadius="lg"
+        shadow="md"
+        bg={styles.cardBg}
+        p={[4, 6, 8]}
+        mr={[0, 0, 16]}
+        mb={[4, 6, 0]}
+      >
         <Flex justify="space-between" align="center" mb={4}>
-          <Heading as="h1" size="lg" mb={6} color={styles.headingColor}>
+          <Heading as="h1" size="lg" mb={4} color={styles.headingColor}>
             Review #{reviewData.data.review_id}
           </Heading>
           <Box mb={4}>
@@ -167,9 +175,9 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       </Box>
 
       {/* Right section: Policy Violation and Buttons */}
-      <Flex direction="column" flex="1" maxWidth="400px" alignSelf="stretch">
-        <Box borderRadius="lg" shadow="md" bg={styles.cardBg} p={8} mb={8}>
-          <Heading as="h2" size="lg" mb={6} color={styles.headingColor}>
+      <Flex direction="column" flex="1" maxWidth={['100%', '100%', '400px']} alignSelf="stretch">
+        <Box borderRadius="lg" shadow="md" bg={styles.cardBg} p={[4, 6, 8]} mb={8}>
+          <Heading as="h2" size="lg" mb={4} color={styles.headingColor}>
             Policy Violation
           </Heading>
           <FormControl color={styles.color} mb={6}>
@@ -246,17 +254,10 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
         </Box>
         {isPendingReview && (
           <Box mt="auto">
-            <Button
-              colorScheme="green"
-              onClick={() => handleAccept()}
-              width="full"
-              mb={5}
-              p={5}
-              py={8}
-            >
+            <Button colorScheme="green" onClick={() => handleAccept()} width="full" mb={5} p={6}>
               Accept Review
             </Button>
-            <Button colorScheme="red" onClick={handleReject} width="full" p={5} py={8}>
+            <Button colorScheme="red" onClick={handleReject} width="full" p={6}>
               Reject Review
             </Button>
           </Box>
