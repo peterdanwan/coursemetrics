@@ -199,7 +199,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
         )}
       </Flex>
 
-      <Divider mb={4} borderColor={styles.borderColor} />
+      <Divider mb={4} borderColor={styles.dividerColor} />
       {/* Conditionally render appropriate category when it is selected */}
       {selectedOption === 'professors' && (
         <ProfessorsTable professors={filteredProfessors} onRemove={removeProfessor} />

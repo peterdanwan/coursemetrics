@@ -2,12 +2,14 @@
 'use client';
 import { Box, Flex, Stack, Text, Button } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
+import { useFlexStyle } from '@/styles/styles';
 
 const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: number) => void }> = ({
   professors,
   onRemove,
 }) => {
   const router = useRouter();
+  const styles = useFlexStyle();
   //console.log('Professors Data: ', professors);
 
   const displayedProfessors = professors;
@@ -28,12 +30,12 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
     <>
       {/* Table Header */}
       <Flex
-        bg="gray.50"
+        bg={styles.bgColor}
         p={2}
         borderRadius="md"
         justify="space-between"
         fontWeight="bold"
-        color="black"
+        color={styles.color}
         align="center"
       >
         <Text flex="5" textAlign="left">
@@ -54,14 +56,14 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
             width: '6px',
           },
           '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
+            background: styles.bgColor,
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888',
+            backgroundColor: styles.borderColor,
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb:hover': {
-            background: '#555',
+            background: styles.hoverBg,
           },
         }}
       >
@@ -72,10 +74,10 @@ const ProfessorsTable: React.FC<{ professors: any[]; onRemove: (professorId: num
               borderWidth="1px"
               borderRadius="lg"
               padding={4}
-              bg="gray.50"
+              bg={styles.cardBg}
             >
               <Flex justify="space-between" align="center">
-                <Text flex="5" color="black" m={1}>
+                <Text flex="5" color={styles.color} m={1}>
                   {`${professor.first_name} ${professor.last_name}`}
                 </Text>
                 <Flex
