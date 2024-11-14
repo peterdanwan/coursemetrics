@@ -10,6 +10,8 @@ import {
   Flex,
   Heading,
   Textarea,
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -17,13 +19,14 @@ import Select, { MultiValue } from 'react-select';
 import withAdminAuth from '@/components/withAdminAuth';
 import customStyles from '@/styles/customStyles';
 import { apiFetcher } from '@/utils';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { useParams } from 'next/navigation';
 import { useFlexStyle } from '@/styles/styles';
 
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const styles = useFlexStyle();
   const router = useRouter();
+  const toast = useToast();
   const { id: courseId } = useParams();
 
   const { data: coursesID, error: courseError } = useSWR(`/api/courses/id/${courseId}`, apiFetcher);
@@ -83,10 +86,12 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
           value: course?.CourseTerm?.year?.toString() || '',
           label: course?.CourseTerm?.year?.toString() || '',
         },
-        deliveryFormat: {
-          value: course?.CourseDeliveryFormat?.course_delivery_format_id || '',
-          label: course?.CourseDeliveryFormat?.format || '',
-        },
+        deliveryFormat: course?.CourseDeliveryFormat
+          ? {
+              value: course?.course_delivery_format_id.toString() || '',
+              label: course?.CourseDeliveryFormat?.format || '',
+            }
+          : null,
         professors:
           course?.ProfessorCourses?.map((prof: any) => ({
             value: prof.professor_id,
@@ -101,7 +106,8 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    console.log('Data to be sent:', formValues);
+
+    // console.log('Data to be sent:', formValues);
 
     const updatedCourseData = {
       course_id: courseId,
@@ -112,8 +118,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
       termSeason: formValues.termSeason.value,
       termYear: formValues.termYear.value,
       deliveryFormatId: formValues.deliveryFormat.value,
-      professorIds: formValues.professors.map((professor: any) => professor.value),
+      professorIds:
+        formValues.professors.length > 0
+          ? formValues.professors.map((professor: any) => professor.value)
+          : [],
     };
+
+    //console.log('Updated Course Data:', updatedCourseData);
 
     try {
       const response = await fetch(`/api/courses/id/${courseId}`, {
@@ -123,6 +134,18 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
         },
         body: JSON.stringify(updatedCourseData),
       });
+
+      if (response.status === 409) {
+        const result = await response.json();
+        // Show a toast to the user
+        toast({
+          title: 'Course Already Exists',
+          description: result.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
 
       const data = await response.json();
       console.log('Course updated successfully:', data);
@@ -170,7 +193,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
           <Stack spacing={4}>
             <FormControl>
               <FormLabel htmlFor="course-name" color={styles.color}>
-                Course Name:
+                Course Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="course-name"
@@ -184,7 +210,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="section-code" color={styles.color}>
-                Course Code:
+                Course Code:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="course-code"
@@ -198,7 +227,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="course-section" color={styles.color}>
-                Course Section:
+                Course Section:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="section-code"
@@ -212,7 +244,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="description" color={styles.color}>
-                Description
+                Description{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Textarea
                 id="description"
@@ -226,7 +261,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="term-season" color={styles.color}>
-                Select Term Season
+                Select Term Season{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Select
                 id="term-season"
@@ -236,13 +274,16 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                   setFormValues({ ...formValues, termSeason: selectedOption })
                 }
                 required
-                placeholder="Select term season"
+                placeholder="Select Term Season"
                 styles={customStyles}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="term-year" color={styles.color}>
-                Select Term Year
+                Select Term Year{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Select
                 id="term-year"
@@ -252,13 +293,16 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                   setFormValues({ ...formValues, termYear: selectedOption })
                 }
                 required
-                placeholder="Select term year"
+                placeholder="Select Term Year"
                 styles={customStyles}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="delivery-format" color={styles.color}>
-                Select Delivery Format
+                Select Delivery Format{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Select
                 id="delivery-format"
@@ -268,13 +312,16 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                   setFormValues({ ...formValues, deliveryFormat: selectedOption })
                 }
                 required
-                placeholder="Select delivery format"
+                placeholder="Select Delivery Format"
                 styles={customStyles}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="professor-name" color={styles.color}>
-                Select Professors:
+                Select Professors:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Optional)
+                </Text>
               </FormLabel>
               <Select
                 isMulti
@@ -284,8 +331,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
                 onChange={(selectedOptions: MultiValue<any>) =>
                   setFormValues({ ...formValues, professors: selectedOptions })
                 }
-                required
-                placeholder="Select professors..."
+                placeholder="Select Professors..."
                 styles={customStyles}
               />
             </FormControl>

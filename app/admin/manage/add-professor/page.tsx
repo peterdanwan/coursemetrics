@@ -10,7 +10,7 @@ import {
   Stack,
   Flex,
   Heading,
-  Textarea,
+  Text,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -122,7 +122,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
           <Stack spacing={4}>
             <FormControl>
               <FormLabel htmlFor="professor-first-name" color={styles.color}>
-                First Name:
+                First Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="professor-first-name"
@@ -136,7 +139,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="professor-last-name" color={styles.color}>
-                Last Name:
+                Last Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="professor-last-name"

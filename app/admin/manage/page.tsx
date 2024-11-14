@@ -11,6 +11,7 @@ import {
   Flex,
   Divider,
   Link,
+  useToast,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -24,6 +25,7 @@ import { useFlexStyle } from '@/styles/styles';
 
 export default withAdminAuth(function Manage({ user }: { user: any }) {
   const styles = useFlexStyle();
+  const toast = useToast();
   const searchParams = useSearchParams();
   const initialOption = searchParams.get('option') || '';
   const [selectedOption, setSelectedOption] = useState<string>(initialOption);
@@ -34,7 +36,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   const { data: courses, error: courseError } = useSWR('/api/courses', apiFetcher);
   //console.log('Professors Data:', professors);
   //console.log('Reviews Data Manage Page:', reviews);
-  //console.log('Courses Data:', courses);
+  console.log('Courses Data:', courses);
 
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
@@ -64,6 +66,15 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
       if (!response.ok) {
         throw new Error(data.error.message);
       }
+
+      // Show success toast
+      toast({
+        title: `Professor successfully deleted.`,
+        description: `The professor id ${professorId} has been successfully deleted.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       mutate('/api/professors');
     } catch (error) {
       console.error(error);
@@ -82,6 +93,15 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
       if (!response.ok) {
         throw new Error(data.error.message);
       }
+
+      // Show success toast
+      toast({
+        title: `Course successfully deleted.`,
+        description: `The course id ${courseId} has been successfully deleted.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
 
       mutate('/api/courses');
     } catch (error) {

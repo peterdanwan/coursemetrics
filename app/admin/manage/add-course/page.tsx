@@ -1,3 +1,4 @@
+// app/admin/manage/add-course/page.tsx
 'use client';
 import {
   Box,
@@ -9,6 +10,8 @@ import {
   Flex,
   Heading,
   Textarea,
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -22,6 +25,8 @@ import { useFlexStyle } from '@/styles/styles';
 export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
   const styles = useFlexStyle();
   const router = useRouter();
+  const toast = useToast();
+
   const [courseName, setCourseName] = useState('');
   const [courseCode, setCourseCode] = useState('');
   const [courseSection, setCourseSection] = useState('');
@@ -93,6 +98,18 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
         body: JSON.stringify(courseData),
       });
 
+      if (response.status === 409) {
+        const result = await response.json();
+        // Show a toast to the user
+        toast({
+          title: 'Course Already Exists',
+          description: result.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+
       const data = await response.json();
       console.log('Course created successfully:', data);
       router.push('/admin/manage?option=courses');
@@ -147,7 +164,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
           <Stack spacing={4}>
             <FormControl>
               <FormLabel htmlFor="course-name" color={styles.color}>
-                Course Name:
+                Course Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="course-name"
@@ -161,7 +181,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="section-code" color={styles.color}>
-                Course Code:
+                Course Code:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="course-code"
@@ -175,7 +198,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="course-section" color={styles.color}>
-                Course Section:
+                Course Section:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="section-section"
@@ -189,7 +215,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="description" color={styles.color}>
-                Description
+                Description{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Textarea
                 id="description"
@@ -203,7 +232,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="term-season" color={styles.color}>
-                Select Term Season
+                Select Term Season{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Select
                 id="term-season"
@@ -222,7 +254,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="term-year" color={styles.color}>
-                Select Term Year
+                Select Term Year{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Select
                 id="term-year"
@@ -236,7 +271,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="delivery-format" color={styles.color}>
-                Select Delivery Format
+                Select Delivery Format{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Select
                 id="delivery-format"
@@ -250,7 +288,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="professor-name" color={styles.color}>
-                Select Professors:
+                Select Professors:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Optional)
+                </Text>
               </FormLabel>
               <Select
                 isMulti
@@ -267,7 +308,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
               isLoading={isSubmitting}
               isDisabled={isSubmitting}
             >
-              Add Course
+              {isSubmitting ? 'Submitting...' : 'Add Course'}
             </Button>
             <Button type="button" onClick={handleCancel} colorScheme="gray">
               Cancel
