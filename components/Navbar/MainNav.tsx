@@ -211,7 +211,7 @@ export default function MainNav(props: { user: any }) {
         color={flexStyle.color}
         minH={'60px'}
         py={{ base: 2 }}
-        px={{ base: 4 }}
+        px={{ base: 2, sm: 3, md: 4 }}
         borderBottom={1}
         borderStyle={'solid'}
         borderColor={flexStyle.borderColor}
@@ -266,7 +266,8 @@ export default function MainNav(props: { user: any }) {
           flex={{ base: 1, md: 0 }}
           justify={'flex-end'}
           direction={'row'}
-          spacing={{ base: 4, md: 6 }}
+          spacing={{ base: 2, md: 4, lg: 6 }}
+          align={'center'}
         >
           <Divider
             orientation="vertical"
@@ -274,6 +275,7 @@ export default function MainNav(props: { user: any }) {
             mx={3}
             display={{ base: 'none', md: 'block' }}
           />
+
           <Menu>
             <MenuButton
               as={IconButton}
@@ -283,9 +285,6 @@ export default function MainNav(props: { user: any }) {
               cursor={'pointer'}
               minW={0}
             />
-            <Button onClick={toggleColorMode}>
-              {colorMode === 'light' ? <CiLight /> : <MdDarkMode />}
-            </Button>
             <MenuList>
               {user ? (
                 <>
@@ -414,6 +413,9 @@ export default function MainNav(props: { user: any }) {
               )}
             </MenuList>
           </Menu>
+          <Button onClick={toggleColorMode} display={{ base: 'none', md: 'flex' }}>
+            {colorMode === 'light' ? <CiLight /> : <MdDarkMode />}
+          </Button>
         </Stack>
       </Flex>
 
@@ -426,6 +428,8 @@ export default function MainNav(props: { user: any }) {
           filteredCourses={filteredCourses}
           onCloseMenu={onClose}
           getButtonText={getButtonText}
+          toggleColorMode={toggleColorMode}
+          colorMode={colorMode}
         />
       </Collapse>
     </Box>
@@ -647,6 +651,8 @@ const MobileNav = ({
   filteredCourses,
   onCloseMenu,
   getButtonText,
+  toggleColorMode,
+  colorMode,
 }: {
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
@@ -655,6 +661,8 @@ const MobileNav = ({
   filteredCourses: ICourse[];
   onCloseMenu: () => void;
   getButtonText: (category: string) => string;
+  toggleColorMode: () => void;
+  colorMode: string;
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const popoverContentBgColor = useColorModeValue('white', 'gray.800');
@@ -676,7 +684,11 @@ const MobileNav = ({
   };
 
   return (
-    <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
+    <Stack
+      bg={useColorModeValue('white', 'gray.800')}
+      p={4}
+      display={{ base: 'block', md: 'none' }}
+    >
       {NAV_ITEMS.map((navItem, index) => (
         <React.Fragment key={navItem.label}>
           <MobileNavItem
@@ -747,6 +759,12 @@ const MobileNav = ({
           )}
         </React.Fragment>
       ))}
+      <Button
+        onClick={toggleColorMode}
+        leftIcon={colorMode === 'light' ? <CiLight /> : <MdDarkMode />}
+      >
+        {colorMode === 'light' ? 'Light' : 'Dark'} Mode
+      </Button>
     </Stack>
   );
 };
