@@ -11,6 +11,7 @@ import CourseTerm from '@/database/models/CourseTerm';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
 import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
+import { Op } from 'sequelize';
 
 // ===== API ROUTE TO FETCH COURSE BY COURSE ID =====
 export const GET = withApiAuthRequired(async function get_course_by_course_id(
@@ -83,6 +84,7 @@ export const PATCH = withApiAuthRequired(async function update_course(
   const log = logger.child({ module: 'app/api/courses/id/[courseId]/route.ts' });
   log.info('Received PATCH request to update course', { body: req.body });
   const body = await req.json();
+  console.log(body);
 
   const {
     course_id,
@@ -104,13 +106,27 @@ export const PATCH = withApiAuthRequired(async function update_course(
     !course_section ||
     !termSeason ||
     !termYear ||
-    !deliveryFormatId ||
-    !professorIds
+    !deliveryFormatId
   ) {
     return NextResponse.json(createErrorResponse(400, 'Missing required fields'), { status: 400 });
   }
 
   try {
+    // Check if the course already exists with the same course_code (excluding the current course)
+    const existingCourse = await Course.findOne({
+      where: {
+        course_code,
+        course_section,
+        course_id: { [Op.ne]: course_id }, // Ensure the current course is not found
+      },
+    });
+
+    if (existingCourse) {
+      return NextResponse.json(createErrorResponse(409, 'Course already exists'), {
+        status: 409,
+      });
+    }
+
     const course = await Course.findByPk(course_id);
     if (!course) {
       return NextResponse.json(createErrorResponse(404, 'Course not found'), { status: 404 });
@@ -144,6 +160,25 @@ export const PATCH = withApiAuthRequired(async function update_course(
     await course.update({ course_delivery_format_id: deliveryFormatId });
     log.info('CourseDeliveryFormat associated with course', { courseDeliveryFormat });
 
+    // Remove all ProfessorCourse associations if professorIds is empty
+    if (!professorIds || professorIds.length === 0) {
+      //console.log(`Deleting professor associations for course_id: ${course_id}`);
+      const deleteResult = await ProfessorCourse.destroy({ where: { course_id: course_id } });
+      //console.log(`Delete result: ${deleteResult}`);
+      log.info('All ProfessorCourse associations removed for course');
+
+      // Explicitly reset the professor relationship on the Course
+      await course.update({
+        professor_id: null,
+      });
+
+      return NextResponse.json(
+        { message: 'Course updated with no professor associations' },
+        { status: 200 }
+      );
+    }
+
+    // Update the ProfessorCourse associations if professorIds is not empty
     await ProfessorCourse.destroy({ where: { course_id: course_id } });
     await ProfessorCourse.bulkCreate(
       professorIds.map((professorId: number) => ({
