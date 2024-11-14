@@ -10,7 +10,8 @@ import {
   Stack,
   Flex,
   Heading,
-  Textarea,
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,6 +21,7 @@ import { useFlexStyle } from '@/styles/styles';
 export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
   const styles = useFlexStyle();
   const router = useRouter();
+  const toast = useToast();
 
   // State to manage form input and possible error/success messages
   const [firstName, setFirstName] = useState('');
@@ -50,7 +52,14 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
 
       const data = await response.json();
       console.log('Professor successfully created:', data);
-      router.push('/admin/manage');
+      toast({
+        title: 'Professor successfully created',
+        description: `The professor ${professorData.first_name} ${professorData.last_name} has been successfully created.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      router.push('/admin/manage?option=professors');
 
       if (response.status === 409) {
         // If the professor already exists, ask for confirmation to add as a new professor
@@ -74,6 +83,13 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
 
           const createNewData = await createNewResponse.json();
           console.log('New professor added despite duplication:', createNewData);
+          toast({
+            title: 'Professor successfully created',
+            description: `The new professor ${professorData.first_name} ${professorData.last_name} has been successfully created.`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
           router.push('/admin/manage?option=professors');
 
           if (!createNewResponse.ok) {
@@ -122,7 +138,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
           <Stack spacing={4}>
             <FormControl>
               <FormLabel htmlFor="professor-first-name" color={styles.color}>
-                First Name:
+                First Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="professor-first-name"
@@ -136,7 +155,10 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="professor-last-name" color={styles.color}>
-                Last Name:
+                Last Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="professor-last-name"

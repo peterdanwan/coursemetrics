@@ -145,7 +145,25 @@ export const POST = withApiAuthRequired(async function create_course(
     });
     log.info('CourseTerm found or created', { courseTerm });
 
-    // Step 3: Create Course
+    // Step 3.1: Check if the course already exists with the same information
+    const existingCourse = await Course.findOne({
+      where: {
+        course_code,
+        course_section,
+        course_detail_id: courseDetail.course_detail_id,
+        course_term_id: courseTerm.course_term_id,
+        course_delivery_format_id: course_delivery_format_id,
+      },
+    });
+
+    if (existingCourse) {
+      // If an identical course exists, return a 409 Conflict response
+      return NextResponse.json(createErrorResponse(409, 'This course already exists.'), {
+        status: 409,
+      });
+    }
+
+    // Step 3.2: Create Course
     const course = await Course.create({
       course_code,
       course_section,
@@ -153,6 +171,7 @@ export const POST = withApiAuthRequired(async function create_course(
       course_term_id: courseTerm.course_term_id,
       course_delivery_format_id: course_delivery_format_id,
     });
+
     log.info('Course created successfully', { course });
 
     // Step 4: Associate Professors

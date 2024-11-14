@@ -1,6 +1,17 @@
 // app/admin/manage/edit-professor/[id]/page.tsx
 'use client';
-import { Box, Button, FormControl, FormLabel, Input, Stack, Flex, Heading } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Stack,
+  Flex,
+  Heading,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import withAdminAuth from '@/components/withAdminAuth';
@@ -14,6 +25,7 @@ import { useFlexStyle } from '@/styles/styles';
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
   const styles = useFlexStyle();
+  const toast = useToast();
   const { id: professorId } = useParams();
 
   // Local state to manage the form inputs
@@ -58,13 +70,21 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
 
       const data = await response.json();
       console.log('Professor updated successfully:', data);
+      toast({
+        title: `Professor ${professorId} successfully updated`,
+        description: `The professor ${updatedProfessor.first_name} ${updatedProfessor.last_name} has been successfully updated.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       router.push('/admin/manage?option=professors');
 
       if (!response.ok) {
         // Handle the conflict error (duplicate professor)
         if (response.status === 409) {
           const confirmUpdate = window.confirm(
-            data.error.message || 'Are you sure you want to proceed?'
+            data.error.message ||
+              'Professor with this name already exists. Are you sure you want to proceed?'
           );
           if (confirmUpdate) {
             updatedProfessor.forceUpdate = true;
@@ -80,6 +100,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
 
             const retryData = await retryResponse.json();
             console.log('Professor force updated successfully:', retryData);
+            toast({
+              title: `Professor ${professorId} successfully updated`,
+              description: `The professor ${updatedProfessor.first_name} ${updatedProfessor.last_name} has been successfully updated.`,
+              status: 'success',
+              duration: 5000,
+              isClosable: true,
+            });
             if (!retryResponse.ok) {
               throw new Error(data.error.message);
             }
@@ -127,7 +154,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
           <Stack spacing={4}>
             <FormControl>
               <FormLabel htmlFor="first-name" color={styles.color}>
-                First Name:
+                First Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="first-name"
@@ -143,7 +173,10 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="last-name" color={styles.color}>
-                Last Name:
+                Last Name:{' '}
+                <Text as="span" color={styles.requiredColor} fontSize="sm">
+                  (Required)
+                </Text>
               </FormLabel>
               <Input
                 id="last-name"

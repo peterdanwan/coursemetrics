@@ -16,6 +16,7 @@ import {
   Tr,
   Text,
   VStack,
+  useToast,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
@@ -29,6 +30,7 @@ import customStyles from '@/styles/customStyles';
 export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
   const styles = useFlexStyle();
   const router = useRouter();
+  const toast = useToast();
   const { id: reviewId } = useParams();
   const { data: reviewData, error: reviewError } = useSWR(`/api/reviews/${reviewId}`, apiFetcher);
   const { data: policyData, error: policyError } = useSWR(`/api/policies`, apiFetcher);
@@ -66,7 +68,14 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       if (response.ok) {
         // Handle success (e.g., navigate back or show success message)
         console.log('Review approved successfully:', data);
-        router.back(); // Go back to the previous page
+        toast({
+          title: 'Review Approved',
+          description: `The review id ${reviewId} has been approved successfully.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push('/admin/manage?option=reviews');
       } else {
         // Handle error response
         console.error('Error approving review:', data.message);
@@ -95,7 +104,14 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       if (response.ok) {
         // Handle success (e.g., navigate back or show success message)
         console.log('Review rejected successfully:', data);
-        router.back(); // Go back to the previous page
+        toast({
+          title: 'Review Rejected',
+          description: `The review id ${reviewId} has been rejected successfully.`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        router.push('/admin/manage?option=reviews');
       } else {
         // Handle error response
         console.error('Error rejecting review:', data.message);
