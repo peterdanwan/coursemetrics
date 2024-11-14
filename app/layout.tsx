@@ -39,7 +39,13 @@ export default async function RootLayout({
         <body className="min-h-screen">
           <Providers>
             <MainNav user={user} />
-            <Container maxW="container.4xl" minHeight={'90vh'}>
+            <Container
+              maxW="container.4xl"
+              minHeight={'90vh'}
+              px={{ base: 0, md: 4 }}
+              mx="auto"
+              overflowX="hidden"
+            >
               {children}
             </Container>
             <Footer />

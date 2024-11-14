@@ -53,12 +53,13 @@ export default function Home() {
     <>
       <Box bgColor={flexStyle.bgColor}>
         <Container
-          // maxW={{ base: "container.sm", md: "container.lg", lg: "container.xl" }}
-          width={'100vw'}
+          width="full"
           height={{ base: '100vh' }}
           alignContent={'center'}
           justifyContent={'center'}
           bgColor={flexStyle.bgColor}
+          px={{ base: 4, md: 6 }}
+          maxW="inherit"
         >
           <Stack
             as={Box}
