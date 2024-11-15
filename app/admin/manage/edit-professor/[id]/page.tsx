@@ -10,6 +10,7 @@ import {
   Flex,
   Heading,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -24,6 +25,7 @@ import { useFlexStyle } from '@/styles/styles';
 export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const router = useRouter();
   const styles = useFlexStyle();
+  const toast = useToast();
   const { id: professorId } = useParams();
 
   // Local state to manage the form inputs
@@ -68,6 +70,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
 
       const data = await response.json();
       console.log('Professor updated successfully:', data);
+      toast({
+        title: `Professor ${professorId} successfully updated`,
+        description: `The professor ${updatedProfessor.first_name} ${updatedProfessor.last_name} has been successfully updated.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       router.push('/admin/manage?option=professors');
 
       if (!response.ok) {
@@ -91,6 +100,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
 
             const retryData = await retryResponse.json();
             console.log('Professor force updated successfully:', retryData);
+            toast({
+              title: `Professor ${professorId} successfully updated`,
+              description: `The professor ${updatedProfessor.first_name} ${updatedProfessor.last_name} has been successfully updated.`,
+              status: 'success',
+              duration: 5000,
+              isClosable: true,
+            });
             if (!retryResponse.ok) {
               throw new Error(data.error.message);
             }

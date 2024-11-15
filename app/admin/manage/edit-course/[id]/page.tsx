@@ -149,6 +149,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
 
       const data = await response.json();
       console.log('Course updated successfully:', data);
+      toast({
+        title: `Course ${updatedCourseData.course_id} successfully updated`,
+        description: `The course ${updatedCourseData.course_code} has been successfully updated.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       router.push('/admin/manage?option=courses');
 
       if (!response.ok) {

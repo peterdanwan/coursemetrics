@@ -112,6 +112,13 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
 
       const data = await response.json();
       console.log('Course created successfully:', data);
+      toast({
+        title: 'Course successfully created',
+        description: `The course ${courseData.course_code} has been successfully created.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
       router.push('/admin/manage?option=courses');
 
       if (!response.ok) {
