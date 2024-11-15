@@ -32,29 +32,22 @@ export const GET = async function fetch_reviews_by_course_code(
     const url = new URL(req.url);
 
     const courseCode = url.pathname.split('/').pop();
+    const season = req.nextUrl.searchParams.get('season');
+    const year = req.nextUrl.searchParams.get('year');
 
-    let season = req.nextUrl.searchParams.get('season');
-    season = String(season).charAt(0).toUpperCase() + String(season).slice(1);
-    let year = Number(req.nextUrl.searchParams.get('year'));
-    let courseTermConditions: { season?: any; year?: any } = {};
-
-    if (season !== null && season !== undefined && season !== 'Null') {
-      courseTermConditions.season = season;
-    }
-
-    if (year !== null && year !== undefined && year !== 0) {
-      courseTermConditions.year = year;
-    }
-
-    if (season === 'Null' && year === 0) {
-      courseTermConditions = {};
+    let courseTermConditions = {};
+    if (season && year) {
+      courseTermConditions = {
+        season: String(season).charAt(0).toUpperCase() + String(season).slice(1),
+        year: Number(year),
+      };
     }
 
     const reviews = await Review.findAll({
       where: {
         review_type_id: 1,
-        // Commenting out this filter to show all results including the flagged reviews for testing purposes
-        // review_status_id: 2,
+
+        review_status_id: 2,
       },
       include: [
         {
@@ -90,7 +83,8 @@ export const GET = async function fetch_reviews_by_course_code(
               include: [
                 {
                   model: CourseTerm,
-                  where: courseTermConditions,
+                  where:
+                    Object.keys(courseTermConditions).length > 0 ? courseTermConditions : undefined,
                 },
               ],
             },
@@ -98,14 +92,6 @@ export const GET = async function fetch_reviews_by_course_code(
         },
       ],
     });
-
-    if (!reviews.length) {
-      log.info('No reviews found with status 2');
-      return NextResponse.json(
-        createSuccessResponse({ message: 'No reviews found with status 2' }),
-        { status: 200 }
-      );
-    }
 
     log.debug(
       {

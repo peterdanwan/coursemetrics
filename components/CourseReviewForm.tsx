@@ -337,7 +337,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                           required: 'Term is required. Please enter the term this course is taken.',
                         })}
                       >
-                        {courseTerms.map((term: any, index: number) => (
+                        {courseTerms?.map((term: any, index: number) => (
                           <option key={index} value={term}>
                             {term}
                           </option>
