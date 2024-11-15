@@ -16,5 +16,6 @@ export const useFlexStyle = () => {
     policyBgColor: useColorModeValue('gray.200', 'gray.600'),
     dividerColor: useColorModeValue('gray.900', 'gray.200'),
     requiredColor: useColorModeValue('teal.500', 'teal.200'),
+    accordionPanelColor: useColorModeValue('gray.800', 'gray.200'),
   };
 };
