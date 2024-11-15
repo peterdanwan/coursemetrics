@@ -51,21 +51,30 @@ export default function Home() {
 
   return (
     <>
-      <Box bgColor={flexStyle.bgColor}>
+      <Box
+        bgColor={flexStyle.bgColor}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="100vh"
+      >
         <Container
           width="full"
-          height={{ base: '100vh' }}
-          alignContent={'center'}
-          justifyContent={'center'}
+          alignItems="center"
+          justifyContent="center"
           bgColor={flexStyle.bgColor}
           px={{ base: 4, md: 6 }}
-          maxW="inherit"
+          display="flex"
+          flexDirection="column"
+          minHeight="100vh"
+          mx="auto"
+          maxW="container.md"
         >
           <Stack
             as={Box}
             textAlign={'center'}
             spacing={{ base: 8, md: 14 }}
-            width={{ base: '90%' }}
+            width={{ base: '100%', sm: '90%' }}
             textColor={flexStyle.color}
           >
             <Heading
