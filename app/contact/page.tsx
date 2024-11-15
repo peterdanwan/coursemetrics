@@ -29,11 +29,11 @@ export default function Contact() {
         p={8}
         borderRadius="lg"
         shadow="md"
-        bgColor={flexStyle.bgColor}
-        color={flexStyle.color}
+        bgColor={flexStyle.cardBg}
+        color={flexStyle.cardColor}
       >
         <Box>
-          <Heading as="h1" size="2xl" mb={4}>
+          <Heading as="h1" size="2xl" mb={4} color={flexStyle.headingColor}>
             Contact Us
           </Heading>
           <Text fontSize="lg" mt={2}>

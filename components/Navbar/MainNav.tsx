@@ -274,6 +274,7 @@ export default function MainNav(props: { user: any }) {
             height="30px"
             mx={3}
             display={{ base: 'none', md: 'block' }}
+            borderColor={flexStyle.dividerColor}
           />
 
           <Menu>
@@ -436,6 +437,7 @@ export default function MainNav(props: { user: any }) {
   );
 }
 
+// -----------------------------
 const DesktopNav = ({
   position,
   selectedCategory,
@@ -592,6 +594,8 @@ const DesktopNav = ({
     </Stack>
   );
 };
+
+// -----------------------------
 
 const DesktopSubNav = ({
   label,

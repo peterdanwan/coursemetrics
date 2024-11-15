@@ -36,19 +36,20 @@ export default function ProfessorCard({ professor }: ProfessorCardProps) {
     router.push(`/professors/${selectedProfessor.professor_id}`);
   };
 
-  const handleBookmark = () => {
-    alert('Bookmark clicked - Still in development');
-  };
-  const cardBgColor = useColorModeValue('white', 'grey.700');
+  // Might remove this bookmark and only have the reviews bookmark instead
+  // const handleBookmark = () => {
+  //   alert('Bookmark clicked - Still in development');
+  // };
+
   return (
-    <Card bgColor={cardBgColor} border={flexStyle.borderColor} borderWidth={1} p={2}>
+    <Card bgColor={flexStyle.cardBg} border={flexStyle.borderColor} borderWidth={1}>
       <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
         <Flex align="center" gap={2} wrap="wrap">
           <Box>
             <Link href={`/professors/${selectedProfessor.professor_id}`}>
               <Heading
                 as="h1"
-                color="teal"
+                color={flexStyle.headingColor}
                 fontSize={{ base: '20', sm: '24', md: '24', lg: '28' }}
                 mb={2}
               >
@@ -57,21 +58,19 @@ export default function ProfessorCard({ professor }: ProfessorCardProps) {
             </Link>
           </Box>
           <Spacer />
-          <Box color="pink.400">
+          {/* <Box color="pink.400">
             <IconButton aria-label="Bookmark" variant="outline" onClick={handleBookmark}>
               <CiBookmark size={20} />
             </IconButton>
-          </Box>
+          </Box> */}
         </Flex>
       </CardHeader>
       <Button
         colorScheme="teal"
-        variant="outline"
+        // variant="outline"
         size="sm"
         onClick={navigateToProfessor}
         mt={2}
-        w={'70%'}
-        mx={'auto'}
       >
         View Reviews
       </Button>
