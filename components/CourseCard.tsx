@@ -60,17 +60,6 @@ export default function CourseCard({ courses }: CourseCardProps) {
     }
   };
 
-  // const navigateToCourse = () => {
-  //   if (selectedTermId === '') {
-  //     // No term selected; navigate without query parameters
-  //     router.push(`/courses/${selectedCourse.course_code}`);
-  //   } else {
-  //     router.push(
-  //       `/courses/${selectedCourse.course_code}?season=${selectedCourse.CourseTerm.season}&year=${selectedCourse.CourseTerm.year}`
-  //     );
-  //   }
-  // };
-
   const navigateToCourse = () => {
     if (selectedTermId === '') {
       // Get the most recent term's course
