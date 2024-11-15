@@ -21,16 +21,16 @@ import {
   Stack,
   StackDivider,
   Select,
+  Spinner,
   useDisclosure,
 } from '@chakra-ui/react';
-import CourseReview from '@/components/CourseReview';
-import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
+import { FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
 import ProfReviewForm from '@/components/ProfReviewForm';
 
-import SideMenu from '@/components/SideFilterMenuCourse';
 import { useFlexStyle } from '@/styles/styles';
+import RatingIcons from '@/components/RatingIcons';
 
 interface IProfessor {
   professor_id: number;
@@ -90,7 +90,6 @@ function getAllProfessorsURL() {
 export default function ProfessorPage({ params }: { params: { professorId: string } }) {
   const flexStyle = useFlexStyle();
   const professorId = params.professorId.toUpperCase();
-  const [expandedReviewId, setExpandedReviewId] = useState(-1);
   const [profCourses, setProfCourses] = useState<ICourse[]>([]);
   const [professor, setProfessor] = useState<IProfessor | null>(null);
   const [professors, setProfessors] = useState<IProfessor[]>([]);
@@ -159,17 +158,17 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
   // };
 
   return (
-    <Grid
-      gridTemplateColumns="repeat(12, 1fr)"
-      gap={{ base: '3', md: '3', lg: '6' }}
-      p={{ base: '3', md: '3', lg: '5' }}
-      margin="0 auto"
-      w={{ base: '100%', '2xl': '80%' }}
-      bgColor={flexStyle.bgColor}
-    >
+    <>
       {/* Course Details Section */}
       {professor ? (
-        <>
+        <Grid
+          gridTemplateColumns="repeat(12, 1fr)"
+          gap={{ base: '3', md: '3', lg: '6' }}
+          p={{ base: '3', md: '3', lg: '5' }}
+          margin="0 auto"
+          w={{ base: '100%', '2xl': '80%' }}
+          bgColor={flexStyle.bgColor}
+        >
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
@@ -187,7 +186,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                   <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                     <Flex gap={5} alignItems="center">
-                      <Box color="pink.400">
+                      <Box color="red.500">
                         <FaHeart size={25} />
                       </Box>
                       <Text>4.5/5</Text>
@@ -327,92 +326,28 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                     <Text as="b">Difficulty:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="3" iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Course Load:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Average Grade:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="4" iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Would Take Again:</Text>
                   </GridItem>
                   <GridItem>
-                    <Flex color="yellow.300">
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                      <Box>
-                        <FaRegStar />
-                      </Box>
-                    </Flex>
+                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
                   </GridItem>
                 </Grid>
               </CardBody>
@@ -437,10 +372,12 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
               </CardBody>
             </Card>
           </GridItem>
-        </>
+        </Grid>
       ) : (
-        <Text>Hello</Text> // Fallback message
+        <Flex justifyContent="center" alignItems="center" h="100vh">
+          <Spinner />
+        </Flex> // Fallback message
       )}
-    </Grid>
+    </>
   );
 }

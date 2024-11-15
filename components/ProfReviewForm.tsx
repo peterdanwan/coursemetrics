@@ -214,6 +214,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
             <form onSubmit={handleSubmit(submitForm)}>
               <Flex gap={10} wrap="wrap" direction={{ base: 'column', md: 'column', lg: 'row' }}>
                 <Flex flex="1" gap={5} direction="column">
+                  {/**** PROFESSOR NAME ****/}
                   <FormControl isInvalid={!!errors.professor}>
                     <FormLabel htmlFor="professor">
                       Professor:{' '}
@@ -237,24 +238,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                     </FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={!!errors.term}>
-                    <FormLabel htmlFor="term">
-                      Term:{' '}
-                      <Text as="span" color="teal" fontSize="sm">
-                        (Required)
-                      </Text>
-                    </FormLabel>
-                    <Input
-                      id="term"
-                      placeholder="Follow Format SEMESTER YEAR (Winter 2024, Fall 2023, etr)"
-                      {...register('term', {
-                        required: 'Term is required. Please enter the term this course is taken.',
-                      })}
-                    />
-
-                    <FormErrorMessage>{errors.term && errors.term.message}</FormErrorMessage>
-                  </FormControl>
-
+                  {/**** COURSE NAME ****/}
                   <FormControl isInvalid={!!errors.courseName}>
                     <FormLabel htmlFor="course-name">
                       Course Name:{' '}
@@ -277,6 +261,26 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                     </FormErrorMessage>
                   </FormControl>
 
+                  {/**** TERM ****/}
+                  <FormControl isInvalid={!!errors.term}>
+                    <FormLabel htmlFor="term">
+                      Term:{' '}
+                      <Text as="span" color="teal" fontSize="sm">
+                        (Required)
+                      </Text>
+                    </FormLabel>
+                    <Input
+                      id="term"
+                      placeholder="Follow Format SEMESTER YEAR (Winter 2024, Fall 2023, etr)"
+                      {...register('term', {
+                        required: 'Term is required. Please enter the term this course is taken.',
+                      })}
+                    />
+
+                    <FormErrorMessage>{errors.term && errors.term.message}</FormErrorMessage>
+                  </FormControl>
+
+                  {/**** SECTION CODE ****/}
                   <FormControl isInvalid={!!errors.sectionCode}>
                     <FormLabel htmlFor="section-code">
                       Section Code:{' '}
@@ -300,8 +304,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({ isOpen, onClose }) => {
                     </FormErrorMessage>
                   </FormControl>
 
-                  {/**** Included Profs: Need to discuss how this is implemented *****/}
-
+                  {/**** QUESTIONS SECTION ****/}
                   <Flex gap={5} wrap="wrap">
                     <Flex gap={5} wrap="wrap">
                       <Flex flex="1" direction="column" gap={5}>
