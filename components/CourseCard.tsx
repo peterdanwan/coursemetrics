@@ -12,8 +12,6 @@ import {
   Button,
   Select,
   IconButton,
-  useColorMode,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { CiBookmark } from 'react-icons/ci';
 import Link from 'next/link';
@@ -62,10 +60,30 @@ export default function CourseCard({ courses }: CourseCardProps) {
     }
   };
 
+  // const navigateToCourse = () => {
+  //   if (selectedTermId === '') {
+  //     // No term selected; navigate without query parameters
+  //     router.push(`/courses/${selectedCourse.course_code}`);
+  //   } else {
+  //     router.push(
+  //       `/courses/${selectedCourse.course_code}?season=${selectedCourse.CourseTerm.season}&year=${selectedCourse.CourseTerm.year}`
+  //     );
+  //   }
+  // };
+
   const navigateToCourse = () => {
     if (selectedTermId === '') {
-      // No term selected; navigate without query parameters
-      router.push(`/courses/${selectedCourse.course_code}`);
+      // Get the most recent term's course
+      const mostRecentCourse = courses.reduce((latest, current) => {
+        if (!latest) return current;
+        const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+        const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+        return currentDate > latestDate ? current : latest;
+      }, null as ICourse | null);
+
+      if (mostRecentCourse) {
+        router.push(`/courses/${mostRecentCourse.course_code}`);
+      }
     } else {
       router.push(
         `/courses/${selectedCourse.course_code}?season=${selectedCourse.CourseTerm.season}&year=${selectedCourse.CourseTerm.year}`
@@ -73,43 +91,44 @@ export default function CourseCard({ courses }: CourseCardProps) {
     }
   };
 
-  const handleBookmark = () => {
-    alert('Bookmark clicked - Still in development');
-  };
-
-  const cardBgColor = useColorModeValue('white', 'grey.700');
+  // May remove this bookmark from here and only have it on the views instead
+  // const handleBookmark = () => {
+  //   alert('Bookmark clicked - Still in development');
+  // };
 
   return (
-    <Card bgColor={cardBgColor} border={flexStyle.borderColor} borderWidth={1}>
+    <Card bgColor={flexStyle.cardBg} border={flexStyle.borderColor} borderWidth={1}>
       <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
         <Flex align="center" gap={2} wrap="wrap">
           <Box>
             <Link href={`/courses/${selectedCourse.course_code}`}>
               <Heading
                 as="h1"
-                color="teal"
+                color={flexStyle.headingColor}
                 fontSize={{ base: '20', sm: '24', md: '24', lg: '28' }}
                 mb={2}
               >
                 {selectedCourse.course_code}
               </Heading>
             </Link>
-            <Heading as="h2" color="teal" fontSize={{ md: '18' }}>
+            <Heading as="h2" color={flexStyle.headingColor} fontSize={{ md: '18' }}>
               {selectedCourse.CourseDetail.course_name}
             </Heading>
           </Box>
           <Spacer />
-          <Box color="pink.400">
+          {/* <Box color="pink.400">
             <IconButton aria-label="Bookmark" variant="outline" onClick={handleBookmark}>
               <CiBookmark size={20} />
             </IconButton>
-          </Box>
+          </Box> */}
           <Box>
             <Select
               placeholder="Select Term"
               size="sm"
               onChange={handleTermChange}
               value={selectedTermId}
+              borderColor={flexStyle.borderColor}
+              focusBorderColor={flexStyle.headingColor}
             >
               {courses.map((course) => (
                 <option key={course.course_id} value={course.course_term_id}>
@@ -121,9 +140,11 @@ export default function CourseCard({ courses }: CourseCardProps) {
         </Flex>
       </CardHeader>
       <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-        <Text fontSize={{ md: '14' }}>{selectedCourse.CourseDetail.course_description}</Text>
+        <Text fontSize={{ md: '14' }} color={flexStyle.color}>
+          {selectedCourse.CourseDetail.course_description}
+        </Text>
       </CardBody>
-      <Button colorScheme="teal" variant="outline" size="sm" onClick={navigateToCourse} mt={2}>
+      <Button colorScheme="teal" size="sm" onClick={navigateToCourse} mt={2}>
         View Reviews
       </Button>
     </Card>

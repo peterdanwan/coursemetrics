@@ -65,19 +65,20 @@ function getURL(
   year: string | null,
   courseCode: string | null
 ) {
-  let url: string;
-  if (year && season) {
-    url = `/api/${apiRoute}/${courseCode}?season=${season}&year=${year}`;
-  } else if (year) {
-    url = `/api/${apiRoute}/${courseCode}?year=${year}`;
-  } else if (season) {
-    url = `/api/${apiRoute}/${courseCode}?season=${season}`;
-  } else {
-    url = `/api/${apiRoute}/${courseCode}`;
-    // console.log('here');
+  // For course details
+  if (apiRoute === 'courses') {
+    if (year && season) {
+      return `/api/${apiRoute}/${courseCode}?season=${season}&year=${year}`;
+    }
+    return `/api/${apiRoute}/${courseCode}`;
   }
 
-  return url;
+  // For reviews - always fetch all approved reviews for the course code
+  if (apiRoute === 'reviews/courses') {
+    return `/api/${apiRoute}/${courseCode}`;
+  }
+
+  return '';
 }
 
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
@@ -95,9 +96,18 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const year = searchParams.get('year') || null;
   const season = searchParams.get('season') || null;
 
-  const courseURL = getURL('courses', null, null, courseCode);
+  const courseURL = getURL('courses', season, year, courseCode);
+  //const reviewsURL = courseCode ? `/api/reviews/courses/${courseCode}` : null;
+  const reviewsURL = courseCode
+    ? `/api/reviews/courses/${courseCode}${year && season ? `?year=${year}&season=${season}` : ''}`
+    : null;
+  console.log('courseURL', courseURL);
+  console.log('reviewsURL', reviewsURL);
 
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
+  const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
+  console.log('Fetched Course', courseResponse);
+  console.log('Fetched Reviews', reviewResponse);
 
   // For review form modal
   const {
@@ -105,6 +115,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     onOpen: onCourseReviewFormOpen,
     onClose: onCourseReviewFormClose,
   } = useDisclosure();
+
+  useEffect(() => {
+    if (courseCode) {
+      const reviewsURL = `/api/reviews/courses/${courseCode}?year=${year}&season=${season}`;
+      mutate(reviewsURL); // Trigger re-fetch based on updated filters
+    }
+  }, [courseCode, year, season]);
 
   useEffect(() => {
     if (courseResponse) {
@@ -134,31 +151,27 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
       }
 
       if (!initialCourse) {
-        // If no matching course is found, default to the first course
-        initialCourse = coursesArray[0];
+        // If no matching course is found or no term selected, use the most recent term
+        initialCourse = coursesArray.reduce((latest: any, current: any) => {
+          if (!latest) return current;
+          const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+          const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+          return currentDate > latestDate ? current : latest;
+        }, null as ICourse | null);
       }
 
       setCourse(initialCourse);
-      console.log(initialCourse);
-      const initialTermKey = `${initialCourse?.CourseTerm.season}_${initialCourse?.CourseTerm.year}`;
-      const initialSections = coursesArray.filter(
-        (courseItem: ICourse) =>
-          `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}` === initialTermKey
-      );
-      setSections(initialSections);
+
+      if (initialCourse) {
+        const initialTermKey = `${initialCourse.CourseTerm.season}_${initialCourse.CourseTerm.year}`;
+        const initialSections = coursesArray.filter(
+          (courseItem: ICourse) =>
+            `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}` === initialTermKey
+        );
+        setSections(initialSections);
+      }
     }
   }, [courseResponse, year, season]);
-
-  const reviewsURL = course
-    ? getURL(
-        'reviews/courses',
-        course.CourseTerm.season,
-        course.CourseTerm.year.toString(),
-        courseCode
-      )
-    : null;
-
-  const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
 
   useEffect(() => {
     // console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
@@ -268,9 +281,10 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                     <Flex gap={5} alignItems="center">
-                      <Box color="red.500">
+                      {/* Don't need to book mark it */}
+                      {/* <Box color="red.500">
                         <FaHeart size={25} />
-                      </Box>
+                      </Box> */}
                       <Text>4.5/5</Text>
                     </Flex>
                   </Box>
