@@ -62,8 +62,20 @@ export default function CourseCard({ courses }: CourseCardProps) {
 
   const navigateToCourse = () => {
     if (selectedTermId === '') {
-      // No term selected; navigate without query parameters
-      router.push(`/courses/${selectedCourse.course_code}`);
+      // Get the most recent term's course
+      const mostRecentCourse = courses.reduce(
+        (latest, current) => {
+          if (!latest) return current;
+          const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+          const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+          return currentDate > latestDate ? current : latest;
+        },
+        null as ICourse | null
+      );
+
+      if (mostRecentCourse) {
+        router.push(`/courses/${mostRecentCourse.course_code}`);
+      }
     } else {
       router.push(
         `/courses/${selectedCourse.course_code}?season=${selectedCourse.CourseTerm.season}&year=${selectedCourse.CourseTerm.year}`
