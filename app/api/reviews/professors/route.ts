@@ -13,10 +13,10 @@ import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
 import { sequelizeInstance } from '@/database/sequelizeInstance';
 import { calculateAverageRating } from '@/utils/funcs';
-import Policy from '@/database/models/Policy';
-import { ReviewEvaluator } from '@/utils/ai';
-import { getReviewResponses } from '@/utils/funcs';
-import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
+// import Policy from '@/database/models/Policy';
+// import { ReviewEvaluator } from '@/utils/ai';
+// import { getReviewResponses } from '@/utils/funcs';
+// import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
 
 export const POST = async function post_professor_review(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/reviews/professors/route.ts' });
@@ -59,7 +59,7 @@ export const POST = async function post_professor_review(req: NextRequest): Prom
       });
     }
 
-    const reviewEvaluator = new ReviewEvaluator();
+    // const reviewEvaluator = new ReviewEvaluator();
 
     // Start a transaction to ensure all operations succeed or fail together
     const transaction = await sequelizeInstance.transaction();
@@ -72,29 +72,29 @@ export const POST = async function post_professor_review(req: NextRequest): Prom
 
       const userInstanceJson = userInstance.toJSON();
 
-      let policiesData = await Policy.findAll<any>();
-      let policies = [];
-      let reviewStatus = 1;
+      // let policiesData = await Policy.findAll<any>();
+      // let policies = [];
+      // let reviewStatus = 1;
 
-      if (!policiesData.length) {
-        log.info('No policies found in the database.');
-        policies = [];
-      }
+      // if (!policiesData.length) {
+      //   log.info('No policies found in the database.');
+      //   policies = [];
+      // }
 
-      policies = policiesData.map((policy) => {
-        return `${policy.policy_name}: ${policy.policy_description}`;
-      });
+      // policies = policiesData.map((policy) => {
+      //   return `${policy.policy_name}: ${policy.policy_description}`;
+      // });
 
-      const reviewResponses = getReviewResponses(professorReviewData);
+      // const reviewResponses = getReviewResponses(professorReviewData);
 
-      const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
-        reviewResponses,
-        policies
-      );
+      // const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
+      //   reviewResponses,
+      //   policies
+      // );
 
-      if (!evaluationResult.approvedByModel) {
-        reviewStatus = 4;
-      }
+      // if (!evaluationResult.approvedByModel) {
+      //   reviewStatus = 3;
+      // }
 
       const course = await Course.findOne<any>({
         where: { course_code: courseCode },
@@ -126,7 +126,7 @@ export const POST = async function post_professor_review(req: NextRequest): Prom
       const review = await Review.create(
         {
           review_type_id: 2,
-          review_status_id: reviewStatus,
+          review_status_id: 1,
           professor_course_id: professorCourseJson.professor_course_id,
           user_id: userInstanceJson.user_id,
           rating: averageRating,
@@ -165,14 +165,14 @@ export const POST = async function post_professor_review(req: NextRequest): Prom
       await transaction.commit();
 
       // Log the violation if any at the end when everything is created
-      if (reviewStatus === 4) {
-        const reason = evaluationResult.reason || 'No specific reason provided.';
-        await ReviewPolicyViolationLog.create({
-          review_id: reviewJson.review_id,
-          policy_id: evaluationResult.violatedPolicyIndex + 1,
-          reason: reason,
-        });
-      }
+      // if (reviewStatus === 3) {
+      //   const reason = evaluationResult.reason || 'No specific reason provided.';
+      //   await ReviewPolicyViolationLog.create({
+      //     review_id: reviewJson.review_id,
+      //     policy_id: evaluationResult.violatedPolicyIndex + 1,
+      //     reason: reason,
+      //   });
+      // }
 
       log.info('Review successfully created and associated with course and professor.');
       return NextResponse.json(

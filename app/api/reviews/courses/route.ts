@@ -13,10 +13,10 @@ import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
 import { sequelizeInstance } from '@/database/sequelizeInstance';
 import { calculateAverageRating } from '@/utils/funcs';
-import Policy from '@/database/models/Policy';
-import { ReviewEvaluator } from '@/utils/ai';
-import { getReviewResponses } from '@/utils/funcs';
-import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
+// import Policy from '@/database/models/Policy';
+// import { ReviewEvaluator } from '@/utils/ai';
+// import { getReviewResponses } from '@/utils/funcs';
+// import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
 
 export const POST = async function post_course_review(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/reviews/courses/route.ts' });
@@ -59,42 +59,42 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       });
     }
 
-    const reviewEvaluator = new ReviewEvaluator();
+    //const reviewEvaluator = new ReviewEvaluator();
 
     // Start a transaction to ensure all operations succeed or fail together
-    const transaction = await sequelizeInstance.transaction();
+    const postTransaction = await sequelizeInstance.transaction();
 
     try {
       const userInstance = await User.findOne<any>({
         where: { email: userEmail },
-        transaction,
+        transaction: postTransaction,
       });
 
       const userInstanceJson = userInstance.toJSON();
 
-      let policiesData = await Policy.findAll<any>();
-      let policies = [];
-      let reviewStatus = 1;
+      // let policiesData = await Policy.findAll<any>();
+      // let policies = [];
+      // let reviewStatus = 1;
 
-      if (!policiesData.length) {
-        log.info('No policies found in the database.');
-        policies = [];
-      }
+      // if (!policiesData.length) {
+      //   log.info('No policies found in the database.');
+      //   policies = [];
+      // }
 
-      policies = policiesData.map((policy) => {
-        return `${policy.policy_name}: ${policy.policy_description}`;
-      });
+      // policies = policiesData.map((policy) => {
+      //   return `${policy.policy_name}: ${policy.policy_description}`;
+      // });
 
-      const reviewResponses = getReviewResponses(courseReviewData);
+      // const reviewResponses = getReviewResponses(courseReviewData);
 
-      const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
-        reviewResponses,
-        policies
-      );
+      // const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
+      //   reviewResponses,
+      //   policies
+      // );
 
-      if (!evaluationResult.approvedByModel) {
-        reviewStatus = 4;
-      }
+      // if (!evaluationResult.approvedByModel) {
+      //   reviewStatus = 3;
+      // }
 
       const course = await Course.findOne<any>({
         where: { course_code: courseCode },
@@ -104,7 +104,7 @@ export const POST = async function post_course_review(req: NextRequest): Promise
             where: { season: season, year: year },
           },
         ],
-        transaction,
+        transaction: postTransaction,
       });
 
       if (!course) {
@@ -116,7 +116,7 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
       const professorCourse = await ProfessorCourse.findOne<any>({
         where: { course_id: courseJson.course_id },
-        transaction,
+        transaction: postTransaction,
       });
 
       const professorCourseJson = professorCourse.toJSON();
@@ -127,7 +127,7 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       const review = await Review.create(
         {
           review_type_id: 1,
-          review_status_id: reviewStatus,
+          review_status_id: 1,
           professor_course_id: professorCourseJson.professor_course_id,
           user_id: userInstanceJson.user_id,
           rating: averageRating,
@@ -135,7 +135,7 @@ export const POST = async function post_course_review(req: NextRequest): Promise
           comment: courseReviewData.comment,
           grade: courseReviewData.grade,
         },
-        { transaction }
+        { transaction: postTransaction }
       );
 
       const reviewJson = review.toJSON();
@@ -148,7 +148,7 @@ export const POST = async function post_course_review(req: NextRequest): Promise
               review_id: reviewJson.review_id,
               question_id,
             },
-            { transaction }
+            { transaction: postTransaction }
           );
 
           const reviewQuestionJson = reviewQuestion.toJSON();
@@ -158,22 +158,22 @@ export const POST = async function post_course_review(req: NextRequest): Promise
               review_question_id: reviewQuestionJson.review_question_id,
               answer,
             },
-            { transaction }
+            { transaction: postTransaction }
           );
         }
       }
 
-      await transaction.commit();
+      await postTransaction.commit();
 
       // Log the violation if any at the end when everything is created
-      if (reviewStatus === 4) {
-        const reason = evaluationResult.reason || 'No specific reason provided.';
-        await ReviewPolicyViolationLog.create({
-          review_id: reviewJson.review_id,
-          policy_id: evaluationResult.violatedPolicyIndex + 1,
-          reason: reason,
-        });
-      }
+      // if (reviewStatus === 3) {
+      //   const reason = evaluationResult.reason || 'No specific reason provided.';
+      //   await ReviewPolicyViolationLog.create({
+      //     review_id: reviewJson.review_id,
+      //     policy_id: evaluationResult.violatedPolicyIndex + 1,
+      //     reason: reason,
+      //   });
+      // }
 
       log.info('Review successfully created and associated with course and professor.');
       return NextResponse.json(
@@ -181,13 +181,16 @@ export const POST = async function post_course_review(req: NextRequest): Promise
         { status: 201 }
       );
     } catch (error) {
-      await transaction.rollback();
+      await postTransaction.rollback();
       log.error(`Transaction rolled back due to error, ${error}`);
       return NextResponse.json(
         createErrorResponse(500, 'Failed to create course review. Transaction rolled back.'),
         { status: 500 }
       );
     }
+
+    // Start another transaction with regards to changing the review_status_id
+    // const aiTransaction = await sequelizeInstance.transaction();
   } catch (error) {
     console.error(error);
     log.error('Error posting the course review', { error });
