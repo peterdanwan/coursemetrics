@@ -1,4 +1,4 @@
-// app/api/auth/route.ts
+// app/api/users/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
