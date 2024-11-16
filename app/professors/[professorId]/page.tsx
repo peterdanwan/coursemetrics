@@ -63,37 +63,35 @@ interface ICourse {
   CourseTerm: ICourseTerm;
 }
 
-function getURL(
-  apiRoute: string,
-  season: string | null,
-  year: string | null,
-  professorId: string | null
-) {
-  let url: string;
-  if (year && season) {
-    url = `/api/${apiRoute}/${professorId}?year=${year}&season=${season}`;
-  } else if (year) {
-    url = `/api/${apiRoute}/${professorId}?year=${year}`;
-  } else if (season) {
-    url = `/api/${apiRoute}/${professorId}?season=${season}`;
-  } else {
-    url = `/api/${apiRoute}/${professorId}`;
-  }
+// function getURL(
+//   apiRoute: string,
+//   season: string | null,
+//   year: string | null,
+//   professorId: string | null
+// ) {
+//   let url: string;
+//   if (year && season) {
+//     url = `/api/${apiRoute}/${professorId}?year=${year}&season=${season}`;
+//   } else if (year) {
+//     url = `/api/${apiRoute}/${professorId}?year=${year}`;
+//   } else if (season) {
+//     url = `/api/${apiRoute}/${professorId}?season=${season}`;
+//   } else {
+//     url = `/api/${apiRoute}/${professorId}`;
+//   }
 
-  return url;
-}
+//   return url;
+// }
 
-function getAllProfessorsURL() {
-  return `/api/professors`;
-}
+// function getAllProfessorsURL() {
+//   return `/api/professors`;
+// }
 
 export default function ProfessorPage({ params }: { params: { professorId: string } }) {
   const flexStyle = useFlexStyle();
   const professorId = params.professorId.toUpperCase();
   const [profCourses, setProfCourses] = useState<ICourse[]>([]);
   const [professor, setProfessor] = useState<IProfessor | null>(null);
-  const [professors, setProfessors] = useState<IProfessor[]>([]);
-  const searchParams = useSearchParams();
 
   // For review form modal
   const {
@@ -102,40 +100,23 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
     onClose: onCourseReviewFormClose,
   } = useDisclosure();
 
-  // Missing API route for single professor
+  const professorURL = `/api/professors/${professorId}`;
 
-  // const professorUrl = getURL('professors', null, null, professorId);
-  // const { data: professorResponse, error: professorResponseError } = useSWR(
-  //   professorUrl,
-  //   apiFetcher
-  // );
-  // useEffect(() => {
-  //   if (professorResponse) {
-  //     if (Array.isArray(professorResponse.data)) {
-  //       setProfessor(professorResponse.data);
-  //       console.log(professorResponse.data);
-  //     } else {
-  //       setProfessor(null);
-  //     }
-  //   }
-  // }, [professorResponse]);
+  const professorReviewsByProfessorID = `/api/reviews/professors/${professorId}`; //
 
-  const professorsURL = getAllProfessorsURL();
-  const { data: professorsResponse, error: professorsResponseError } = useSWR(
-    professorsURL,
+  const { data: professorResponse, error: professorResponseError } = useSWR(
+    professorReviewsByProfessorID,
     apiFetcher
   );
-  useEffect(() => {
-    setProfessors(professorsResponse?.data.professors || []);
-  }, [professorsResponse]);
 
-  // find professor by id
   useEffect(() => {
-    const professor = professors.find((prof) => prof.professor_id.toString() === professorId);
-    if (professor) {
+    if (professorResponse && professorResponse.status === 'ok') {
+      const { professor, professorCourses } = professorResponse.data;
       setProfessor(professor);
+      setProfCourses(professorCourses);
+      console.log(professorResponse.data);
     }
-  }, [professors, professorId]);
+  }, [professorResponse]);
 
   // const reviewsURL = course
   //   ? getURL('reviews', course.CourseTerm.season, course.CourseTerm.year.toString(), courseCode)
