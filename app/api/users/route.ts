@@ -1,4 +1,4 @@
-// app/api/auth/route.ts
+// app/api/users/route.ts
 
 import { NextResponse, NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
@@ -12,7 +12,6 @@ import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Course from '@/database/models/Course';
 import CourseTerm from '@/database/models/CourseTerm';
 import Professor from '@/database/models/Professor';
-import { sequelizeInstance } from '@/database/sequelizeInstance';
 
 // ===== API ROUTE TO CREATE A NEW USER IF THEY DON'T EXIST ALREADY =====
 export const POST = async function create_user(req: NextRequest): Promise<NextResponse> {
@@ -34,51 +33,35 @@ export const POST = async function create_user(req: NextRequest): Promise<NextRe
     const userName = user.name;
     log.info(`Checking for existing user or creating a new one, email: ${userEmail}`);
 
-    // Start a transaction to ensure all operations succeed or fail together
-    const transaction = await sequelizeInstance.transaction();
-
-    try {
-      // Use findOrCreate to find or create the user
-      const [userInstance, created] = await User.findOrCreate({
-        where: { email: userEmail },
-        defaults: {
-          full_name: userName,
-          email: userEmail,
-        },
-        transaction,
-      });
-
-      log.info(`User ${created ? 'created for new user' : 'already exists'}`, {
+    // Use findOrCreate to find or create the user
+    const [userInstance, created] = await User.findOrCreate({
+      where: { email: userEmail },
+      defaults: {
+        full_name: userName,
         email: userEmail,
-      });
+      },
+    });
 
-      let userInstanceJSON = await userInstance.toJSON();
+    log.info(`User ${created ? 'created for new user' : 'already exists'}`, {
+      email: userEmail,
+    });
 
-      await UserProfile.findOrCreate({
-        where: { user_id: userInstanceJSON.user_id },
-        defaults: {
-          user_id: userInstanceJSON.id,
-        },
-        transaction,
-      });
+    let userInstanceJSON = await userInstance.toJSON();
 
-      await transaction.commit();
+    await UserProfile.findOrCreate({
+      where: { user_id: userInstanceJSON.user_id },
+      defaults: {
+        user_id: userInstanceJSON.id,
+      },
+    });
 
-      log.info(`User profile ${created ? 'created for new user' : 'already exists'}`, {
-        email: userEmail,
-      });
+    log.info(`User profile ${created ? 'created for new user' : 'already exists'}`, {
+      email: userEmail,
+    });
 
-      return NextResponse.json(createSuccessResponse({ message: 'User processed successfully' }), {
-        status: 200,
-      });
-    } catch (error) {
-      await transaction.rollback();
-      log.error(`Transaction rolled back due to error, ${error}`);
-      return NextResponse.json(
-        createErrorResponse(500, 'Failed to create course review. Transaction rolled back.'),
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(createSuccessResponse({ message: 'User processed successfully' }), {
+      status: 200,
+    });
   } catch (error: unknown) {
     console.error(error);
     log.error('Error processing user', { error });
