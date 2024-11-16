@@ -1,7 +1,9 @@
 import { Box, Flex, Text, Heading, Select, Card, CardBody } from '@chakra-ui/react';
 import { FaBookmark } from 'react-icons/fa';
+import { useFlexStyle } from '@/styles/styles';
 
 const BookmarkedReview = ({ review }: { review: any }) => {
+  const styles = useFlexStyle();
   const alignItemsVals = { base: 'start', sm: 'start', md: 'start', lg: 'start' };
   const directionVals = {
     base: 'row' as const,
@@ -21,7 +23,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
     console.log('Unbookmarked this review!');
   };
   return (
-    <Card>
+    <Card bg={styles.cardBg} color={styles.cardColor}>
       <CardBody>
         <Flex gap={4} direction={{ base: 'column', sm: 'column', md: 'column', lg: 'row' }}>
           {!isCourseReview && (
@@ -32,7 +34,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
               gap={2}
               w={{ base: '100%', sm: '100%', md: '100%', lg: '120px' }}
             >
-              <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+              <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
                 Professor
               </Text>
               <Text fontSize={fontSizeVals} as="b" lineHeight={largeTextLineHeight}>
@@ -47,7 +49,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             gap={2}
             w={{ base: '100%', sm: '100%', md: '100%', lg: '80px' }}
           >
-            <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+            <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
               Course
             </Text>
             {isCourseReview ? (
@@ -67,7 +69,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             gap={2}
             w="40px"
           >
-            <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+            <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
               Section
             </Text>
             <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
@@ -82,7 +84,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             // w="115px"
             w={{ base: '100%', sm: '100%', md: '100%', lg: '115px' }}
           >
-            <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+            <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
               Term
             </Text>
             <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
@@ -96,7 +98,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             gap={2}
             flex="1"
           >
-            <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+            <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
               Review
             </Text>
             <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
@@ -110,7 +112,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             gap={2}
             w="45px"
           >
-            <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+            <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
               Rating
             </Text>
             <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
@@ -124,12 +126,12 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             gap={2}
             w="55px"
           >
-            <Text fontSize="sm" color="teal" lineHeight={smallTextLineHeight}>
+            <Text fontSize="sm" color={styles.headingColor} lineHeight={smallTextLineHeight}>
               Remove
             </Text>
             <Flex justifyContent={iconJustifyContentVals} w="100%">
-              <Box as="button" onClick={handleUnbookmarkClick}>
-                <FaBookmark size="22px" color="#285E61" />
+              <Box as="button" onClick={handleUnbookmarkClick} _hover={{ bg: styles.hoverBg }}>
+                <FaBookmark size="22px" color={styles.iconColor} />
               </Box>
             </Flex>
           </Flex>

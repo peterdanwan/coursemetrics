@@ -17,5 +17,6 @@ export const useFlexStyle = () => {
     dividerColor: useColorModeValue('gray.900', 'gray.200'),
     requiredColor: useColorModeValue('teal.500', 'teal.200'),
     accordionPanelColor: useColorModeValue('gray.800', 'gray.200'),
+    iconColor: useColorModeValue('#285E61', '#38B2AC'),
   };
 };

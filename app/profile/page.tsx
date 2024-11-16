@@ -16,10 +16,11 @@ import {
 import { useState, useEffect } from 'react';
 import defaultAvatar from '@/assets/images/profile.png';
 import type { StaticImageData } from 'next/image';
+import { useFlexStyle } from '@/styles/styles';
 
 export default function Profile() {
+  const styles = useFlexStyle();
   const { user, isLoading } = useUser();
-  const bgColor = useColorModeValue('white', 'gray.800');
   const [avatarError, setAvatarError] = useState(false);
   const [avatarLoading, setAvatarLoading] = useState(true);
   const [userPicture, setUserPicture] = useState<string | undefined>();
@@ -75,7 +76,7 @@ export default function Profile() {
             <Box
               maxW={'270px'}
               w={'full'}
-              bg={bgColor}
+              bg={styles.cardBg}
               boxShadow={'2xl'}
               rounded={'md'}
               overflow={'hidden'}
@@ -98,30 +99,35 @@ export default function Profile() {
                     src={avatarError ? fallbackAvatarUrl : userPicture}
                     name={user.name || 'User'}
                     css={{
-                      border: '2px solid white',
-                      backgroundColor: 'white',
+                      border: `2px solid ${styles.bgColor}`,
+                      backgroundColor: styles.bgColor,
                     }}
                   />
                 )}
               </Flex>
               <Box p={6}>
                 <Stack spacing={0} align={'center'} mb={5}>
-                  <Heading fontSize={'2xl'} textColor="black" fontWeight={500} fontFamily={'body'}>
+                  <Heading
+                    fontSize={'2xl'}
+                    textColor={styles.color}
+                    fontWeight={500}
+                    fontFamily={'body'}
+                  >
                     {user.name ?? ''}
                   </Heading>
                 </Stack>
 
                 <Stack direction={'column'} justify={'center'} spacing={1}>
-                  <Heading fontSize={'sm'} textColor="black">
+                  <Heading fontSize={'sm'} textColor={styles.headingColor}>
                     Username
                   </Heading>
-                  <Text fontSize={'sm'} textColor="black">
+                  <Text fontSize={'sm'} textColor={styles.color}>
                     {user.nickname ?? ''}
                   </Text>
-                  <Heading fontSize={'sm'} textColor="black">
+                  <Heading fontSize={'sm'} textColor={styles.headingColor}>
                     Email
                   </Heading>
-                  <Text fontSize={'sm'} textColor="black">
+                  <Text fontSize={'sm'} textColor={styles.color}>
                     {user.email ?? ''}
                   </Text>
                 </Stack>

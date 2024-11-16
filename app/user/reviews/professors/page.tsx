@@ -5,8 +5,10 @@ import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
 import { useState } from 'react';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
+import { useFlexStyle } from '@/styles/styles';
 
 export default function Professors() {
+  const styles = useFlexStyle();
   const { data: reviewProfessorData, error: reviewProfessorError } = useSWR(
     '/api/users',
     apiFetcher
@@ -55,12 +57,10 @@ export default function Professors() {
 
   return (
     <>
-      <Box p={4}>
+      <Box p={4} bg={styles.bgColor} color={styles.color}>
         <Flex justify="space-between" align="center" mb={4} p={4}>
           <Stack direction="row" spacing={4} flex="1" maxW="50%" align="center">
-            <Text color="white" fontWeight="bold">
-              Filter:
-            </Text>
+            <Text fontWeight="bold">Filter:</Text>
 
             <FormControl>
               <FormLabel htmlFor="search" srOnly>
@@ -74,7 +74,8 @@ export default function Professors() {
                 value={searchValue}
                 onChange={handleInputChange}
                 paddingX={4}
-                _placeholder={{ color: 'gray.400' }}
+                bg={styles.cardBg}
+                color={styles.color}
               />
             </FormControl>
           </Stack>
@@ -82,12 +83,12 @@ export default function Professors() {
       </Box>
       {/* Table Header */}
       <Flex
-        bg="gray.50"
+        bg={styles.cardBg}
         p={2}
         borderRadius="md"
         justify="space-between"
         fontWeight="bold"
-        color="black"
+        color={styles.cardColor}
         align="center"
       >
         <Text flex="1" textAlign="left">
@@ -113,8 +114,8 @@ export default function Professors() {
       {/* Scrollable Stack Container */}
       {!hasReviews ? (
         <>
-          <Box mt={4} p={4} bg="gray.100" borderRadius="md">
-            <Text color="gray.500" fontSize="lg" textAlign="center">
+          <Box mt={4} p={4} bg={styles.cardBg} borderRadius="md">
+            <Text color={styles.cardColor} fontSize="lg" textAlign="center">
               No professor reviews added yet.
             </Text>
           </Box>
@@ -130,38 +131,45 @@ export default function Professors() {
                 width: '6px',
               },
               '&::-webkit-scrollbar-track': {
-                background: '#f1f1f1',
+                background: styles.bgColor,
               },
               '&::-webkit-scrollbar-thumb': {
-                backgroundColor: '#888',
+                backgroundColor: styles.borderColor,
                 borderRadius: '10px',
               },
               '&::-webkit-scrollbar-thumb:hover': {
-                background: '#555',
+                background: styles.hoverBg,
               },
             }}
           >
             <Stack spacing={4}>
               {filteredReviews.map((review, index) => (
-                <Box key={index} borderWidth="1px" borderRadius="lg" padding={4} bg="gray.50">
+                <Box
+                  key={index}
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  padding={4}
+                  bg={styles.cardBg}
+                  _hover={{ bg: styles.hoverBg }}
+                >
                   <Flex justify="space-between" align="center">
                     {/* Professor Name */}
-                    <Text flex="1" color="black" m={1}>
+                    <Text flex="1" color={styles.color} m={1}>
                       {review.professor_name}
                       {`${review.ProfessorCourse?.Professor?.first_name} ${review.ProfessorCourse?.Professor?.last_name}`}
                     </Text>
                     {/* Course Code */}
-                    <Text flex="1" color="black" m={1}>
+                    <Text flex="1" color={styles.color} m={1}>
                       {review.ProfessorCourse?.Course?.course_code}
                     </Text>
 
                     {/* Truncated Review */}
-                    <Text flex="2" color="black" isTruncated m={1}>
+                    <Text flex="2" color={styles.color} isTruncated m={1}>
                       {review.comment}
                     </Text>
 
                     {/* Average Rating */}
-                    <Text flex="1" color="black" m={1} textAlign="center">
+                    <Text flex="1" color={styles.color} m={1} textAlign="center">
                       {review.rating?.toFixed(1)} / 5
                     </Text>
 
