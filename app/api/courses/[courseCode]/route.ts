@@ -10,7 +10,7 @@ import CourseDetail from '@/database/models/CourseDetail';
 import CourseTerm from '@/database/models/CourseTerm';
 
 // ===== API ROUTE TO FETCH COURSE BY COURSE CODE =====
-export const GET = withApiAuthRequired(async function get_course_by_course_code(
+export const GET = async function get_course_by_course_code(
   req: NextRequest
 ): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/courses/[courseCode]/route.ts' });
@@ -84,7 +84,7 @@ export const GET = withApiAuthRequired(async function get_course_by_course_code(
       { status: 500 }
     );
   }
-});
+};
 
 // ===== API ROUTE TO DELETE COURSE BY COURSE CODE =====
 export const DELETE = withApiAuthRequired(async function delete_course_by_course_code(

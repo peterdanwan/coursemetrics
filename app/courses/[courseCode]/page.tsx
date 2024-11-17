@@ -22,6 +22,7 @@ import {
   StackDivider,
   useDisclosure,
   Spinner,
+  Link,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
 import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
@@ -33,6 +34,7 @@ import { useFlexStyle } from '@/styles/styles';
 import { getFirstFiveComments } from '@/utils/funcs';
 import { ReviewEvaluator } from '@/utils/ai';
 import RatingIcons from '@/components/RatingIcons';
+import useFetchUser from '@/components/useFetchUser';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -91,6 +93,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [sections, setSections] = useState<ICourse[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
+  const { user, loading, error } = useFetchUser();
 
   // Get year and season from query params, with fallback to current values
   const year = searchParams.get('year') || null;
@@ -125,7 +128,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
   useEffect(() => {
     if (courseResponse) {
-      const coursesArray = courseResponse.data.courses;
+      const coursesArray = courseResponse.data?.courses;
       setCourses(coursesArray);
 
       // Extract unique terms
@@ -375,16 +378,32 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>
-                  <Button
-                    colorScheme="teal"
-                    variant="solid"
-                    size="lg"
-                    alignSelf="flex-end"
-                    mt={5}
-                    onClick={onCourseReviewFormOpen}
-                  >
-                    Add a Review
-                  </Button>
+                  {loading ? (
+                    <Spinner /> // Or whatever loading indicator you prefer
+                  ) : user && user.role_id === 2 ? (
+                    <Button
+                      colorScheme="teal"
+                      variant="solid"
+                      size="lg"
+                      alignSelf="flex-end"
+                      mt={5}
+                      onClick={onCourseReviewFormOpen}
+                    >
+                      Add a Review
+                    </Button>
+                  ) : (
+                    <Text color={flexStyle.color} alignSelf="flex-end" mt={5}>
+                      Please{' '}
+                      <Link
+                        href="/api/auth/login"
+                        color={flexStyle.headingColor}
+                        _hover={{ color: flexStyle.requiredColor }}
+                      >
+                        sign in
+                      </Link>{' '}
+                      as a student to add a review
+                    </Text>
+                  )}
                   <CourseReviewForm
                     isOpen={isCourseReviewFormOpen}
                     onClose={onCourseReviewFormClose}

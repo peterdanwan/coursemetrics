@@ -21,14 +21,6 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
   try {
     await connectDB();
 
-    const { user }: any = await getSession();
-    if (!user) {
-      log.warn('User not authenticated');
-      return NextResponse.json(createErrorResponse(401, 'User not authenticated'), { status: 401 });
-    }
-
-    log.info(`Fetching reviews for user with email: ${user.email}`);
-
     const reviews = await Review.findAll({
       include: [
         {
