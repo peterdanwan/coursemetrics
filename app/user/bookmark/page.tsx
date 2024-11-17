@@ -128,7 +128,12 @@ const Bookmark = () => {
       margin="0 auto"
       p={{ base: '3', sm: '3', md: '3', lg: '5' }}
     >
-      <Heading as="h1" color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }} pb={4}>
+      <Heading
+        as="h1"
+        color={flexStyle.headingColor}
+        fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+        pb={4}
+      >
         My Bookmarked Reviews
       </Heading>
       <Flex
