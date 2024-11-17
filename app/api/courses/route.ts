@@ -13,9 +13,7 @@ import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
 
 // ===== API ROUTE TO FETCH ALL COURSES =====
-export const GET = withApiAuthRequired(async function get_courses(
-  req: NextRequest
-): Promise<NextResponse> {
+export const GET = async function get_courses(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/courses/route.ts' });
 
   try {
@@ -92,7 +90,7 @@ export const GET = withApiAuthRequired(async function get_courses(
       { status: 500 }
     );
   }
-});
+};
 
 // ===== API ROUTE TO CREATE A NEW COURSE =====
 export const POST = withApiAuthRequired(async function create_course(

@@ -23,12 +23,6 @@ export const GET = async function fetch_reviews_by_course_code(
   try {
     await connectDB();
 
-    const { user }: any = await getSession();
-
-    if (!user) {
-      log.warn('User not authenticated');
-    }
-
     const url = new URL(req.url);
 
     const courseCode = url.pathname.split('/').pop();

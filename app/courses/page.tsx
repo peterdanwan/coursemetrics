@@ -44,13 +44,7 @@ interface ICourse {
 
 function getURL(page: string | null, limit: string) {
   let url: string;
-
-  if (page) {
-    url = `/api/courses?page=${page}&limit=${limit}`;
-  } else {
-    url = `/api/courses`;
-  }
-
+  url = `/api/courses`;
   return url;
 }
 
@@ -64,10 +58,11 @@ export default function CoursesPage() {
   const coursesURL = getURL(page, limit);
 
   const { data: coursesResponse, error } = useSWR(coursesURL, apiFetcher);
+  console.log('Course Resoonse in Courses page', coursesResponse);
 
   useEffect(() => {
     if (coursesResponse) {
-      const coursesArray = coursesResponse.data.courses;
+      const coursesArray = coursesResponse?.data.courses || [];
 
       // Group courses by course_code
       const groupedCourses = coursesArray.reduce(

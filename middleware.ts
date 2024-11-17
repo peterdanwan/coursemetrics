@@ -8,5 +8,5 @@ export default withMiddlewareAuthRequired();
 
 export const config = {
   // These routes are protected from unauthenticated users
-  matcher: ['/courses/:path*'],
+  matcher: ['/admin/:path*'],
 };

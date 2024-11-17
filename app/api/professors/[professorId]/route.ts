@@ -11,7 +11,7 @@ import ProfessorCourse from '@/database/models/ProfessorCourse';
 import CourseTerm from '@/database/models/CourseTerm';
 import { Op } from 'sequelize';
 
-export const GET = withApiAuthRequired(async function get_professor_by_professor_id(
+export const GET = async function get_professor_by_professor_id(
   req: NextRequest
 ): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/professors/[professorId]/route.ts' });
@@ -56,7 +56,7 @@ export const GET = withApiAuthRequired(async function get_professor_by_professor
       { status: 500 }
     );
   }
-});
+};
 
 export const DELETE = withApiAuthRequired(async function delete_professor_by_professor_id(
   req: NextRequest
