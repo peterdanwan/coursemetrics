@@ -1,5 +1,6 @@
 // app/api/reviews/[reviewId]/route.ts
 import { NextResponse, NextRequest } from 'next/server';
+import { withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { getSession } from '@auth0/nextjs-auth0';
 import { connectDB } from '@/database/connectDB';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
@@ -160,3 +161,37 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
     );
   }
 };
+
+export const DELETE = withApiAuthRequired(async function delete_review_by_review_id(
+  req: NextRequest
+): Promise<NextResponse> {
+  const log = logger.child({ module: 'app/api/reviews/[reviewId]/route.ts' });
+
+  try {
+    await connectDB();
+    const url = new URL(req.url);
+
+    const reviewId = url.pathname.split('/').pop();
+
+    const review = await Review.findByPk(reviewId);
+
+    if (!review) {
+      log.warn('Review not found', { reviewId: reviewId });
+      return NextResponse.json(createErrorResponse(404, 'Review not found'), { status: 404 });
+    }
+
+    await review.destroy();
+
+    log.info('Review deleted successfully', { reviewId: reviewId });
+    return NextResponse.json(createSuccessResponse({ message: 'Review deleted successfully' }), {
+      status: 200,
+    });
+  } catch (error: unknown) {
+    console.error(error);
+    log.error('Error deleting review by review id', { error });
+    return NextResponse.json(
+      createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
+      { status: 500 }
+    );
+  }
+});
