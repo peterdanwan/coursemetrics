@@ -1,3 +1,4 @@
+// components/Rating.tsx
 import { Box, UseRadioProps, useRadio } from '@chakra-ui/react';
 
 interface InputProps extends UseRadioProps {

@@ -1,3 +1,4 @@
+// components/RatingScale.tsx
 import { Controller } from 'react-hook-form';
 import React from 'react';
 import {
@@ -5,7 +6,6 @@ import {
   HStack,
   FormControl,
   FormLabel,
-  RadioGroup,
   FormErrorMessage,
   Text,
 } from '@chakra-ui/react';
@@ -19,24 +19,46 @@ interface RatingScaleProps {
   ratingName: string;
   defaultValue: string;
   control: any;
+  question_id: string;
 }
+
+const RatingGroup: React.FC<{
+  name: string;
+  value: string;
+  onChange: (value: string) => void;
+  question_id: string;
+}> = ({ name, value, onChange, question_id }) => {
+  const ratingOptions = ['1', '2', '3', '4', '5'];
+
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name,
+    value,
+    onChange,
+  });
+
+  const group = getRootProps();
+
+  return (
+    <HStack {...group} spacing={4}>
+      {ratingOptions.map((optionValue) => {
+        const radio = getRadioProps({ value: optionValue });
+        return (
+          <Rating key={`${question_id}-${optionValue}`} {...radio}>
+            {optionValue}
+          </Rating>
+        );
+      })}
+    </HStack>
+  );
+};
 
 const RatingScale: React.FC<RatingScaleProps> = ({
   index,
   fieldErrors,
   question_text,
-  ratingName,
-  defaultValue,
   control,
+  question_id,
 }) => {
-  const ratingOptions = ['1', '2', '3', '4', '5'];
-
-  const { getRootProps, getRadioProps } = useRadioGroup({
-    name: ratingName,
-    defaultValue: defaultValue,
-  });
-
-  const radioGroup = getRootProps();
   return (
     <FormControl
       key={index}
@@ -49,29 +71,21 @@ const RatingScale: React.FC<RatingScaleProps> = ({
           (Required)
         </Text>
       </FormLabel>
-      <RadioGroup name={ratingName}>
-        <Controller
-          name={ratingName}
-          control={control}
-          rules={{ required: 'This rating is required' }}
-          render={({ field }) => {
-            return (
-              <HStack {...radioGroup} onChange={field.onChange}>
-                {ratingOptions.map((value) => {
-                  const radio = getRadioProps({
-                    value,
-                  });
-                  return (
-                    <Rating key={value} {...radio} id={ratingName} name={ratingName} value={value}>
-                      {value}
-                    </Rating>
-                  );
-                })}
-              </HStack>
-            );
-          }}
-        />
-      </RadioGroup>
+      <Controller
+        name={`questions.${index}.answer`}
+        control={control}
+        rules={{ required: 'This field is required' }}
+        render={({ field }) => {
+          return (
+            <RatingGroup
+              name={`rating-${question_id}`}
+              value={field.value}
+              onChange={field.onChange}
+              question_id={question_id}
+            />
+          );
+        }}
+      />
       <FormErrorMessage>{fieldErrors && fieldErrors.message}</FormErrorMessage>
     </FormControl>
   );
