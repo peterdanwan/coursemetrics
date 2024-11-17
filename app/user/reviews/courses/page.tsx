@@ -33,7 +33,7 @@ export default function Courses() {
         isClosable: true,
       });
 
-      mutate('/api/reviews');
+      mutate('/api/users');
     } catch (error) {
       console.error(error);
     }
