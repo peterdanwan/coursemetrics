@@ -1,69 +1,115 @@
-// app/api/professorCourses/[professorId]/route.ts
+// app/api/reviews/professors/[professorId]/route.ts
 
-// /api/reviews/professors/[professorId]
 import { NextResponse, NextRequest } from 'next/server';
+import { getSession } from '@auth0/nextjs-auth0';
 import { connectDB } from '@/database/connectDB';
 import { createSuccessResponse, createErrorResponse } from '@/utils';
-import Professor from '@/database/models/Professor';
 import Review from '@/database/models/Review';
 import User from '@/database/models/User';
-import Question from '@/database/models/Question';
 import ReviewQuestion from '@/database/models/ReviewQuestion';
 import ReviewAnswer from '@/database/models/ReviewAnswer';
-import { logger } from '@/utils';
-import { withApiAuthRequired } from '@auth0/nextjs-auth0';
-import Course from '@/database/models/Course';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
+import Professor from '@/database/models/Professor';
+import Question from '@/database/models/Question';
+import Course from '@/database/models/Course';
+import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
-import { Op } from 'sequelize';
 
-export const GET = withApiAuthRequired(async function get_reviews_by_professor_id(
+const processReviews = (data: any) => {
+  // Initialize the reviews and quickStats objects
+  const result = {
+    reviews: [],
+    quickStats: {
+      difficulty: 0,
+      knowledge: 0,
+      responsiveness: 0,
+      gradingFairness: 0,
+      engagement: 0,
+      clarity: 0,
+      totalReviews: 0, // To track the number of reviews with ratings
+    },
+  };
+
+  // Iterate through each review in the provided data
+  data.forEach((review) => {
+    // Filter out reviews where the ReviewAnswers array for all questions with is_rating=true is empty
+    const validReview = review.ReviewQuestions.some((reviewQuestion) => {
+      // Filter for questions with `is_rating: true` and non-empty answers
+      return (
+        reviewQuestion.ReviewAnswers.length > 0 && reviewQuestion.ReviewAnswers[0].answer !== null
+      );
+    });
+
+    if (validReview) {
+      result.quickStats.totalReviews++;
+      // Add to the reviews array
+      result.reviews.push(review);
+
+      // Iterate through the review's questions to calculate the quickStats
+      review.ReviewQuestions.forEach((reviewQuestion) => {
+        // We only care about questions that have `is_rating: true`
+        if (reviewQuestion.Question.is_rating && reviewQuestion.ReviewAnswers.length > 0) {
+          const answer = reviewQuestion.ReviewAnswers[0].answer;
+          const rating = parseFloat(answer); // Convert the answer to a float (assuming numeric rating)
+
+          if (!isNaN(rating)) {
+            switch (reviewQuestion.Question.question_text) {
+              case 'Difficulty':
+                result.quickStats.difficulty += rating;
+                break;
+              case 'Knowledge':
+                result.quickStats.knowledge += rating;
+                break;
+              case 'Responsiveness':
+                result.quickStats.responsiveness += rating;
+                break;
+              case 'Grading Fairness':
+                result.quickStats.gradingFairness += rating;
+                break;
+              case 'Engagement':
+                result.quickStats.engagement += rating;
+                break;
+              case 'Clarity':
+                result.quickStats.clarity += rating;
+                break;
+              default:
+                break;
+            }
+          }
+        }
+      });
+    }
+  });
+
+  // Calculate averages for quickStats
+  if (result.quickStats.totalReviews > 0) {
+    result.quickStats.difficulty /= result.quickStats.totalReviews;
+    result.quickStats.knowledge /= result.quickStats.totalReviews;
+    result.quickStats.responsiveness /= result.quickStats.totalReviews;
+    result.quickStats.gradingFairness /= result.quickStats.totalReviews;
+    result.quickStats.engagement /= result.quickStats.totalReviews;
+    result.quickStats.clarity /= result.quickStats.totalReviews;
+  }
+
+  return result;
+};
+
+export const GET = async function fetch_reviews_by_professor_id(
   req: NextRequest
 ): Promise<NextResponse> {
-  const log = logger.child({ module: 'app/api/professorCourses/[professorId]/route.ts' });
+  const log = logger.child({ module: 'app/api/reviews/professors/[professorId]/route.ts' });
 
   try {
     await connectDB();
+
     const url = new URL(req.url);
+
     const professorId = url.pathname.split('/').pop();
 
-    // Step 1: get professor by id
-    const professor = await Professor.findByPk(professorId);
-
-    if (!professor) {
-      log.warn('Professor not found', { professorId });
-      return NextResponse.json(createErrorResponse(404, 'Professor not found'), { status: 404 });
-    }
-
-    // Step 2: get all the courses taught by that professor
-    const professorCourses = await ProfessorCourse.findAll({
-      where: { professor_id: professorId },
-      include: {
-        model: Course, // Join with the Course model
-        attributes: ['course_id', 'course_code', 'course_section'], // Select relevant fields from Course
-        include: [
-          {
-            model: CourseTerm, // Join with the CourseTerm model
-            attributes: ['season', 'year'], // Select season and year fields
-          },
-        ],
-      },
-    });
-
-    log.debug({ professorCourses }, 'professorCourses teehee');
-
-    // Get a set of all the professorCourseIDs related to professorId
-    const professorCourseIds = professorCourses.map((professorCourse: any) => {
-      return professorCourse.professor_course_id;
-    });
-
-    log.debug({ professorCourseIds }, 'professorCourseIds');
-
-    // Step 3: for each professorCourse
     const reviews = await Review.findAll({
       where: {
-        review_type_id: 2, // Reviews about the professor
-        review_status_id: 2, // Accepted reviews
+        review_type_id: 2,
+        review_status_id: 2,
       },
       include: [
         {
@@ -79,61 +125,49 @@ export const GET = withApiAuthRequired(async function get_reviews_by_professor_i
             },
             {
               model: Question,
-              attributes: ['question_text'],
+              attributes: ['question_text', 'is_rating'],
             },
           ],
-          attributes: ['review_question_id', 'question_id'],
+          attributes: ['review_question_id'],
         },
-        // {
-        //   model: ProfessorCourse,
-        //   required: true,
-        //   include: [
-        //     {
-        //       model: Professor,
-        //       as: 'Professor',
-        //       attributes: ['first_name', 'last_name'],
-        //     },
-        //     {
-        //       model: Course,
-        //       where: { course_code: courseCode },
-        //       include: [
-        //         {
-        //           model: CourseTerm,
-        //           where:
-        //             Object.keys(courseTermConditions).length > 0 ? courseTermConditions : undefined,
-        //         },
-        //       ],
-        //     },
-        //   ],
-        // },
+        {
+          model: ProfessorCourse,
+          required: true,
+          attributes: ['professor_course_id'],
+          include: [
+            {
+              model: Professor,
+              where: {
+                professor_id: professorId,
+              },
+              attributes: ['first_name', 'last_name'],
+            },
+            {
+              model: Course,
+              attributes: ['course_code'],
+              include: [
+                {
+                  model: CourseTerm,
+                },
+              ],
+            },
+          ],
+        },
       ],
     });
 
-    log.debug({ reviews }, 'Reviews Vinh');
+    const processedReviews = processReviews(reviews);
 
-    const filteredReviews = professorCourseIds
-      .map((professorCourseId: any) =>
-        reviews.filter((review: any) => review.professor_course_id === professorCourseId)
-      )
-      .filter((reviews: any) => reviews.length > 0)
-      .flat();
+    log.error(processedReviews, 'Reviews fetched from DB');
 
-    // const new_filteredReviews = filteredReviews.filter(review => professorCourseIds.has(review.professor_course_id));
-
-    log.debug({ filteredReviews }, 'Filtered Reviews');
-
-    return NextResponse.json(
-      createSuccessResponse({ professor, professorCourses, reviews: filteredReviews }),
-      {
-        status: 200,
-      }
-    );
-  } catch (error: unknown) {
+    return NextResponse.json(createSuccessResponse(processedReviews), { status: 200 });
+  } catch (error) {
     console.error(error);
-    log.error('Error getting professor by professorId', { error });
+
+    log.error('Error fetching reviews for professor', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
       { status: 500 }
     );
   }
-});
+};
