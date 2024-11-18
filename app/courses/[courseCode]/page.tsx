@@ -90,10 +90,41 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [course, setCourse] = useState<ICourse | null>(null);
   const [terms, setTerms] = useState<ICourseTerm[]>([]);
   const [reviews, setReviews]: any = useState(null);
+  const [courseAverageRating, setCourseAverageRating] = useState<number>(0);
+  const [quickStats, setQuickStats]: any = useState(null);
   const [sections, setSections] = useState<ICourse[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const { user, loading, error } = useFetchUser();
+
+  const calculateAverageRating = (data: any) => {
+    // Extract the rating fields and sum them
+    const ratingFields = [
+      'contentQuality',
+      'courseLoad',
+      'courseStructure',
+      'difficulty',
+      'evaluationFairness',
+      'materialRelevance',
+    ];
+
+    let totalRating = 0;
+    let ratingCount = 0;
+
+    // Loop through each rating field and sum the values
+    ratingFields.forEach((field) => {
+      if (data[field] !== undefined) {
+        totalRating += data[field];
+        ratingCount++;
+      }
+    });
+
+    // Calculate the average rating
+    const averageRating = totalRating / ratingCount;
+
+    // Return the average rating
+    return Math.round(averageRating * 100) / 100;
+  };
 
   // Get year and season from query params, with fallback to current values
   const year = searchParams.get('year') || null;
@@ -184,24 +215,27 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     const fetchTags = async () => {
       console.log(reviewResponse);
       if (reviewResponse && reviewResponse.status === 'ok') {
-        if (Array.isArray(reviewResponse.data)) {
-          const reviewsFromDB = reviewResponse.data;
+        if (Array.isArray(reviewResponse.data.reviews)) {
+          const reviewsFromDB = reviewResponse.data.reviews;
           const sortedReviews = [...reviewsFromDB].sort(
             (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
           );
 
           setReviews(sortedReviews);
+          setQuickStats(reviewResponse.data.quickStats);
+          const averageRating = calculateAverageRating(reviewResponse.data.quickStats);
+          setCourseAverageRating(averageRating);
+          // const reviewEvaluator = new ReviewEvaluator();
 
-          const reviewEvaluator = new ReviewEvaluator();
+          // const dynamicTags = await reviewEvaluator.generateTags(
+          //   getFirstFiveComments(reviewsFromDB)
+          // );
 
-          const dynamicTags = await reviewEvaluator.generateTags(
-            getFirstFiveComments(reviewResponse.data)
-          );
+          // const uniqueTags = Array.from(new Set(dynamicTags.tags));
+          // const topUniqueTags = uniqueTags.slice(0, 5);
 
-          const uniqueTags = Array.from(new Set(dynamicTags.tags));
-          const topUniqueTags = uniqueTags.slice(0, 5);
-
-          setTags(topUniqueTags);
+          // setTags(topUniqueTags);
+          setTags(['Jeremy Goat', 'Mimi Daaaang']);
         } else {
           setReviews([]);
         }
@@ -291,7 +325,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                       {/* <Box color="red.500">
                         <FaHeart size={25} />
                       </Box> */}
-                      <Text>4.5/5</Text>
+                      <Text>{courseAverageRating}/5</Text>
                     </Flex>
                   </Box>
                 </Flex>
@@ -426,31 +460,57 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
                 <Grid templateColumns="repeat(2, 1fr)" gap={2}>
                   <GridItem>
-                    <Text as="b">Difficulty:</Text>
+                    <Text as="b">Content Quality:</Text>
                   </GridItem>
                   <GridItem>
-                    <RatingIcons rating="3" iconSize={8} color="teal.200" />
+                    <RatingIcons rating={quickStats.contentQuality} iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
                     <Text as="b">Course Load:</Text>
                   </GridItem>
                   <GridItem>
-                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
+                    <RatingIcons rating={quickStats.courseLoad} iconSize={8} color="teal.200" />
                   </GridItem>
 
                   <GridItem>
-                    <Text as="b">Average Grade:</Text>
+                    <Text as="b">Course Structure:</Text>
                   </GridItem>
                   <GridItem>
-                    <RatingIcons rating="4" iconSize={8} color="teal.200" />
+                    <RatingIcons
+                      rating={quickStats.courseStructure}
+                      iconSize={8}
+                      color="teal.200"
+                    />
                   </GridItem>
 
                   <GridItem>
-                    <Text as="b">Would Take Again:</Text>
+                    <Text as="b">Difficulty:</Text>
                   </GridItem>
                   <GridItem>
-                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
+                    <RatingIcons rating={quickStats.difficulty} iconSize={8} color="teal.200" />
+                  </GridItem>
+
+                  <GridItem>
+                    <Text as="b">Evaluation Fairness:</Text>
+                  </GridItem>
+                  <GridItem>
+                    <RatingIcons
+                      rating={quickStats.evaluationFairness}
+                      iconSize={8}
+                      color="teal.200"
+                    />
+                  </GridItem>
+
+                  <GridItem>
+                    <Text as="b">Material Relevance:</Text>
+                  </GridItem>
+                  <GridItem>
+                    <RatingIcons
+                      rating={quickStats.materialRelevance}
+                      iconSize={8}
+                      color="teal.200"
+                    />
                   </GridItem>
                 </Grid>
               </CardBody>
