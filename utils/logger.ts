@@ -15,5 +15,5 @@ export const logger: Logger =
             colorize: true,
           },
         },
-        level: 'debug',
+        level: 'error',
       });

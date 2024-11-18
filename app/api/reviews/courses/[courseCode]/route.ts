@@ -14,6 +14,86 @@ import Question from '@/database/models/Question';
 import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
+import { Op } from 'sequelize';
+
+const processReviews = (data: any) => {
+  // Initialize the reviews and quickStats objects
+  const result = {
+    reviews: [],
+    quickStats: {
+      difficulty: 0,
+      courseStructure: 0,
+      courseLoad: 0,
+      evaluationFairness: 0,
+      contentQuality: 0,
+      materialRelevance: 0,
+      totalReviews: 0, // To track the number of reviews with ratings
+    },
+  };
+
+  // Iterate through each review in the provided data
+  data.forEach((review) => {
+    // Filter out reviews where the ReviewAnswers array for all questions with is_rating=true is empty
+    const validReview = review.ReviewQuestions.some((reviewQuestion) => {
+      // Filter for questions with `is_rating: true` and non-empty answers
+      return (
+        reviewQuestion.ReviewAnswers.length > 0 && reviewQuestion.ReviewAnswers[0].answer !== null
+      );
+    });
+
+    if (validReview) {
+      result.quickStats.totalReviews++;
+      // Add to the reviews array
+      result.reviews.push(review);
+
+      // Iterate through the review's questions to calculate the quickStats
+      review.ReviewQuestions.forEach((reviewQuestion) => {
+        // We only care about questions that have `is_rating: true`
+        if (reviewQuestion.Question.is_rating && reviewQuestion.ReviewAnswers.length > 0) {
+          const answer = reviewQuestion.ReviewAnswers[0].answer;
+          const rating = parseFloat(answer); // Convert the answer to a float (assuming numeric rating)
+
+          if (!isNaN(rating)) {
+            switch (reviewQuestion.Question.question_text) {
+              case 'Difficulty':
+                result.quickStats.difficulty += rating;
+                break;
+              case 'Course Structure':
+                result.quickStats.courseStructure += rating;
+                break;
+              case 'Course Load':
+                result.quickStats.courseLoad += rating;
+                break;
+              case 'Evaluation Fairness':
+                result.quickStats.evaluationFairness += rating;
+                break;
+              case 'Content Quality':
+                result.quickStats.contentQuality += rating;
+                break;
+              case 'Material Relevance':
+                result.quickStats.materialRelevance += rating;
+                break;
+              default:
+                break;
+            }
+          }
+        }
+      });
+    }
+  });
+
+  // Calculate averages for quickStats
+  if (result.quickStats.totalReviews > 0) {
+    result.quickStats.difficulty /= result.quickStats.totalReviews;
+    result.quickStats.courseStructure /= result.quickStats.totalReviews;
+    result.quickStats.courseLoad /= result.quickStats.totalReviews;
+    result.quickStats.evaluationFairness /= result.quickStats.totalReviews;
+    result.quickStats.contentQuality /= result.quickStats.totalReviews;
+    result.quickStats.materialRelevance /= result.quickStats.totalReviews;
+  }
+
+  return result;
+};
 
 export const GET = async function fetch_reviews_by_course_code(
   req: NextRequest
@@ -40,7 +120,6 @@ export const GET = async function fetch_reviews_by_course_code(
     const reviews = await Review.findAll({
       where: {
         review_type_id: 1,
-
         review_status_id: 2,
       },
       include: [
@@ -57,14 +136,15 @@ export const GET = async function fetch_reviews_by_course_code(
             },
             {
               model: Question,
-              attributes: ['question_text'],
+              attributes: ['question_text', 'is_rating'],
             },
           ],
-          attributes: ['review_question_id', 'question_id'],
+          attributes: ['review_question_id'],
         },
         {
           model: ProfessorCourse,
           required: true,
+          attributes: ['professor_course_id'],
           include: [
             {
               model: Professor,
@@ -87,14 +167,11 @@ export const GET = async function fetch_reviews_by_course_code(
       ],
     });
 
-    log.debug(
-      {
-        reviews,
-      },
-      'Reviews fetched from DB'
-    );
+    const processedReviews = processReviews(reviews);
 
-    return NextResponse.json(createSuccessResponse(reviews), { status: 200 });
+    log.error(processedReviews, 'Reviews fetched from DB');
+
+    return NextResponse.json(createSuccessResponse(processedReviews), { status: 200 });
   } catch (error) {
     console.error(error);
 
