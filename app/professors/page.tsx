@@ -14,6 +14,7 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
   Text,
+  Spinner,
 } from '@chakra-ui/react';
 import ProfessorCard from '@/components/ProfessorCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
@@ -47,7 +48,13 @@ export default function ProfessorsPage() {
   }, [professorsResponse]);
 
   if (error) return <Text>Error loading courses</Text>;
-  if (!professorsResponse) return <Text>Loading professors...</Text>;
+  if (!professorsResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading professors...
+      </div>
+    );
 
   return (
     <>

@@ -14,6 +14,7 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
   Text,
+  Spinner,
 } from '@chakra-ui/react';
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
@@ -82,8 +83,13 @@ export default function CoursesPage() {
   }, [coursesResponse]);
 
   if (error) return <Text>Error loading courses</Text>;
-  if (!coursesResponse) return <Text>Loading courses...</Text>;
-
+  if (!coursesResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading courses...
+      </div>
+    );
   const uniqueCourseCodes = Object.keys(groupedCourses);
   const displayedCourseCodes = uniqueCourseCodes;
 
