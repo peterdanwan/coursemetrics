@@ -1,8 +1,11 @@
-// import { useState, useEffect, useRef } from 'react';
+// components/CourseReview.tsx
+'use client';
 import { Grid, GridItem, Heading, Box, Text, Button, Flex, useDisclosure } from '@chakra-ui/react';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import ReviewDetailModal from './ReviewDetailModal';
 import RatingIcons from './RatingIcons';
+import { useState, useEffect } from 'react';
+import { toggleReviewBookmark, isReviewBookmarked } from '@/utils/localStorageHelpers';
 
 export default function CourseReview({ review }: { review: any }) {
   const {
@@ -10,6 +13,17 @@ export default function CourseReview({ review }: { review: any }) {
     onOpen: onReviewDetailOpen,
     onClose: onReviewDetailClose,
   } = useDisclosure();
+
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  useEffect(() => {
+    setIsBookmarked(isReviewBookmarked(review.review_id));
+  }, [review.review_id]);
+
+  const handleToggleBookmark = () => {
+    const updatedBookmarkState = toggleReviewBookmark(review.review_id);
+    setIsBookmarked(updatedBookmarkState);
+  };
 
   return (
     <Box key={review.review_id} p={{ base: '2', lg: '3' }}>
@@ -22,8 +36,8 @@ export default function CourseReview({ review }: { review: any }) {
         >
           {review.title}
         </Heading>
-        <Box color="teal">
-          {review.bookmark ? <FaBookmark size={25} /> : <FaRegBookmark size={25} />}
+        <Box color="teal" onClick={handleToggleBookmark} cursor="pointer">
+          {isBookmarked ? <FaBookmark size={25} /> : <FaRegBookmark size={25} />}
         </Box>
       </Flex>
 
