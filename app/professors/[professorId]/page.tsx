@@ -1,8 +1,8 @@
-// app/courses/[courseCode]/page.tsx
+// app/professors/[professorId]/page.tsx
 
 'use client';
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import {
   Grid,
   GridItem,
@@ -28,6 +28,7 @@ import { FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
 import ProfReviewForm from '@/components/ProfReviewForm';
+import ProfessorReview from '@/components/ProfessorReview';
 
 import { useFlexStyle } from '@/styles/styles';
 import RatingIcons from '@/components/RatingIcons';
@@ -63,80 +64,88 @@ interface ICourse {
   CourseTerm: ICourseTerm;
 }
 
-// function getURL(
-//   apiRoute: string,
-//   season: string | null,
-//   year: string | null,
-//   professorId: string | null
-// ) {
-//   let url: string;
-//   if (year && season) {
-//     url = `/api/${apiRoute}/${professorId}?year=${year}&season=${season}`;
-//   } else if (year) {
-//     url = `/api/${apiRoute}/${professorId}?year=${year}`;
-//   } else if (season) {
-//     url = `/api/${apiRoute}/${professorId}?season=${season}`;
-//   } else {
-//     url = `/api/${apiRoute}/${professorId}`;
-//   }
-
-//   return url;
-// }
-
-// function getAllProfessorsURL() {
-//   return `/api/professors`;
-// }
-
 export default function ProfessorPage({ params }: { params: { professorId: string } }) {
   const flexStyle = useFlexStyle();
   const professorId = params.professorId.toUpperCase();
-  const [profCourses, setProfCourses] = useState<ICourse[]>([]);
-  const [professor, setProfessor] = useState<IProfessor | null>(null);
+  const [profCourses, setProfCourses] = useState<any>(null);
+  const [professor, setProfessor] = useState<any>(null);
+  const [reviews, setReviews] = useState<any>(null);
+  const [uniqueCourseCodes, setUniqueCourseCodes] = useState<any>(null);
+  const [quickStats, setQuickStats] = useState<any>(null);
 
   // For review form modal
   const {
-    isOpen: isCourseReviewFormOpen,
-    onOpen: onCourseReviewFormOpen,
-    onClose: onCourseReviewFormClose,
+    isOpen: isProfReviewFormOpen,
+    onOpen: onProfReviewFormOpen,
+    onClose: onProfReviewFormClose,
   } = useDisclosure();
 
   const professorURL = `/api/professors/${professorId}`;
 
-  const professorReviewsByProfessorID = `/api/reviews/professors/${professorId}`; //
+  const profReviewsByProfIdURL = `/api/reviews/professors/${professorId}`; //
 
   const { data: professorResponse, error: professorResponseError } = useSWR(
-    professorReviewsByProfessorID,
+    professorURL,
+    apiFetcher
+  );
+
+  const { data: professorReviewsResponse, error: professorReviewsResponseError } = useSWR(
+    profReviewsByProfIdURL,
     apiFetcher
   );
 
   useEffect(() => {
     if (professorResponse && professorResponse.status === 'ok') {
-      const { professor, professorCourses } = professorResponse.data;
-      setProfessor(professor);
-      setProfCourses(professorCourses);
-      console.log(professorResponse.data);
+      const { professor: profFromDB, professorCourses: profCoursesFromDB } = professorResponse.data;
+      setProfessor(profFromDB);
+      setProfCourses(profCoursesFromDB);
+
+      console.log(professorResponse);
+
+      console.log(profFromDB);
+      console.log(profCoursesFromDB);
+
+      // Set course tags
+      // let courseCodes = profCoursesFromDB?.map((course: any) => course.Course.course_code);
+      // let uniqueCourseCodesSet: Set<string> = new Set(courseCodes);
+      // // console.log(uniqueCourseCodesSet);
+      // // console.log(Array.from(uniqueCourseCodesSet));
+
+      const uniqueCourseCodes = Array.from(
+        new Set(profCoursesFromDB?.map((course: any) => course.Course.course_code))
+      );
+      setUniqueCourseCodes(uniqueCourseCodes);
     }
   }, [professorResponse]);
 
-  // const reviewsURL = course
-  //   ? getURL('reviews', course.CourseTerm.season, course.CourseTerm.year.toString(), courseCode)
-  //   : null;
+  useEffect(() => {
+    if (!isProfReviewFormOpen) mutate(profReviewsByProfIdURL);
 
-  // const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
+    if (professorReviewsResponse && professorReviewsResponse.status === 'ok') {
+      const { quickStats: quickStatsFromDB, reviews: profReviewsFromDB } =
+        professorReviewsResponse.data;
 
-  // useEffect(() => {
-  //   if (reviewResponse) {
-  //     if (Array.isArray(reviewResponse.data)) {
-  //       setReviews(reviewResponse.data);
-  //     } else {
-  //       setReviews([]);
-  //     }
-  //   }
-  // }, [reviewResponse]);
+      setReviews(profReviewsFromDB);
+      setQuickStats(quickStatsFromDB);
+      console.log(professorReviewsResponse.data);
+    }
+  }, [professorReviewsResponse, isProfReviewFormOpen, profReviewsByProfIdURL]);
 
-  // const toggleExpandedReview = (reviewId: number) => {
-  //   setExpandedReviewId((prevId) => (prevId === reviewId ? -1 : reviewId));
-  // };
+  // Hide page's scrollbar when form modal is open:
+  useEffect(() => {
+    if (isProfReviewFormOpen) {
+      // Hide page scrollbar when modal is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore page scrollbar when modal is closed
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup to restore scroll behavior when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isProfReviewFormOpen]);
 
   return (
     <>
@@ -177,26 +186,29 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
               </CardHeader>
             </Card>
           </GridItem>
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="orange.400" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
-                  Courses
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <List listStyleType="none">
-                  <Flex wrap="wrap" gap={5}>
-                    {profCourses.map((course, index) => (
-                      <ListItem key={index}>
-                        <Tag colorScheme="orange">{course.course_code}</Tag>
-                      </ListItem>
-                    ))}
-                  </Flex>
-                </List>
-              </CardBody>
-            </Card>
-          </GridItem>
+          {uniqueCourseCodes && uniqueCourseCodes.length && (
+            <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
+              <Card>
+                <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+                  <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                    Courses
+                  </Heading>
+                </CardHeader>
+                <CardBody p={{ base: '3', sm: '3', md: '3' }}>
+                  <List listStyleType="none">
+                    <Flex wrap="wrap" gap={5}>
+                      {uniqueCourseCodes.map((courseTag: any, index: number) => (
+                        <ListItem key={index}>
+                          <Tag colorScheme="orange">{courseTag}</Tag>
+                        </ListItem>
+                      ))}
+                    </Flex>
+                  </List>
+                </CardBody>
+              </Card>
+            </GridItem>
+          )}
+
           {/* Professor Reviews Section: make it scrollable too see more reviews */}
           <GridItem
             gridColumn={{ base: 'span 12', md: 'span 8' }}
@@ -226,21 +238,22 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex direction="column" gap={5}>
-                  <Stack divider={<StackDivider />} height="700px" overflowY="scroll" spacing="4">
-                    {/**** Course Review Component starts here ****/}
+                  <Stack
+                    divider={<StackDivider />}
+                    height="700px"
+                    overflowY="scroll"
+                    spacing="4"
+                    key={isProfReviewFormOpen ? 'form-open' : 'form-closed-refresh'}
+                  >
+                    {/**** Prof Review Component starts here ****/}
                     {/* Check if reviews array exist before calling .map */}
-                    {/* {Array.isArray(reviews) ? (
+                    {Array.isArray(reviews) ? (
                       reviews.map((review: any, index: number) => (
-                        <CourseReview
-                          key={index}
-                          review={review}
-                          expandedReviewId={expandedReviewId}
-                          toggleExpandedReview={toggleExpandedReview}
-                        />
+                        <ProfessorReview key={index} review={review} />
                       ))
                     ) : (
                       <Text>No reviews available</Text>
-                    )} */}
+                    )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>
                   <Button
@@ -250,14 +263,18 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                     // width="200px"
                     alignSelf="flex-end"
                     mt={5}
-                    onClick={onCourseReviewFormOpen}
+                    onClick={onProfReviewFormOpen}
                   >
                     Add Review
                   </Button>
                   <ProfReviewForm
-                    isOpen={isCourseReviewFormOpen}
-                    onClose={onCourseReviewFormClose}
-                    key={isCourseReviewFormOpen ? 'open' : 'closed'}
+                    isOpen={isProfReviewFormOpen}
+                    onClose={onProfReviewFormClose}
+                    key={isProfReviewFormOpen ? 'open' : 'closed'}
+                    professor={professor}
+                    profReviews={reviews}
+                    professorCourses={profCourses}
+                    uniqueCourseCodes={uniqueCourseCodes}
                   />
                 </Flex>
               </CardBody>
@@ -293,7 +310,6 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           </GridItem>
 
           {/* Quick Stats Section */}
-          {/* TODO: Componentize QuickStats */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
@@ -335,7 +351,6 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
             </Card>
           </GridItem>
           {/* Prerequisites Section */}
-          {/* TODO: Componentize Prerequisite */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>

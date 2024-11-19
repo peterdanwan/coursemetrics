@@ -35,14 +35,14 @@ const ReviewDetailModal = ({
   const [feedbackQuestions, setFeedbackQuestions] = useState<any>(null);
 
   // Fetch questions from API
-  const { data: courseQuestionsResponse, error: courseQuestionsResponseError } = useSWR(
-    `/api/questions?type=1`,
+  const { data: questionsResponse, error: questionsResponseError } = useSWR(
+    `/api/questions?type=${review.review_type_id}`,
     apiFetcher
   );
 
   useEffect(() => {
     if (!isReviewDetailOpen) return;
-    if (courseQuestionsResponse && courseQuestionsResponse.status === 'ok') {
+    if (questionsResponse && questionsResponse.status === 'ok') {
       if (!review) return;
 
       // Helper function: match questions from db and answers from review
@@ -72,9 +72,9 @@ const ReviewDetailModal = ({
 
       // get all questions from DB that indicate whether they're rating or feedback questions
       // by review_type_id (which review answers do not)
-      const courseQuestionsFromDB = courseQuestionsResponse.data.questions;
+      const questionsFromDB = questionsResponse.data.questions;
 
-      const ratingQuestionsFromDB = courseQuestionsFromDB.filter((q: any) => {
+      const ratingQuestionsFromDB = questionsFromDB.filter((q: any) => {
         return q.is_rating;
       });
 
@@ -83,7 +83,7 @@ const ReviewDetailModal = ({
       setRatingQuestions(ratingQnA);
 
       // filter out feedback questions
-      const feedbackQuestionsFromDB = courseQuestionsFromDB.filter((q: any) => {
+      const feedbackQuestionsFromDB = questionsFromDB.filter((q: any) => {
         return !q.is_rating;
       });
 
@@ -91,13 +91,7 @@ const ReviewDetailModal = ({
       const feedbackQnA: QnA[] = extractQnAsForUI(feedbackQuestionsFromDB, reviewQnA);
       setFeedbackQuestions(feedbackQnA.length > 0 ? feedbackQnA : null);
     }
-  }, [
-    isReviewDetailOpen,
-    courseQuestionsResponse,
-    review,
-    setRatingQuestions,
-    setFeedbackQuestions,
-  ]);
+  }, [isReviewDetailOpen, questionsResponse, review, setRatingQuestions, setFeedbackQuestions]);
 
   return (
     <Modal isOpen={isReviewDetailOpen} onClose={onReviewDetailClose} isCentered size="xl">
@@ -129,7 +123,7 @@ const ReviewDetailModal = ({
                   {feedbackQuestions.map((q: QnA) => {
                     return (
                       <ListItem key={q.question_id} my={3}>
-                        <Text as="i">Q: {q.question}:</Text>
+                        <Text as="i">Q: {q.question}</Text>
                         <Text>A: {q.answer}</Text>
                       </ListItem>
                     );
@@ -137,10 +131,12 @@ const ReviewDetailModal = ({
                 </List>
               )}
             </Box>
-            <Box mb={4}>
-              <Text as="b">Professor:</Text> {review.ProfessorCourse.Professor.first_name}{' '}
-              {review.ProfessorCourse.Professor.last_name}
-            </Box>
+            {review.review_type_id === 1 && (
+              <Box mb={4}>
+                <Text as="b">Professor:</Text> {review.ProfessorCourse.Professor.first_name}{' '}
+                {review.ProfessorCourse.Professor.last_name}
+              </Box>
+            )}
           </Box>
         </ModalBody>
       </ModalContent>

@@ -14,7 +14,7 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
   Text,
-  Spinner,
+  Flex,
 } from '@chakra-ui/react';
 import ProfessorCard from '@/components/ProfessorCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
@@ -47,13 +47,17 @@ export default function ProfessorsPage() {
     setProfessors(professorsResponse?.data.professors || []);
   }, [professorsResponse]);
 
-  if (error) return <Text>Error loading courses</Text>;
+  if (error)
+    return (
+      <Flex justifyContent="center" alignItems="center" h="100vh">
+        <Text>Error loading courses</Text>
+      </Flex>
+    );
   if (!professorsResponse)
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading professors...
-      </div>
+      <Flex justifyContent="center" alignItems="center" h="100vh">
+        <Text>Loading professors...</Text>
+      </Flex>
     );
 
   return (
