@@ -54,6 +54,7 @@ export const GET = async function fetch_reviews(req: NextRequest): Promise<NextR
               include: [
                 {
                   model: CourseTerm,
+                  attributes: ['season', 'year'],
                 },
               ],
             },

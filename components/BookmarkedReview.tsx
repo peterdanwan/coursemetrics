@@ -1,8 +1,16 @@
+// components/BookmarkedReview.tsx
+'use client';
 import { Box, Flex, Text, Heading, Select, Card, CardBody } from '@chakra-ui/react';
 import { FaBookmark } from 'react-icons/fa';
 import { useFlexStyle } from '@/styles/styles';
 
-const BookmarkedReview = ({ review }: { review: any }) => {
+const BookmarkedReview = ({
+  review,
+  onToggleBookmark,
+}: {
+  review: any;
+  onToggleBookmark: (reviewId: number) => void;
+}) => {
   const styles = useFlexStyle();
   const alignItemsVals = { base: 'start', sm: 'start', md: 'start', lg: 'start' };
   const directionVals = {
@@ -16,12 +24,14 @@ const BookmarkedReview = ({ review }: { review: any }) => {
   const largeTextLineHeight = { base: '1', sm: '1', md: '1', lg: 'normal' };
   const fontSizeVals = { base: 'md', sm: 'md', md: 'md', lg: 'lg' };
   const iconJustifyContentVals = { base: 'start', sm: 'start', md: 'start', lg: 'center' };
+  console.log('BookmarkedReview Component: ', review);
 
   const isCourseReview = review.review_type_id === 1;
 
-  const handleUnbookmarkClick = () => {
-    console.log('Unbookmarked this review!');
+  const handleToggleBookmark = () => {
+    onToggleBookmark(review.review_id);
   };
+
   return (
     <Card bg={styles.cardBg} color={styles.cardColor}>
       <CardBody>
@@ -38,7 +48,8 @@ const BookmarkedReview = ({ review }: { review: any }) => {
                 Professor
               </Text>
               <Text fontSize={fontSizeVals} as="b" lineHeight={largeTextLineHeight}>
-                {review.professor_name}
+                {review.ProfessorCourse.Professor.first_name}{' '}
+                {review.ProfessorCourse.Professor.last_name}
               </Text>
             </Flex>
           )}
@@ -54,11 +65,11 @@ const BookmarkedReview = ({ review }: { review: any }) => {
             </Text>
             {isCourseReview ? (
               <Text fontSize={fontSizeVals} as="b" lineHeight={largeTextLineHeight}>
-                {review.course_code}
+                {review.ProfessorCourse.Course.course_code}
               </Text>
             ) : (
               <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
-                {review.course_code}
+                {review.ProfessorCourse.Course.course_code}
               </Text>
             )}
           </Flex>
@@ -73,7 +84,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
               Section
             </Text>
             <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
-              {review.course_section}
+              {review.ProfessorCourse.Course.course_section}
             </Text>
           </Flex>
           <Flex
@@ -88,7 +99,8 @@ const BookmarkedReview = ({ review }: { review: any }) => {
               Term
             </Text>
             <Text fontSize={fontSizeVals} lineHeight={largeTextLineHeight}>
-              {review.course_term}
+              {review.ProfessorCourse.Course.CourseTerm.season}{' '}
+              {review.ProfessorCourse.Course.CourseTerm.year}
             </Text>
           </Flex>
           <Flex
@@ -130,7 +142,7 @@ const BookmarkedReview = ({ review }: { review: any }) => {
               Remove
             </Text>
             <Flex justifyContent={iconJustifyContentVals} w="100%">
-              <Box as="button" onClick={handleUnbookmarkClick} _hover={{ bg: styles.hoverBg }}>
+              <Box as="button" onClick={handleToggleBookmark} _hover={{ bg: styles.hoverBg }}>
                 <FaBookmark size="22px" color={styles.iconColor} />
               </Box>
             </Flex>
