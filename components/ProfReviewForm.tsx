@@ -404,6 +404,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
                                 ratingName={`questions.${index}.answer`}
                                 defaultValue=""
                                 control={control}
+                                question_id={q.question_id}
                               />
                             );
                           })}

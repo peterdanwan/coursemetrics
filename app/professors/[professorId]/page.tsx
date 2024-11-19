@@ -1,4 +1,4 @@
-// app/courses/[courseCode]/page.tsx
+// app/professors/[professorId]/page.tsx
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -71,6 +71,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
   const [professor, setProfessor] = useState<any>(null);
   const [reviews, setReviews] = useState<any>(null);
   const [uniqueCourseCodes, setUniqueCourseCodes] = useState<any>(null);
+  const [quickStats, setQuickStats] = useState<any>(null);
 
   // For review form modal
   const {
@@ -79,7 +80,14 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
     onClose: onProfReviewFormClose,
   } = useDisclosure();
 
+  const professorURL = `/api/professors/${professorId}`;
+
   const profReviewsByProfIdURL = `/api/reviews/professors/${professorId}`; //
+
+  const { data: professorResponse, error: professorResponseError } = useSWR(
+    professorURL,
+    apiFetcher
+  );
 
   const { data: professorReviewsResponse, error: professorReviewsResponseError } = useSWR(
     profReviewsByProfIdURL,
@@ -87,21 +95,39 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
   );
 
   useEffect(() => {
+    if (professorResponse && professorResponse.status === 'ok') {
+      const { professor: profFromDB, professorCourses: profCoursesFromDB } = professorResponse.data;
+      setProfessor(profFromDB);
+      setProfCourses(profCoursesFromDB);
+
+      console.log(professorResponse);
+
+      console.log(profFromDB);
+      console.log(profCoursesFromDB);
+
+      // Set course tags
+      // let courseCodes = profCoursesFromDB?.map((course: any) => course.Course.course_code);
+      // let uniqueCourseCodesSet: Set<string> = new Set(courseCodes);
+      // // console.log(uniqueCourseCodesSet);
+      // // console.log(Array.from(uniqueCourseCodesSet));
+
+      const uniqueCourseCodes = Array.from(
+        new Set(profCoursesFromDB?.map((course: any) => course.Course.course_code))
+      );
+      setUniqueCourseCodes(uniqueCourseCodes);
+    }
+  }, [professorResponse]);
+
+  useEffect(() => {
     if (!isProfReviewFormOpen) mutate(profReviewsByProfIdURL);
 
     if (professorReviewsResponse && professorReviewsResponse.status === 'ok') {
-      const { professor, professorCourses, reviews: profReviews } = professorReviewsResponse.data;
-      setProfessor(professor);
-      setProfCourses(professorCourses);
-      setReviews(profReviews);
-      console.log(professorReviewsResponse.data);
+      const { quickStats: quickStatsFromDB, reviews: profReviewsFromDB } =
+        professorReviewsResponse.data;
 
-      // Set course tags
-      let courseCodes = professorCourses.map((course: any) => course.Course.course_code);
-      let uniqueCourseCodesSet: Set<string> = new Set(courseCodes);
-      // console.log(uniqueCourseCodesSet);
-      // console.log(Array.from(uniqueCourseCodesSet));
-      setUniqueCourseCodes(Array.from(uniqueCourseCodesSet));
+      setReviews(profReviewsFromDB);
+      setQuickStats(quickStatsFromDB);
+      console.log(professorReviewsResponse.data);
     }
   }, [professorReviewsResponse, isProfReviewFormOpen, profReviewsByProfIdURL]);
 

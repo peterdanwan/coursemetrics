@@ -41,7 +41,7 @@ export interface FormValues extends FieldValues {
   courseName: string;
   term: string;
   sectionCode: string;
-  professor: string;
+  professorId: number;
   questions: QuestionUI[];
   takeAgain: boolean;
   grade: string;
@@ -53,7 +53,7 @@ const defaultFormVal: FormValues = {
   courseName: '',
   term: '',
   sectionCode: '',
-  professor: '',
+  professorId: -1,
   questions: [],
   takeAgain: false,
   grade: '',
@@ -153,7 +153,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
       setCourseSectionsByTerm(sectionCodes);
       setCoursesByTerm(updatedCoursesByTerm);
       setCourseProfessors([]);
-      reset({ ...currValues, sectionCode: '', professor: '' });
+      reset({ ...currValues, sectionCode: '', professorId: -1 });
     }
   }, [
     selectedTerm,
@@ -184,13 +184,18 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
               (course: any) => course.course_id === updatedCoursesBySection[0].course_id
             )
           )
-          .map((prof: any) => `${prof.first_name} ${prof.last_name}`);
+          .map((prof: any) => {
+            return {
+              professorId: prof.professor_id,
+              professorName: `${prof.first_name} ${prof.last_name}`,
+            };
+          });
 
         // get current values of all fields
         const currValues = getValues();
 
         setCourseProfessors(uniqueProfs);
-        reset({ ...currValues, professor: '' });
+        reset({ ...currValues, professorId: -1 });
       }
     }
   }, [
@@ -259,7 +264,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     console.log(data);
 
     try {
-      await fetch(`/api/reviews/courses`, {
+      await fetch(`/api/reviews/courses/${courseName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -386,28 +391,28 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                     </FormControl>
 
                     {/**** PROFESSOR ****/}
-                    <FormControl isInvalid={!!errors.professor}>
-                      <FormLabel htmlFor="professor">
+                    <FormControl isInvalid={!!errors.professorId}>
+                      <FormLabel htmlFor="professorId">
                         Professor:{' '}
                         <Text as="span" color="teal" fontSize="sm">
                           (Required)
                         </Text>
                       </FormLabel>
                       <Select
-                        id="professor"
+                        id="professorId"
                         placeholder="Add existing professor(s)..."
-                        {...register('professor', {
+                        {...register('professorId', {
                           required: 'Professor is required. Please select from the list.',
                         })}
                       >
-                        {courseProfessors?.map((courseProfessor: any, index: number) => (
-                          <option key={index} value={courseProfessor}>
-                            {courseProfessor}
+                        {courseProfessors?.map((prof: any, index: number) => (
+                          <option key={index} value={prof.professorId}>
+                            {prof.professorName}
                           </option>
                         ))}
                       </Select>
                       <FormErrorMessage>
-                        {errors.professor && errors.professor.message}
+                        {errors.professorId && errors.professorId.message}
                       </FormErrorMessage>
                     </FormControl>
 
