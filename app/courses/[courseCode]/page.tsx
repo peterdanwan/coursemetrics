@@ -168,15 +168,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
       if (!initialCourse) {
         // If no matching course is found or no term selected, use the most recent term
-        initialCourse = coursesArray.reduce(
-          (latest: any, current: any) => {
-            if (!latest) return current;
-            const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
-            const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
-            return currentDate > latestDate ? current : latest;
-          },
-          null as ICourse | null
-        );
+        initialCourse = coursesArray.reduce((latest: any, current: any) => {
+          if (!latest) return current;
+          const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+          const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+          return currentDate > latestDate ? current : latest;
+        }, null as ICourse | null);
       }
 
       setCourse(initialCourse);
@@ -428,9 +425,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>
-                  {loading ? (
-                    <Spinner /> // Or whatever loading indicator you prefer
-                  ) : user && user.role_id === 2 ? (
+                  {user && user.role_id === 2 ? (
                     <Button
                       colorScheme="teal"
                       variant="solid"
