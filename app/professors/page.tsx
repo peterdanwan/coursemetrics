@@ -16,6 +16,7 @@ import {
   Text,
   Flex,
   Center,
+  Spinner,
 } from '@chakra-ui/react';
 import ProfessorCard from '@/components/ProfessorCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
