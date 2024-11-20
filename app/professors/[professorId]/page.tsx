@@ -24,12 +24,14 @@ import {
   Spinner,
   useDisclosure,
   Divider,
+  Link,
 } from '@chakra-ui/react';
 import { FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
 import ProfReviewForm from '@/components/ProfReviewForm';
 import ProfessorReview from '@/components/ProfessorReview';
+import useFetchUser from '@/components/useFetchUser';
 
 import { useFlexStyle } from '@/styles/styles';
 import RatingIcons from '@/components/RatingIcons';
@@ -92,6 +94,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
   const [quickStats, setQuickStats] = useState<any>(null);
   const [totalReviews, setTotalReviews] = useState<any>(null);
   const [profAvgRating, setProfAvgRating] = useState<number>(0);
+  const { user, loading, error } = useFetchUser();
 
   // For review form modal
   const {
@@ -102,7 +105,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
 
   const professorURL = `/api/professors/${professorId}`;
 
-  const profReviewsByProfIdURL = `/api/reviews/professors/${professorId}`; //
+  const profReviewsByProfIdURL = `/api/reviews/professors/${professorId}`;
 
   const { data: professorResponse, error: professorResponseError } = useSWR(
     professorURL,
@@ -188,6 +191,16 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
       .join(' '); // Join the words back into a single string
   }
 
+  if (professorResponseError || professorReviewsResponseError)
+    return <div>Failed to load data</div>;
+  if (!professorResponse || !professorReviewsResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
+
   return (
     <>
       {professor ? (
@@ -217,9 +230,9 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                   <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                     <Flex gap={5} alignItems="center">
-                      <Box color="red.500">
+                      {/* <Box color="red.500">
                         <FaHeart size={25} />
-                      </Box>
+                      </Box> */}
                       <Flex gap={2} alignItems="center">
                         <Text fontSize={22}>{profAvgRating}/5 </Text>
                         <RatingIcons
@@ -302,17 +315,33 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                     )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>
-                  <Button
-                    colorScheme="teal"
-                    variant="solid"
-                    size="lg"
-                    // width="200px"
-                    alignSelf="flex-end"
-                    mt={5}
-                    onClick={onProfReviewFormOpen}
-                  >
-                    Add Review
-                  </Button>
+                  {loading ? (
+                    <Spinner />
+                  ) : user && user.role_id === 2 ? (
+                    <Button
+                      colorScheme="teal"
+                      variant="solid"
+                      size="lg"
+                      // width="200px"
+                      alignSelf="flex-end"
+                      mt={5}
+                      onClick={onProfReviewFormOpen}
+                    >
+                      Add a Review
+                    </Button>
+                  ) : (
+                    <Text color={flexStyle.color} alignSelf="flex-end" mt={5}>
+                      Please{' '}
+                      <Link
+                        href="/api/auth/login"
+                        color={flexStyle.headingColor}
+                        _hover={{ color: flexStyle.requiredColor }}
+                      >
+                        sign in
+                      </Link>{' '}
+                      as a student to add a review
+                    </Text>
+                  )}
                   <ProfReviewForm
                     isOpen={isProfReviewFormOpen}
                     onClose={onProfReviewFormClose}

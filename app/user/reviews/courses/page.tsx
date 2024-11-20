@@ -1,6 +1,16 @@
 // app/user/reviews/courses/page.tsx
 'use client';
-import { Box, Flex, Stack, Text, Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Stack,
+  Text,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Spinner,
+} from '@chakra-ui/react';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
 import { useState, useEffect } from 'react';
 import { apiFetcher } from '@/utils';
@@ -62,11 +72,18 @@ export default function Courses() {
   };
 
   const filteredReviews = sortedReviews.filter((review) => {
+    const searchTerm = searchValue.toLowerCase().trim();
     const normalizedRate = review.rating?.toFixed(1);
+    const combinedSeasonYear =
+      `${review.ProfessorCourse.Course.CourseTerm.season} ${review.ProfessorCourse.Course.CourseTerm.year}`.toLowerCase();
+
     return (
-      review.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.comment.toLowerCase().includes(searchValue.toLowerCase()) ||
-      normalizedRate?.includes(searchValue)
+      review.title.toLowerCase().includes(searchTerm) ||
+      review.ProfessorCourse.Course.course_code.toLowerCase().includes(searchTerm) ||
+      review.ProfessorCourse.Course.CourseTerm.season.toLowerCase().includes(searchTerm) ||
+      String(review.ProfessorCourse.Course.CourseTerm.year).includes(searchTerm) ||
+      normalizedRate?.includes(searchTerm) ||
+      combinedSeasonYear.includes(searchTerm)
     );
   });
 
@@ -76,7 +93,13 @@ export default function Courses() {
   const hasReviews = filteredReviews.length > 0;
 
   if (reviewCourseError) return <Text color="red.500">Failed to load course reviews</Text>;
-  if (!reviewCourseData) return <Text>Loading...</Text>;
+  if (!reviewCourseData)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp;Loading the data ...
+      </div>
+    );
   return (
     <>
       <Box p={4} bg={styles.bgColor} color={styles.color}>
@@ -120,7 +143,7 @@ export default function Courses() {
           Term
         </Text>
         <Text flex="2" textAlign="left">
-          Review
+          Review Title
         </Text>
         <Text flex="1" textAlign="center">
           Avg. Rating
@@ -187,7 +210,7 @@ export default function Courses() {
 
                     {/* Truncated Review */}
                     <Text flex="2" color={styles.color} isTruncated m={1}>
-                      {review.comment}
+                      {review.title}
                     </Text>
 
                     {/* Average Rating */}

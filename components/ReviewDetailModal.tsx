@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
   Flex,
+  Spinner,
 } from '@chakra-ui/react';
 
 import RatingIcons from './RatingIcons';
@@ -98,6 +99,15 @@ const ReviewDetailModal = ({
       setFeedbackQuestions(feedbackQnA.length > 0 ? feedbackQnA : null);
     }
   }, [isReviewDetailOpen, questionsResponse, review, setRatingQuestions, setFeedbackQuestions]);
+
+  if (questionsResponseError) return <div>Failed to load data</div>;
+  if (!questionsResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
 
   return (
     <Modal isOpen={isReviewDetailOpen} onClose={onReviewDetailClose} isCentered size="xl">

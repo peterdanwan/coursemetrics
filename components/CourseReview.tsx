@@ -52,13 +52,17 @@ export default function CourseReview({ review }: { review: any }) {
           gridColumn={{ base: 'span 12', lg: 'span 4' }}
         >
           <Box>
-            <Text as="b">Course Term:</Text> {review.ProfessorCourse.Course.CourseTerm.season}{' '}
+            <Text as="b">Term:</Text> {review.ProfessorCourse.Course.CourseTerm.season}{' '}
             {review.ProfessorCourse.Course.CourseTerm.year}
           </Box>
           <Box>
-            <Text as="b">Overall Rating: </Text>
-            <RatingIcons rating={review.rating} />
+            <Text as="b">Section: </Text>
+            {review.ProfessorCourse.Course.course_section}
           </Box>
+          <Flex justifyContent={{ base: 'start', lg: 'end' }} gap={1}>
+            <Text as="b">Rating: </Text>
+            <RatingIcons rating={review.rating} />
+          </Flex>
           <Box>
             <Text as="b">Grade:</Text> {review.grade}
           </Box>
