@@ -81,6 +81,14 @@ export default function ProfessorsPage() {
       </div>
     );
 
+  if (professors.length === 0) {
+    return (
+      <Flex h="100vh" justifyContent="center" alignItems="center">
+        <NotFound statusCode="No Professors Found" />
+      </Flex>
+    );
+  }
+
   return (
     <>
       <Grid
@@ -91,28 +99,14 @@ export default function ProfessorsPage() {
         w={{ base: '100%', xl: '95%' }}
         bgColor={flexStyle.bgColor}
       >
-        {professors.length > 0 && (
+        {professors.map((professor) => (
           <GridItem
-            gridColumn={{ base: 'span 12' }}
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="center"
-          ></GridItem>
-        )}
-        {professors.length > 0 ? (
-          professors.map((professor) => (
-            <GridItem
-              key={professor.professor_id}
-              gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}
-            >
-              <ProfessorCard professor={professor} />
-            </GridItem>
-          ))
-        ) : (
-          <GridItem gridColumn={{ base: 'span 12' }}>
-            <NotFound statusCode="No Professors Found" />
+            key={professor.professor_id}
+            gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}
+          >
+            <ProfessorCard professor={professor} />
           </GridItem>
-        )}
+        ))}
       </Grid>
     </>
   );

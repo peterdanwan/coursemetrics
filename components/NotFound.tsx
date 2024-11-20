@@ -5,8 +5,8 @@ import { CloseIcon } from '@chakra-ui/icons';
 
 export default function NotFound({ statusCode }: { statusCode: string }) {
   return (
-    <Box textAlign="center" py={10} px={6}>
-      <Box display="inline-block">
+    <Box textAlign="center" py={10} px={6} my={'auto'}>
+      <Box display="inline-block" my={'auto'}>
         <Flex
           flexDirection="column"
           justifyContent="center"

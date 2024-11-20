@@ -15,6 +15,7 @@ import {
   NumberDecrementStepper,
   Text,
   Spinner,
+  Flex,
 } from '@chakra-ui/react';
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
@@ -102,6 +103,14 @@ export default function CoursesPage() {
   const uniqueCourseCodes = Object.keys(groupedCourses);
   const displayedCourseCodes = uniqueCourseCodes;
 
+  if (displayedCourseCodes.length === 0) {
+    return (
+      <Flex h="100vh" justifyContent="center" alignItems="center">
+        <NotFound statusCode="No Courses Found" />
+      </Flex>
+    );
+  }
+
   return (
     <>
       <Grid
@@ -111,25 +120,11 @@ export default function CoursesPage() {
         margin="0 auto"
         w={{ base: '100%', xl: '95%' }}
       >
-        {uniqueCourseCodes.length > 0 && (
-          <GridItem
-            gridColumn={{ base: 'span 12' }}
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="center"
-          ></GridItem>
-        )}
-        {uniqueCourseCodes.length > 0 ? (
-          displayedCourseCodes.map((courseCode) => (
-            <GridItem key={courseCode} gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}>
-              <CourseCard courses={groupedCourses[courseCode]} />
-            </GridItem>
-          ))
-        ) : (
-          <GridItem gridColumn={{ base: 'span 12' }}>
-            <NotFound statusCode="No Courses Found" />
+        {displayedCourseCodes.map((courseCode) => (
+          <GridItem key={courseCode} gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}>
+            <CourseCard courses={groupedCourses[courseCode]} />
           </GridItem>
-        )}
+        ))}
       </Grid>
     </>
   );
