@@ -1,6 +1,16 @@
 // app/admin/page.tsx
 'use client';
-import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Link } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Card,
+  CardHeader,
+  CardBody,
+  Heading,
+  Text,
+  Link,
+  Spinner,
+} from '@chakra-ui/react';
 import React from 'react';
 import NextLink from 'next/link';
 import withAdminAuth from '@/components/withAdminAuth';
@@ -31,7 +41,13 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
     : 0;
 
   if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
-  if (!courseData || !professorData || !reviewData) return <div>Loading...</div>;
+  if (!courseData || !professorData || !reviewData)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp;Loading the data ...
+      </div>
+    );
 
   return (
     <Flex
