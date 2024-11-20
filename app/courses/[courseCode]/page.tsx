@@ -92,31 +92,20 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [reviews, setReviews]: any = useState(null);
   const [courseAverageRating, setCourseAverageRating] = useState<number>(0);
   const [quickStats, setQuickStats]: any = useState(null);
+  const [totalReviews, setTotalReviews] = useState<any>(null);
   const [sections, setSections] = useState<ICourse[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const { user, loading, error } = useFetchUser();
 
-  const calculateAverageRating = (data: any) => {
-    // Extract the rating fields and sum them
-    const ratingFields = [
-      'contentQuality',
-      'courseLoad',
-      'courseStructure',
-      'difficulty',
-      'evaluationFairness',
-      'materialRelevance',
-    ];
-
+  const calculateAverageRating = (quickStats: any) => {
     let totalRating = 0;
     let ratingCount = 0;
 
     // Loop through each rating field and sum the values
-    ratingFields.forEach((field) => {
-      if (data[field] !== undefined) {
-        totalRating += data[field];
-        ratingCount++;
-      }
+    quickStats.forEach((stat: any) => {
+      totalRating += parseInt(stat.value);
+      ratingCount++;
     });
 
     // Calculate the average rating
@@ -135,13 +124,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const reviewsURL = courseCode
     ? `/api/reviews/courses/${courseCode}${year && season ? `?year=${year}&season=${season}` : ''}`
     : null;
-  console.log('courseURL', courseURL);
-  console.log('reviewsURL', reviewsURL);
+  // console.log('courseURL', courseURL);
+  // console.log('reviewsURL', reviewsURL);
 
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
-  console.log('Fetched Course', courseResponse);
-  console.log('Fetched Reviews', reviewResponse);
+  // console.log('Fetched Course', courseResponse);
+  // console.log('Fetched Reviews', reviewResponse);
 
   // For review form modal
   const {
@@ -213,17 +202,32 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   useEffect(() => {
     // console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
     const fetchTags = async () => {
-      console.log(reviewResponse);
+      // console.log(reviewResponse);
       if (reviewResponse && reviewResponse.status === 'ok') {
         if (Array.isArray(reviewResponse.data.reviews)) {
-          const reviewsFromDB = reviewResponse.data.reviews;
+          const { quickStats: quickStatsFromDB, reviews: reviewsFromDB } = reviewResponse.data;
+
           const sortedReviews = [...reviewsFromDB].sort(
             (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
           );
 
           setReviews(sortedReviews);
-          setQuickStats(reviewResponse.data.quickStats);
-          const averageRating = calculateAverageRating(reviewResponse.data.quickStats);
+
+          let quickStatsArr = [];
+          let totalReviewsData = {};
+          for (const statName in quickStatsFromDB) {
+            const stat = { name: statName, value: quickStatsFromDB[statName] };
+            if (statName === 'totalReviews') {
+              totalReviewsData = stat;
+            } else {
+              quickStatsArr.push(stat);
+            }
+          }
+
+          setQuickStats(quickStatsArr);
+          setTotalReviews(totalReviewsData);
+
+          const averageRating = calculateAverageRating(quickStatsArr);
           setCourseAverageRating(averageRating);
           // const reviewEvaluator = new ReviewEvaluator();
 
@@ -289,6 +293,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     }
   };
 
+  function capFirstLetterAndAddSpaces(string: string) {
+    if (!(typeof string === 'string' && string.length)) return false;
+    const res = string.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return res
+      .split(' ') // Split the string into an array of words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word
+      .join(' '); // Join the words back into a single string
+  }
+
   return (
     <>
       {/* Course Details Section */}
@@ -302,7 +315,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           bgColor={flexStyle.bgColor}
         >
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
-            <Card>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" gap={2} wrap="wrap">
                   <Box order={{ base: '1', sm: '1', md: '1', lg: '1' }}>
@@ -322,10 +335,23 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                     <Flex gap={5} alignItems="center">
                       {/* Don't need to book mark it */}
-                      {/* <Box color="red.500">
+                      <Box color="red.500">
                         <FaHeart size={25} />
-                      </Box> */}
-                      <Text>{courseAverageRating}/5</Text>
+                      </Box>
+                      <Flex gap={2} alignItems="center">
+                        <Text fontSize={22}>{courseAverageRating}/5 </Text>
+                        <RatingIcons
+                          rating={courseAverageRating.toString()}
+                          iconSize={5}
+                          color="teal.300"
+                        />
+                        {totalReviews && (
+                          <Text as="span">
+                            ({totalReviews?.value}
+                            {totalReviews?.value > 1 ? ' reviews' : ' review'})
+                          </Text>
+                        )}
+                      </Flex>
                     </Flex>
                   </Box>
                 </Flex>
@@ -346,7 +372,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </GridItem>
           {/* Tags Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
                   Tags
@@ -367,10 +393,10 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </GridItem>
           {/* Course Reviews Section: make it scrollable too see more reviews */}
           <GridItem
-            gridColumn={{ base: 'span 12', md: 'span 8' }}
+            gridColumn={{ base: 'span 12', md: 'span 12', lg: 'span 8' }}
             gridRow={{ base: '2', md: 'span 4' }}
           >
-            <Card>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" wrap="wrap" gap={2}>
                   <Heading
@@ -450,74 +476,39 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             </Card>
           </GridItem>
           {/* Quick Stats Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
+          <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
                   Quick Stats
                 </Heading>
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <Grid templateColumns="repeat(2, 1fr)" gap={2}>
-                  <GridItem>
-                    <Text as="b">Content Quality:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating={quickStats.contentQuality} iconSize={8} color="teal.200" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Course Load:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating={quickStats.courseLoad} iconSize={8} color="teal.200" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Course Structure:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons
-                      rating={quickStats.courseStructure}
-                      iconSize={8}
-                      color="teal.200"
-                    />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Difficulty:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating={quickStats.difficulty} iconSize={8} color="teal.200" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Evaluation Fairness:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons
-                      rating={quickStats.evaluationFairness}
-                      iconSize={8}
-                      color="teal.200"
-                    />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Material Relevance:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons
-                      rating={quickStats.materialRelevance}
-                      iconSize={8}
-                      color="teal.200"
-                    />
-                  </GridItem>
-                </Grid>
+                {quickStats && quickStats.length ? (
+                  quickStats.map((stat: any, index: number) => (
+                    <Flex key={index} gap={2} alignItems="center">
+                      <Box w="150px">
+                        <Text as="b" whiteSpace="nowrap">
+                          {capFirstLetterAndAddSpaces(stat.name)}:{' '}
+                        </Text>
+                      </Box>
+                      <Box ml={2}>
+                        <RatingIcons
+                          rating={stat.value}
+                          iconSize={{ base: '5', sm: '8', lg: '8' }}
+                          color="teal.200"
+                        />
+                      </Box>
+                    </Flex>
+                  ))
+                ) : (
+                  <Box>No stats available</Box>
+                )}
               </CardBody>
             </Card>
           </GridItem>
           {/* Prerequisites Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
+          {/* <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
@@ -533,7 +524,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                 </Box>
               </CardBody>
             </Card>
-          </GridItem>
+          </GridItem> */}
         </Grid>
       ) : (
         <Flex justifyContent="center" alignItems="center" h="100vh">

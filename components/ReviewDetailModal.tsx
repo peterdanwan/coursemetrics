@@ -12,6 +12,7 @@ import {
   Box,
   List,
   ListItem,
+  Flex,
 } from '@chakra-ui/react';
 
 import RatingIcons from './RatingIcons';
@@ -45,6 +46,9 @@ const ReviewDetailModal = ({
     if (questionsResponse && questionsResponse.status === 'ok') {
       if (!review) return;
 
+      // console.log('review');
+      // console.log(review);
+
       // Helper function: match questions from db and answers from review
       // Returns an array of QnA objects
       const extractQnAsForUI = (reviewQuestions: any, reviewAnswers: any) => {
@@ -52,10 +56,10 @@ const ReviewDetailModal = ({
 
         for (let i = 0; i < reviewQuestions.length; i++) {
           for (let j = 0; j < reviewAnswers.length; j++) {
-            if (reviewAnswers[j].question_id === reviewQuestions[i].question_id) {
+            if (reviewAnswers[j].Question.question_id === reviewQuestions[i].question_id) {
               if (reviewAnswers[j].ReviewAnswers[0].answer === '') break;
               const qna: QnA = {
-                question_id: reviewAnswers[j].question_id,
+                question_id: reviewAnswers[j].Question.question_id,
                 question: reviewAnswers[j].Question.question_text,
                 answer: reviewAnswers[j].ReviewAnswers[0].answer,
               };
@@ -80,6 +84,8 @@ const ReviewDetailModal = ({
 
       // match rating questions with answers
       const ratingQnA: QnA[] = extractQnAsForUI(ratingQuestionsFromDB, reviewQnA);
+      // console.log('ratingQnA');
+      // console.log(ratingQnA);
       setRatingQuestions(ratingQnA);
 
       // filter out feedback questions
@@ -109,10 +115,12 @@ const ReviewDetailModal = ({
               {ratingQuestions &&
                 ratingQuestions.map((q: QnA) => {
                   return (
-                    <Box key={q.question_id} my={3}>
-                      <Text as="i">{q.question}: </Text>
+                    <Flex key={q.question_id} my={3} gap={2} alignItems="center">
+                      <Text as="i" w="180px">
+                        {q.question}:{' '}
+                      </Text>
                       <RatingIcons rating={q.answer} />
-                    </Box>
+                    </Flex>
                   );
                 })}
             </Box>

@@ -1,10 +1,10 @@
 import { MdCircle, MdOutlineCircle } from 'react-icons/md';
 import { IconType } from 'react-icons';
-import { Icon } from '@chakra-ui/react';
+import { Icon, Flex, Box } from '@chakra-ui/react';
 
 interface RatingIconsProps {
   rating: string;
-  iconSize?: number; // optional
+  iconSize?: any; // optional
   color?: string; // optional
 }
 
@@ -28,11 +28,11 @@ const RatingIcons = ({ rating, iconSize = 4, color = 'teal.400' }: RatingIconsPr
 
   const iconsArr = getRatingIconsArr(rating);
   return (
-    <>
+    <Box>
       {iconsArr.map((icon, index) => (
         <Icon key={index} as={icon} boxSize={iconSize} color={color} />
       ))}
-    </>
+    </Box>
   );
 };
 
