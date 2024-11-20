@@ -15,87 +15,10 @@ import Question from '@/database/models/Question';
 import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
-import { Op } from 'sequelize';
-import { calculateAverageRating } from '@/utils/funcs';
-
-const processReviews = (data: any) => {
-  // Initialize the reviews and quickStats objects
-  const result: any = {
-    reviews: [],
-    quickStats: {
-      difficulty: 0,
-      courseStructure: 0,
-      courseLoad: 0,
-      evaluationFairness: 0,
-      contentQuality: 0,
-      materialRelevance: 0,
-      totalReviews: 0, // To track the number of reviews with ratings
-    },
-  };
-
-  // Iterate through each review in the provided data
-  data.forEach((review: any) => {
-    // Filter out reviews where the ReviewAnswers array for all questions with is_rating=true is empty
-    const validReview = review.ReviewQuestions.some((reviewQuestion: any) => {
-      // Filter for questions with `is_rating: true` and non-empty answers
-      return (
-        reviewQuestion.ReviewAnswers.length > 0 && reviewQuestion.ReviewAnswers[0].answer !== null
-      );
-    });
-
-    if (validReview) {
-      result.quickStats.totalReviews++;
-      // Add to the reviews array
-      result.reviews.push(review);
-
-      // Iterate through the review's questions to calculate the quickStats
-      review.ReviewQuestions.forEach((reviewQuestion: any) => {
-        // We only care about questions that have `is_rating: true`
-        if (reviewQuestion.Question.is_rating && reviewQuestion.ReviewAnswers.length > 0) {
-          const answer = reviewQuestion.ReviewAnswers[0].answer;
-          const rating = parseFloat(answer); // Convert the answer to a float (assuming numeric rating)
-
-          if (!isNaN(rating)) {
-            switch (reviewQuestion.Question.question_text) {
-              case 'Difficulty':
-                result.quickStats.difficulty += rating;
-                break;
-              case 'Course Structure':
-                result.quickStats.courseStructure += rating;
-                break;
-              case 'Course Load':
-                result.quickStats.courseLoad += rating;
-                break;
-              case 'Evaluation Fairness':
-                result.quickStats.evaluationFairness += rating;
-                break;
-              case 'Content Quality':
-                result.quickStats.contentQuality += rating;
-                break;
-              case 'Material Relevance':
-                result.quickStats.materialRelevance += rating;
-                break;
-              default:
-                break;
-            }
-          }
-        }
-      });
-    }
-  });
-
-  // Calculate averages for quickStats
-  if (result.quickStats.totalReviews > 0) {
-    result.quickStats.difficulty /= result.quickStats.totalReviews;
-    result.quickStats.courseStructure /= result.quickStats.totalReviews;
-    result.quickStats.courseLoad /= result.quickStats.totalReviews;
-    result.quickStats.evaluationFairness /= result.quickStats.totalReviews;
-    result.quickStats.contentQuality /= result.quickStats.totalReviews;
-    result.quickStats.materialRelevance /= result.quickStats.totalReviews;
-  }
-
-  return result;
-};
+import { calculateAverageRating, processReviews, getFirstTenComments } from '@/utils/funcs';
+// @ts-ignore
+import redisClient from '@/database/redisInstance';
+import { ReviewEvaluator } from '@/utils/ai';
 
 export const GET = async function fetch_reviews_by_course_code(
   req: NextRequest
@@ -106,12 +29,11 @@ export const GET = async function fetch_reviews_by_course_code(
     await connectDB();
 
     const url = new URL(req.url);
-
-    const courseCode = url.pathname.split('/').pop();
+    const courseCode = url.pathname.split('/').pop()!;
     const season = req.nextUrl.searchParams.get('season');
     const year = req.nextUrl.searchParams.get('year');
 
-    let courseTermConditions = {};
+    let courseTermConditions: Record<string, any> = {};
     if (season && year) {
       courseTermConditions = {
         season: String(season).charAt(0).toUpperCase() + String(season).slice(1),
@@ -119,65 +41,97 @@ export const GET = async function fetch_reviews_by_course_code(
       };
     }
 
-    const reviews = await Review.findAll({
-      where: {
-        review_type_id: 1,
-        review_status_id: 2,
-      },
-      include: [
-        {
-          model: User,
-          attributes: ['user_id', 'full_name', 'email'],
+    // @ts-ignore
+    const cachedData = await redisClient.get(`reviews:${courseCode}:${season}:${year}`);
+
+    let reviews: any[] = [];
+    let tags: string[] = [];
+
+    if (cachedData) {
+      const cachedReviews = JSON.parse(cachedData);
+      reviews = cachedReviews.reviews;
+      tags = cachedReviews.tags;
+    } else {
+      reviews = await Review.findAll({
+        where: {
+          review_type_id: 1,
+          review_status_id: 2,
         },
-        {
-          model: ReviewQuestion,
-          include: [
-            {
-              model: ReviewAnswer,
-              attributes: ['answer'],
-            },
-            {
-              model: Question,
-              attributes: ['question_id', 'question_text', 'is_rating'],
-            },
-          ],
-          attributes: ['review_question_id'],
-        },
-        {
-          model: ProfessorCourse,
-          required: true,
-          attributes: ['professor_course_id'],
-          include: [
-            {
-              model: Professor,
-              as: 'Professor',
-              attributes: ['first_name', 'last_name'],
-            },
-            {
-              model: Course,
-              where: { course_code: courseCode },
-              include: [
-                {
-                  model: CourseTerm,
-                  where:
-                    Object.keys(courseTermConditions).length > 0 ? courseTermConditions : undefined,
-                },
-              ],
-              attributes: ['course_code', 'course_section'],
-            },
-          ],
-        },
-      ],
+        include: [
+          {
+            model: User,
+            attributes: ['user_id', 'full_name', 'email'],
+          },
+          {
+            model: ReviewQuestion,
+            include: [
+              {
+                model: ReviewAnswer,
+                attributes: ['answer'],
+              },
+              {
+                model: Question,
+                attributes: ['question_id', 'question_text', 'is_rating'],
+              },
+            ],
+            attributes: ['review_question_id'],
+          },
+          {
+            model: ProfessorCourse,
+            required: true,
+            attributes: ['professor_course_id'],
+            include: [
+              {
+                model: Professor,
+                as: 'Professor',
+                attributes: ['first_name', 'last_name'],
+              },
+              {
+                model: Course,
+                where: { course_code: courseCode },
+                include: [
+                  {
+                    model: CourseTerm,
+                    where:
+                      Object.keys(courseTermConditions).length > 0
+                        ? courseTermConditions
+                        : undefined,
+                  },
+                ],
+                attributes: ['course_code', 'course_section'],
+              },
+            ],
+          },
+        ],
+      });
+
+      const processedReviews = processReviews(reviews);
+
+      const reviewEvaluator = new ReviewEvaluator();
+
+      if (reviews.length > 0) {
+        const tagResponse: { tags: string[] } = await reviewEvaluator.generateTags(
+          getFirstTenComments(processedReviews.reviews)
+        );
+        const tags = tagResponse.tags.length > 5 ? tagResponse.tags.slice(0, 5) : tagResponse.tags;
+
+        // @ts-ignore
+        await redisClient.set(
+          `reviews:${courseCode}:${season}:${year}`,
+          JSON.stringify({ reviews: processedReviews, tags }),
+          {
+            EX: 60 * 60,
+          }
+        );
+      }
+    }
+
+    log.info('Reviews and tags fetched successfully');
+    return NextResponse.json(createSuccessResponse({ reviewContent: reviews, tags }), {
+      status: 200,
     });
-
-    const processedReviews = processReviews(reviews);
-
-    log.error(processedReviews, 'Reviews fetched from DB');
-
-    return NextResponse.json(createSuccessResponse(processedReviews), { status: 200 });
   } catch (error) {
     console.error(error);
-
     log.error('Error fetching reviews', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
@@ -200,8 +154,6 @@ export const POST = async function post_course_review(req: NextRequest): Promise
     }
 
     const userEmail = user.email;
-
-    // Parse the request body
     const courseReviewData = await req.json();
 
     if (!courseReviewData) {
@@ -292,7 +244,6 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
       const averageRating: number = calculateAverageRating(courseReviewData?.questions);
 
-      // Create the primary review entry
       const review = await Review.create(
         {
           review_type_id: 1,
@@ -343,6 +294,23 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       //     reason: reason,
       //   });
       // }
+
+      const redisKeyPattern = `reviews:${courseCode}:*`; // This pattern will match all keys starting with 'reviews:{courseCode}:'
+
+      try {
+        // @ts-ignore
+        const keys: string[] = await redisClient.keys(redisKeyPattern);
+
+        if (keys.length > 0) {
+          // @ts-ignore
+          await redisClient.del(...keys);
+          console.log(`Deleted ${keys.length} keys starting with ${redisKeyPattern}`);
+        } else {
+          console.log('No keys found to delete.');
+        }
+      } catch (error) {
+        console.error('Error deleting keys:', error);
+      }
 
       log.info('Review successfully created and associated with course and professor.');
       return NextResponse.json(

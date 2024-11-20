@@ -171,7 +171,12 @@ class ReviewEvaluator {
     };
   }
 
-  private constructTagPrompt(reviews: string[]): string {
+  private constructTagPrompt(
+    reviews: {
+      comment: string;
+      answers: string[];
+    }[]
+  ): string {
     return `
       You are tasked with generating concise and insightful one to two word tags for each of the following student reviews. 
       The tags should encapsulate the key themes or insights of the review, focusing on relevant aspects of the educational experience, 
@@ -184,15 +189,16 @@ class ReviewEvaluator {
       Review 3: "${reviews[2]}"
       Review 4: "${reviews[3]}"
       Review 5: "${reviews[4]}"
+      Review 6: "${reviews[5]}"
+      Review 7: "${reviews[6]}"
+      Review 8: "${reviews[7]}"
+      Review 9: "${reviews[8]}"
+      Review 10: "${reviews[9]}"
 
       Format your response as a JSON object:
       {
         "tags": [
-          "Tag for Review 1",
-          "Tag for Review 2",
-          "Tag for Review 3",
-          "Tag for Review 4",
-          "Tag for Review 5"
+          "Tag for Reviews
         ]
       }
 
@@ -207,7 +213,12 @@ class ReviewEvaluator {
     return typeof error === 'object' && error !== null && 'message' in error;
   }
 
-  public async generateTags(reviews: string[]): Promise<TagGenerationResponse> {
+  public async generateTags(
+    reviews: {
+      comment: string;
+      answers: string[];
+    }[]
+  ): Promise<TagGenerationResponse> {
     const prompt = this.constructTagPrompt(reviews);
 
     try {

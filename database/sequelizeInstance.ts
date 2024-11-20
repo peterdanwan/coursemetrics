@@ -6,18 +6,18 @@ import pg from 'pg'; // Ref: https://node-postgres.com
 let config: any = null;
 
 // local DB setup
-if (process.env.POSTGRES_HOST === 'localhost') {
+if (process.env.BUILD_ENV === 'dev') {
   config = {
-    host: process.env.POSTGRES_HOST,
-    username: process.env.POSTGRES_USERNAME,
-    password: process.env.POSTGRES_PASSWORD,
-    database: process.env.POSTGRES_DATABASE,
+    host: 'localhost',
+    username: 'postgres',
+    password: 'postgres',
+    database: 'coursemetricsDB',
     dialect: 'postgres',
     port: 5433,
     dialectModule: pg,
     benchmark: true,
   };
-} else {
+} else if (process.env.BUILD_ENV === 'prod') {
   // Production DB Setup
   config = {
     host: process.env.POSTGRES_HOST,
