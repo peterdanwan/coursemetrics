@@ -25,14 +25,11 @@ import {
   Link,
 } from '@chakra-ui/react';
 import CourseReview from '@/components/CourseReview';
-import { FaStar, FaRegStar, FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
 import { useSearchParams } from 'next/navigation';
 import SideMenu from '@/components/SideFilterMenuCourse';
 import CourseReviewForm from '@/components/CourseReviewForm';
 import { useFlexStyle } from '@/styles/styles';
-import { getFirstFiveComments } from '@/utils/funcs';
-import { ReviewEvaluator } from '@/utils/ai';
 import RatingIcons from '@/components/RatingIcons';
 import useFetchUser from '@/components/useFetchUser';
 
@@ -124,13 +121,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const reviewsURL = courseCode
     ? `/api/reviews/courses/${courseCode}${year && season ? `?year=${year}&season=${season}` : ''}`
     : null;
-  // console.log('courseURL', courseURL);
-  // console.log('reviewsURL', reviewsURL);
 
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
-  // console.log('Fetched Course', courseResponse);
-  // console.log('Fetched Reviews', reviewResponse);
 
   // For review form modal
   const {
@@ -175,12 +168,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
       if (!initialCourse) {
         // If no matching course is found or no term selected, use the most recent term
-        initialCourse = coursesArray.reduce((latest: any, current: any) => {
-          if (!latest) return current;
-          const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
-          const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
-          return currentDate > latestDate ? current : latest;
-        }, null as ICourse | null);
+        initialCourse = coursesArray.reduce(
+          (latest: any, current: any) => {
+            if (!latest) return current;
+            const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+            const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+            return currentDate > latestDate ? current : latest;
+          },
+          null as ICourse | null
+        );
       }
 
       setCourse(initialCourse);
@@ -197,12 +193,11 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   }, [courseResponse, year, season]);
 
   useEffect(() => {
-    // console.log('course review form is', isCourseReviewFormOpen ? 'open' : 'closed');
     const fetchTags = async () => {
-      // console.log(reviewResponse);
       if (reviewResponse && reviewResponse.status === 'ok') {
-        if (Array.isArray(reviewResponse.data.reviews)) {
-          const { quickStats: quickStatsFromDB, reviews: reviewsFromDB } = reviewResponse.data;
+        if (Array.isArray(reviewResponse.data.reviewContent.reviews)) {
+          const { quickStats: quickStatsFromDB, reviews: reviewsFromDB } =
+            reviewResponse.data.reviewContent;
 
           const sortedReviews = [...reviewsFromDB].sort(
             (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
@@ -226,17 +221,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
           const averageRating = calculateAverageRating(quickStatsArr);
           setCourseAverageRating(averageRating);
-          // const reviewEvaluator = new ReviewEvaluator();
-
-          // const dynamicTags = await reviewEvaluator.generateTags(
-          //   getFirstFiveComments(reviewsFromDB)
-          // );
-
-          // const uniqueTags = Array.from(new Set(dynamicTags.tags));
-          // const topUniqueTags = uniqueTags.slice(0, 5);
-
-          // setTags(topUniqueTags);
-          setTags(['Jeremy Goat', 'Mimi Daaaang']);
+          setTags(reviewResponse.data.tags);
         } else {
           setReviews([]);
         }
