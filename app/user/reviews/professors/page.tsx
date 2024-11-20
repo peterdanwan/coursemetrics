@@ -16,13 +16,41 @@ import { useState } from 'react';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
 import { useFlexStyle } from '@/styles/styles';
+import { useToast } from '@chakra-ui/react';
+import { mutate } from 'swr';
 
 export default function Professors() {
   const styles = useFlexStyle();
+  const toast = useToast();
   const { data: reviewProfessorData, error: reviewProfessorError } = useSWR(
     '/api/users',
     apiFetcher
   );
+
+  const deleteReview = async (reviewId: number) => {
+    try {
+      const response = await fetch(`/api/reviews/${reviewId}`, { method: 'DELETE' });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error.message);
+      }
+
+      // Show success toast
+      toast({
+        title: 'Review successfully deleted.',
+        description: `The review id ${reviewId} has been successfully deleted`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+
+      mutate('/api/users');
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   //console.log('Review Course Data:', reviewProfessorData);
 
@@ -214,6 +242,7 @@ export default function Professors() {
                         flex="1"
                         mr={{ base: 0, md: 1 }}
                         mb={{ base: 1, md: 0 }}
+                        onClick={() => deleteReview(review.review_id)}
                       >
                         Delete
                       </Button>
