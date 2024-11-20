@@ -206,14 +206,51 @@ export const DELETE = withApiAuthRequired(async function delete_review_by_review
 
     const reviewId = url.pathname.split('/').pop();
 
-    const review = await Review.findByPk(reviewId);
+    // Fetch the review by its ID
+    const review = await Review.findOne({
+      where: {
+        review_id: reviewId,
+      },
+      include: [
+        {
+          model: ProfessorCourse,
+          include: [
+            {
+              model: Course,
+              attributes: ['course_code'],
+            },
+          ],
+        },
+      ],
+    });
 
     if (!review) {
       log.warn('Review not found', { reviewId: reviewId });
       return NextResponse.json(createErrorResponse(404, 'Review not found'), { status: 404 });
     }
+    const reviewJSON = review.toJSON();
+    const courseCode = reviewJSON.ProfessorCourse.Course.course_code;
 
     await review.destroy();
+
+    // Delete the cached response if we are updating the review's status
+    // The GET route will get updated tags for all reviews
+    const redisKeyPattern = `reviews:${courseCode}:*`; // This pattern will match all keys starting with 'reviews:{courseCode}:'
+
+    try {
+      // @ts-ignore
+      const keys: string[] = await redisClient.keys(redisKeyPattern);
+
+      if (keys.length > 0) {
+        // @ts-ignore
+        await redisClient.del(...keys);
+        console.log(`Deleted ${keys.length} keys starting with ${redisKeyPattern}`);
+      } else {
+        console.log('No keys found to delete.');
+      }
+    } catch (error) {
+      console.error('Error deleting keys:', error);
+    }
 
     log.info('Review deleted successfully', { reviewId: reviewId });
     return NextResponse.json(createSuccessResponse({ message: 'Review deleted successfully' }), {
