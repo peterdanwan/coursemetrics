@@ -15,10 +15,12 @@ import {
   NumberDecrementStepper,
   Text,
   Spinner,
+  Flex,
 } from '@chakra-ui/react';
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
 import { useFlexStyle } from '@/styles/styles';
+import NotFound from '@/components/NotFound';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -52,6 +54,7 @@ function getURL(page: string | null, limit: string) {
 export default function CoursesPage() {
   const flexStyle = useFlexStyle();
   const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [groupedCourses, setGroupedCourses] = useState<Record<string, ICourse[]>>({});
   const [limit, setLimit] = useState<string>('2');
 
@@ -64,9 +67,17 @@ export default function CoursesPage() {
   useEffect(() => {
     if (coursesResponse) {
       const coursesArray = coursesResponse?.data.courses || [];
+      // Filter courses based on search query
+      const filteredCourses = searchQuery
+        ? coursesArray.filter(
+            (course: ICourse) =>
+              course.course_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              course.CourseDetail.course_name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : coursesArray;
 
-      // Group courses by course_code
-      const groupedCourses = coursesArray.reduce(
+      // Group filtered courses by course_code
+      const groupedCourses = filteredCourses.reduce(
         (acc: Record<string, ICourse[]>, course: ICourse) => {
           const { course_code } = course;
           if (!acc[course_code]) {
@@ -77,10 +88,9 @@ export default function CoursesPage() {
         },
         {}
       );
-
       setGroupedCourses(groupedCourses);
     }
-  }, [coursesResponse]);
+  }, [coursesResponse, searchQuery]);
 
   if (error) return <Text>Error loading courses</Text>;
   if (!coursesResponse)
@@ -93,6 +103,14 @@ export default function CoursesPage() {
   const uniqueCourseCodes = Object.keys(groupedCourses);
   const displayedCourseCodes = uniqueCourseCodes;
 
+  if (displayedCourseCodes.length === 0) {
+    return (
+      <Flex h="100vh" justifyContent="center" alignItems="center">
+        <NotFound statusCode="No Courses Found" />
+      </Flex>
+    );
+  }
+
   return (
     <>
       <Grid
@@ -102,23 +120,11 @@ export default function CoursesPage() {
         margin="0 auto"
         w={{ base: '100%', xl: '95%' }}
       >
-        {uniqueCourseCodes.length > 0 && (
-          <GridItem
-            gridColumn={{ base: 'span 12' }}
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="center"
-          ></GridItem>
-        )}
-        {uniqueCourseCodes.length > 0 ? (
-          displayedCourseCodes.map((courseCode) => (
-            <GridItem key={courseCode} gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}>
-              <CourseCard courses={groupedCourses[courseCode]} />
-            </GridItem>
-          ))
-        ) : (
-          <Text>No courses available</Text>
-        )}
+        {displayedCourseCodes.map((courseCode) => (
+          <GridItem key={courseCode} gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}>
+            <CourseCard courses={groupedCourses[courseCode]} />
+          </GridItem>
+        ))}
       </Grid>
     </>
   );

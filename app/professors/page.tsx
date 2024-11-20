@@ -15,11 +15,14 @@ import {
   NumberDecrementStepper,
   Text,
   Flex,
+  Center,
   Spinner,
 } from '@chakra-ui/react';
 import ProfessorCard from '@/components/ProfessorCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
 import { useFlexStyle } from '@/styles/styles';
+import { set } from 'react-hook-form';
+import NotFound from '@/components/NotFound';
 
 interface IProfessor {
   professor_id: number;
@@ -37,6 +40,7 @@ function getURL(page: string | null, limit: string) {
 export default function ProfessorsPage() {
   const flexStyle = useFlexStyle();
   const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [limit, setLimit] = useState<string>('2');
   const page = searchParams.get('page') || null;
 
@@ -48,10 +52,26 @@ export default function ProfessorsPage() {
     setProfessors(professorsResponse?.data.professors || []);
   }, [professorsResponse]);
 
+  useEffect(() => {
+    if (professorsResponse) {
+      const professorArray = professorsResponse?.data?.professors || [];
+      // Filter courses based on search query
+      const filteredProfessors = searchQuery
+        ? professorArray.filter(
+            (professor: IProfessor) =>
+              professor.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              professor.last_name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : professorArray;
+
+      setProfessors(filteredProfessors);
+    }
+  }, [professorsResponse, searchQuery]);
+
   if (error)
     return (
       <Flex justifyContent="center" alignItems="center" h="100vh">
-        <Text>Error loading courses</Text>
+        <Text>Error loading professors</Text>
       </Flex>
     );
   if (!professorsResponse)
@@ -61,6 +81,14 @@ export default function ProfessorsPage() {
         &nbsp;&nbsp; Loading ...
       </div>
     );
+
+  if (professors.length === 0) {
+    return (
+      <Flex h="100vh" justifyContent="center" alignItems="center">
+        <NotFound statusCode="No Professors Found" />
+      </Flex>
+    );
+  }
 
   return (
     <>
@@ -72,26 +100,14 @@ export default function ProfessorsPage() {
         w={{ base: '100%', xl: '95%' }}
         bgColor={flexStyle.bgColor}
       >
-        {professors.length > 0 && (
+        {professors.map((professor) => (
           <GridItem
-            gridColumn={{ base: 'span 12' }}
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="center"
-          ></GridItem>
-        )}
-        {professors.length > 0 ? (
-          professors.map((professor) => (
-            <GridItem
-              key={professor.professor_id}
-              gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}
-            >
-              <ProfessorCard professor={professor} />
-            </GridItem>
-          ))
-        ) : (
-          <Text>No Professors available</Text>
-        )}
+            key={professor.professor_id}
+            gridColumn={{ base: 'span 12', md: 'span 6', lg: 'span 4' }}
+          >
+            <ProfessorCard professor={professor} />
+          </GridItem>
+        ))}
       </Grid>
     </>
   );

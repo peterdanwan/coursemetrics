@@ -176,10 +176,10 @@ export default function MainNav(props: { user: any }) {
       }
     } else {
       if (category == 'Course Reviews') {
-        router.push(`/courses/${searchQuery}`);
+        router.push(`/courses?search=${encodeURIComponent(searchQuery)}`);
         category = 'courses';
       } else if (category == 'Professor Reviews') {
-        router.push(`/professors/${searchQuery}`);
+        router.push(`/professors?search=${encodeURIComponent(searchQuery)}`);
         category = 'professors';
       } else if (category == 'Select Category') {
         toast({

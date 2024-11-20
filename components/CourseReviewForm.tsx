@@ -86,7 +86,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   console.log('Course Review Form', courseResponse);
 
   // Course name passed from course page
-  const courseName = courseResponse?.data?.courses[0].course_code;
+  const courseName = courseResponse?.data?.courses[0]?.course_code;
 
   // To access "questions" fields in form
   const { fields } = useFieldArray({ name: 'questions', control });
@@ -105,7 +105,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
 
   // Fetch data from API
   const { data: courseProfessorResponse, error: courseProfessorResponseError } = useSWR(
-    `/api/professors/course/${courseResponse?.data.courses[0].course_code}`,
+    `/api/professors/course/${courseResponse?.data?.courses[0]?.course_code}`,
     apiFetcher
   );
 
