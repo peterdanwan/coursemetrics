@@ -128,7 +128,7 @@ export const GET = async function fetch_reviews_by_professor_id(
             },
             {
               model: Question,
-              attributes: ['question_text', 'is_rating'],
+              attributes: ['question_id', 'question_text', 'is_rating'],
             },
           ],
           attributes: ['review_question_id'],
@@ -147,7 +147,7 @@ export const GET = async function fetch_reviews_by_professor_id(
             },
             {
               model: Course,
-              attributes: ['course_code'],
+              attributes: ['course_code', 'course_section'],
               include: [
                 {
                   model: CourseTerm,
