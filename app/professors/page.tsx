@@ -15,11 +15,13 @@ import {
   NumberDecrementStepper,
   Text,
   Flex,
-  Spinner,
+  Center,
 } from '@chakra-ui/react';
 import ProfessorCard from '@/components/ProfessorCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
 import { useFlexStyle } from '@/styles/styles';
+import { set } from 'react-hook-form';
+import NotFound from '@/components/NotFound';
 
 interface IProfessor {
   professor_id: number;
@@ -37,6 +39,7 @@ function getURL(page: string | null, limit: string) {
 export default function ProfessorsPage() {
   const flexStyle = useFlexStyle();
   const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [limit, setLimit] = useState<string>('2');
   const page = searchParams.get('page') || null;
 
@@ -48,10 +51,26 @@ export default function ProfessorsPage() {
     setProfessors(professorsResponse?.data.professors || []);
   }, [professorsResponse]);
 
+  useEffect(() => {
+    if (professorsResponse) {
+      const professorArray = professorsResponse?.data?.professors || [];
+      // Filter courses based on search query
+      const filteredProfessors = searchQuery
+        ? professorArray.filter(
+            (professor: IProfessor) =>
+              professor.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              professor.last_name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : professorArray;
+
+      setProfessors(filteredProfessors);
+    }
+  }, [professorsResponse, searchQuery]);
+
   if (error)
     return (
       <Flex justifyContent="center" alignItems="center" h="100vh">
-        <Text>Error loading courses</Text>
+        <Text>Error loading professors</Text>
       </Flex>
     );
   if (!professorsResponse)
@@ -90,7 +109,9 @@ export default function ProfessorsPage() {
             </GridItem>
           ))
         ) : (
-          <Text>No Professors available</Text>
+          <GridItem gridColumn={{ base: 'span 12' }}>
+            <NotFound statusCode="No Professors Found" />
+          </GridItem>
         )}
       </Grid>
     </>

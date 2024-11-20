@@ -19,6 +19,7 @@ import {
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
 import { useFlexStyle } from '@/styles/styles';
+import NotFound from '@/components/NotFound';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -52,6 +53,7 @@ function getURL(page: string | null, limit: string) {
 export default function CoursesPage() {
   const flexStyle = useFlexStyle();
   const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [groupedCourses, setGroupedCourses] = useState<Record<string, ICourse[]>>({});
   const [limit, setLimit] = useState<string>('2');
 
@@ -64,9 +66,17 @@ export default function CoursesPage() {
   useEffect(() => {
     if (coursesResponse) {
       const coursesArray = coursesResponse?.data.courses || [];
+      // Filter courses based on search query
+      const filteredCourses = searchQuery
+        ? coursesArray.filter(
+            (course: ICourse) =>
+              course.course_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              course.CourseDetail.course_name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : coursesArray;
 
-      // Group courses by course_code
-      const groupedCourses = coursesArray.reduce(
+      // Group filtered courses by course_code
+      const groupedCourses = filteredCourses.reduce(
         (acc: Record<string, ICourse[]>, course: ICourse) => {
           const { course_code } = course;
           if (!acc[course_code]) {
@@ -77,10 +87,9 @@ export default function CoursesPage() {
         },
         {}
       );
-
       setGroupedCourses(groupedCourses);
     }
-  }, [coursesResponse]);
+  }, [coursesResponse, searchQuery]);
 
   if (error) return <Text>Error loading courses</Text>;
   if (!coursesResponse)
@@ -117,7 +126,9 @@ export default function CoursesPage() {
             </GridItem>
           ))
         ) : (
-          <Text>No courses available</Text>
+          <GridItem gridColumn={{ base: 'span 12' }}>
+            <NotFound statusCode="No Courses Found" />
+          </GridItem>
         )}
       </Grid>
     </>
