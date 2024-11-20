@@ -214,13 +214,13 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
         >
           {/* Prof Details Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" gap={2} wrap="wrap">
                   <Box order={{ base: '1', sm: '1', md: '1', lg: '1' }}>
                     <Heading
+                      color={flexStyle.headingColor}
                       as="h1"
-                      color="teal"
                       fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
                       mb={2}
                     >
@@ -255,9 +255,12 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           </GridItem>
           {uniqueCourseCodes && uniqueCourseCodes.length && (
             <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-              <Card bgColor="gray.50">
+              <Card bgColor={flexStyle.cardBg}>
                 <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                  <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                  <Heading
+                    color={flexStyle.headingColor}
+                    fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                  >
                     Courses
                   </Heading>
                 </CardHeader>
@@ -281,11 +284,11 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
             gridColumn={{ base: 'span 12', md: 'span 8' }}
             gridRow={{ base: '2', md: 'span 4' }}
           >
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" wrap="wrap" gap={2}>
                   <Heading
-                    color="teal"
+                    color={flexStyle.headingColor}
                     fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
                     order={{ base: '1', sm: '1', md: '1', lg: '1' }}
                   >
@@ -357,9 +360,12 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           </GridItem>
           {/* Skills Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                <Heading
+                  color={flexStyle.headingColor}
+                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                >
                   Skills
                 </Heading>
               </CardHeader>
@@ -386,9 +392,12 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
 
           {/* Quick Stats Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                <Heading
+                  color={flexStyle.headingColor}
+                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                >
                   Quick Stats
                 </Heading>
               </CardHeader>
@@ -421,7 +430,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           {/* <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                <Heading color={flexStyle.headingColor} color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
                   Prerequisites
                 </Heading>
               </CardHeader>

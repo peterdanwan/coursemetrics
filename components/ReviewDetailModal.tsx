@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 
 import RatingIcons from './RatingIcons';
+import { useFlexStyle } from '@/styles/styles';
 
 interface QnA {
   question_id: number;
@@ -33,6 +34,7 @@ const ReviewDetailModal = ({
   onReviewDetailClose: any;
   review: any;
 }) => {
+  const flexStyle = useFlexStyle();
   const [ratingQuestions, setRatingQuestions] = useState<any>(null);
   const [feedbackQuestions, setFeedbackQuestions] = useState<any>(null);
 
@@ -113,7 +115,7 @@ const ReviewDetailModal = ({
     <Modal isOpen={isReviewDetailOpen} onClose={onReviewDetailClose} isCentered size="xl">
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader color="teal" pr={8}>
+        <ModalHeader color={flexStyle.headingColor} pr={8}>
           {review.title}
         </ModalHeader>
         <ModalCloseButton />

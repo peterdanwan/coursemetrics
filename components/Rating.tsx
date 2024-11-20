@@ -1,11 +1,12 @@
 // components/Rating.tsx
 import { Box, UseRadioProps, useRadio } from '@chakra-ui/react';
-
+import { useFlexStyle } from '@/styles/styles';
 interface InputProps extends UseRadioProps {
   children: React.ReactNode;
 }
 
 const Rating: React.FC<InputProps> = (props) => {
+  const flexStyle = useFlexStyle();
   const { getInputProps, getRadioProps } = useRadio(props);
   const input = getInputProps();
   const checkbox = getRadioProps();
@@ -21,6 +22,8 @@ const Rating: React.FC<InputProps> = (props) => {
         borderWidth="1px"
         borderRadius="md"
         boxShadow="md"
+        bgColor={flexStyle.fieldColor}
+        color={flexStyle.color}
         _checked={{
           bg: 'teal.600',
           color: 'white',

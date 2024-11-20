@@ -9,6 +9,7 @@ import {
   Text,
   ModalFooter,
 } from '@chakra-ui/react';
+import { useFlexStyle } from '@/styles/styles';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   message,
   confirmBtnText,
 }) => {
+  const flexStyle = useFlexStyle();
   const confirmCloseAndReset = () => {
     // resetForm();
     // reset to default form values should be handled in the parent component's useEffect
@@ -42,7 +44,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       <ModalOverlay />
       <ModalContent>
         <ModalHeader color={isWarning ? 'red' : 'teal'}>{title}</ModalHeader>
-        <ModalBody color="black">
+        <ModalBody color={flexStyle.color}>
           <Text>{message}</Text>
         </ModalBody>
         <ModalFooter>
