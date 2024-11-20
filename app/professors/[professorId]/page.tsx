@@ -426,24 +426,6 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
               </CardBody>
             </Card>
           </GridItem>
-          {/* Prerequisites Section */}
-          {/* <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color={flexStyle.headingColor} color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
-                  Prerequisites
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <Box>
-                  <Text>WEB422 - Web Programming for Apps and Services</Text>
-                </Box>
-                <Box>
-                  <Text>BTI425 - Web Programming for Apps and Services</Text>
-                </Box>
-              </CardBody>
-            </Card>
-          </GridItem> */}
         </Grid>
       ) : (
         <Flex justifyContent="center" alignItems="center" h="100vh">

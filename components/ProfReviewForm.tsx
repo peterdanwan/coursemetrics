@@ -313,8 +313,8 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
             />
             {/* End Automated Form Filling - TO BE REMOVED WHEN Testing is done */}
           </Flex>
-          <ModalCloseButton color="black" bgColor={flexStyle.hoverBg} m={2} />
-          <ModalBody color="black">
+          <ModalCloseButton color={flexStyle.headingColor} bgColor={flexStyle.hoverBg} m={2} />
+          <ModalBody color={flexStyle.headingColor}>
             {profReviewQuestions ? (
               <form onSubmit={handleSubmit(submitForm)}>
                 <Flex gap={10} wrap="wrap" direction={{ base: 'column', md: 'column', lg: 'row' }}>

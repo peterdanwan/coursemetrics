@@ -175,15 +175,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
       if (!initialCourse) {
         // If no matching course is found or no term selected, use the most recent term
-        initialCourse = coursesArray.reduce(
-          (latest: any, current: any) => {
-            if (!latest) return current;
-            const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
-            const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
-            return currentDate > latestDate ? current : latest;
-          },
-          null as ICourse | null
-        );
+        initialCourse = coursesArray.reduce((latest: any, current: any) => {
+          if (!latest) return current;
+          const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+          const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+          return currentDate > latestDate ? current : latest;
+        }, null as ICourse | null);
       }
 
       setCourse(initialCourse);
@@ -518,24 +515,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardBody>
             </Card>
           </GridItem>
-          {/* Prerequisites Section */}
-          {/* <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color={flexStyle.headingColor} color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
-                  Prerequisites
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <Box>
-                  <Text>WEB422 - Web Programming for Apps and Services</Text>
-                </Box>
-                <Box>
-                  <Text>BTI425 - Web Programming for Apps and Services</Text>
-                </Box>
-              </CardBody>
-            </Card>
-          </GridItem> */}
         </Grid>
       ) : (
         <Flex justifyContent="center" alignItems="center" h="100vh">

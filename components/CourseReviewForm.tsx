@@ -350,8 +350,8 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
             />
             {/* End Automated Form Filling - TO BE REMOVED WHEN Testing is done */}
           </Flex>
-          <ModalCloseButton color="black" bgColor={flexStyle.hoverBg} m={2} />
-          <ModalBody color="black">
+          <ModalCloseButton color={flexStyle.headingColor} bgColor={flexStyle.hoverBg} m={2} />
+          <ModalBody color={flexStyle.headingColor}>
             {courseQuestions ? (
               <form onSubmit={handleSubmit(submitForm)}>
                 <Flex
