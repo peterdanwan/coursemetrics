@@ -18,5 +18,7 @@ export const useFlexStyle = () => {
     requiredColor: useColorModeValue('teal.500', 'teal.200'),
     accordionPanelColor: useColorModeValue('gray.800', 'gray.200'),
     iconColor: useColorModeValue('#285E61', '#38B2AC'),
+    fieldColor: useColorModeValue('white', 'gray.700'),
+    commentTitleColor: useColorModeValue('blackAlpha.600', 'gray.50'),
   };
 };

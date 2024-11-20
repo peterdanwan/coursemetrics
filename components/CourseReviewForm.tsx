@@ -29,6 +29,7 @@ import ConfirmationModal from './ConfirmationModal';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
 import AutoFillCourseReviewFormButton from './AutoFillCourseReviewFormButton'; // TO BE REMOVE WHEN TESTING IS DONE
+import { useFlexStyle } from '@/styles/styles';
 
 type QuestionUI = {
   question_id: string;
@@ -92,12 +93,19 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   const { fields } = useFieldArray({ name: 'questions', control });
 
   // const [courseName, setCourseName] = useState<string>("");
+  const flexStyle = useFlexStyle();
   const [courses, setCourses] = useState<any>([]);
   const [courseProfessors, setCourseProfessors] = useState<any>(null);
   const [courseQuestions, setCourseQuestions] = useState<any>(null);
   const [courseTerms, setCourseTerms] = useState<any>(null);
   const [courseSectionsByTerm, setCourseSectionsByTerm] = useState<any>(null);
   const [coursesByTerm, setCoursesByTerm] = useState<any>([]);
+  const [confirmModalProps, setConfirmModalProps] = React.useState<any>({
+    isWarning: false,
+    title: '',
+    message: '',
+    confirmBtnText: '',
+  });
 
   // Track the selected value of Term and Section Codes
   const selectedTerm = watch('term');
@@ -247,9 +255,9 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
 
   // Confirmation on form submission success Modal <ConfirmationModal />:
   const {
-    isOpen: isSuccessConfirmModalOpen,
-    onOpen: openSuccessConfirmModal,
-    onClose: closeSuccessConfirmModal,
+    isOpen: isSubmitConfirmationModalOpen,
+    onOpen: openSubmitConfirmationModal,
+    onClose: closeSubmitConfirmationModal,
   } = useDisclosure();
 
   useEffect(() => {
@@ -264,17 +272,39 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     console.log(data);
 
     try {
-      await fetch(`/api/reviews/courses/${courseName}`, {
+      const res = await fetch(`/api/reviews/courses/${courseName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
+
+      const resData = await res.json();
+
+      if (resData.status === 'error') {
+        throw new Error(resData.error.code, resData.error.message);
+      }
+
       // If submitted successfully, display success modal:
-      openSuccessConfirmModal();
+      // If submitted successfully, display success modal:
+      setConfirmModalProps({
+        isWarning: false,
+        title: 'Review Submitted!',
+        message: 'Your review has been submitted successfully.',
+        confirmBtnText: 'OK',
+      });
+      openSubmitConfirmationModal();
     } catch (error) {
       console.error('Error', { error });
+      // If submission failed, display info modal:
+      setConfirmModalProps({
+        isWarning: true,
+        title: 'Review Submission Failed!',
+        message: 'There is an error submitting your review. Please try again.',
+        confirmBtnText: 'Close Form',
+      });
+      openSubmitConfirmationModal();
     }
   };
 
@@ -302,8 +332,11 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
         scrollBehavior="inside"
       >
         <ModalOverlay />
-        <ModalContent overflow="scroll">
-          <ModalHeader color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+        <ModalContent overflow="scroll" bgColor={flexStyle.bgColor} color={flexStyle.color}>
+          <ModalHeader
+            color={flexStyle.headingColor}
+            fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+          >
             New Review
           </ModalHeader>
           {/* Start Automated Form Filling - TO BE REMOVED WHEN Testing is done */}
@@ -317,8 +350,8 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
             />
             {/* End Automated Form Filling - TO BE REMOVED WHEN Testing is done */}
           </Flex>
-          <ModalCloseButton color="black" bgColor="gray.200" m={2} />
-          <ModalBody color="black">
+          <ModalCloseButton color={flexStyle.headingColor} bgColor={flexStyle.hoverBg} m={2} />
+          <ModalBody color={flexStyle.headingColor}>
             {courseQuestions ? (
               <form onSubmit={handleSubmit(submitForm)}>
                 <Flex
@@ -329,13 +362,15 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                   <Flex flex="1" gap={5} direction="column">
                     {/**** COURSE NAME ****/}
                     <FormControl isInvalid={!!errors.courseName}>
-                      <FormLabel htmlFor="course-name">
+                      <FormLabel color={flexStyle.color} htmlFor="course-name">
                         Course Name:{' '}
-                        <Text as="span" color="teal" fontSize="sm">
+                        <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                           (Required)
                         </Text>
                       </FormLabel>
                       <Input
+                        color={flexStyle.color}
+                        bgColor={flexStyle.fieldColor}
                         id="course-name"
                         type="text"
                         placeholder={courseName || 'Select course from the list...'}
@@ -353,13 +388,15 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
 
                     {/**** TERM ****/}
                     <FormControl isInvalid={!!errors.term}>
-                      <FormLabel htmlFor="term">
+                      <FormLabel color={flexStyle.color} htmlFor="term">
                         Term:{' '}
-                        <Text as="span" color="teal" fontSize="sm">
+                        <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                           (Required)
                         </Text>
                       </FormLabel>
                       <Select
+                        color={flexStyle.color}
+                        bgColor={flexStyle.fieldColor}
                         id="term"
                         placeholder="Select from existing terms..."
                         {...register('term', {
@@ -377,13 +414,15 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
 
                     {/**** SECTION CODE ****/}
                     <FormControl isInvalid={!!errors.sectionCode}>
-                      <FormLabel htmlFor="section-code">
+                      <FormLabel color={flexStyle.color} htmlFor="section-code">
                         Section Code:{' '}
-                        <Text as="span" color="teal" fontSize="sm">
+                        <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                           (Required)
                         </Text>
                       </FormLabel>
                       <Select
+                        color={flexStyle.color}
+                        bgColor={flexStyle.fieldColor}
                         id="section-code"
                         placeholder="Select from existing sections..."
                         {...register('sectionCode', {
@@ -403,15 +442,17 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
 
                     {/**** PROFESSOR ****/}
                     <FormControl isInvalid={!!errors.professorId}>
-                      <FormLabel htmlFor="professorId">
+                      <FormLabel color={flexStyle.color} htmlFor="professorId">
                         Professor:{' '}
-                        <Text as="span" color="teal" fontSize="sm">
+                        <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                           (Required)
                         </Text>
                       </FormLabel>
                       <Select
+                        color={flexStyle.color}
+                        bgColor={flexStyle.fieldColor}
                         id="professorId"
-                        placeholder="Add existing professor(s)..."
+                        placeholder="Select from existing professors..."
                         value={watch('professorId')}
                         {...register('professorId', {
                           required: 'Professor is required. Please select from the list.',
@@ -459,9 +500,9 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                           isInvalid={!!errors.takeAgain}
                           h={{ base: 'auto', sm: '106.5px', md: '106.5px', lg: '106.5px' }}
                         >
-                          <FormLabel whiteSpace="nowrap">
+                          <FormLabel color={flexStyle.color} whiteSpace="nowrap">
                             Would Take Again:{' '}
-                            <Text as="span" color="teal" fontSize="sm">
+                            <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                               (Required)
                             </Text>
                           </FormLabel>
@@ -475,6 +516,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                             }}
                             render={({ field }) => (
                               <RadioGroup
+                                color={flexStyle.color}
                                 onChange={(val) => {
                                   field.onChange(val === 'true');
                                   field.onBlur();
@@ -496,13 +538,19 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                           isInvalid={!!errors.grade}
                           h={{ base: 'auto', sm: '106.5px', md: '106.5px', lg: '106.5px' }}
                         >
-                          <FormLabel htmlFor="grade">
+                          <FormLabel color={flexStyle.color} htmlFor="grade">
                             Grade:{' '}
-                            <Text as="span" color="teal" fontSize="sm">
+                            <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                               (Optional)
                             </Text>
                           </FormLabel>
-                          <Select id="grade" placeholder="Select grade..." {...register('grade')}>
+                          <Select
+                            color={flexStyle.color}
+                            id="grade"
+                            placeholder="Select grade..."
+                            {...register('grade')}
+                            bgColor={flexStyle.fieldColor}
+                          >
                             {/* Ref Doc: https://www.senecapolytechnic.ca/about/policies/grading-policy.html */}
                             <option value="A+">A+</option>
                             <option value="A">A</option>
@@ -527,13 +575,15 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                     <Flex direction="column" gap={5}>
                       {/**** COMMENT TITLE ****/}
                       <FormControl isInvalid={!!errors.commentTitle}>
-                        <FormLabel htmlFor="comment-title">
+                        <FormLabel color={flexStyle.color} htmlFor="comment-title">
                           Title:{' '}
-                          <Text as="span" color="teal" fontSize="sm">
+                          <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                             (Required)
                           </Text>
                         </FormLabel>
                         <Input
+                          color={flexStyle.color}
+                          bgColor={flexStyle.fieldColor}
                           id="comment-title"
                           placeholder="Title"
                           {...register('commentTitle', {
@@ -547,13 +597,15 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
 
                       {/**** COMMENT ****/}
                       <FormControl isInvalid={!!errors.comment}>
-                        <FormLabel htmlFor="comment">
+                        <FormLabel color={flexStyle.color} htmlFor="comment">
                           Comment:{' '}
-                          <Text as="span" color="teal" fontSize="sm">
+                          <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                             (Required)
                           </Text>
                         </FormLabel>
                         <Textarea
+                          color={flexStyle.color}
+                          bgColor={flexStyle.fieldColor}
                           id="comment"
                           placeholder="Anything about this course you would like to share..."
                           {...register('comment', {
@@ -570,13 +622,18 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                         if (q.is_rating) return;
                         return (
                           <FormControl key={index}>
-                            <FormLabel htmlFor={`questions.${index}.answer`}>
+                            <FormLabel
+                              color={flexStyle.color}
+                              htmlFor={`questions.${index}.answer`}
+                            >
                               {q.question_text}{' '}
-                              <Text as="span" color="teal" fontSize="sm">
+                              <Text as="span" color={flexStyle.headingColor} fontSize="sm">
                                 (Optional)
                               </Text>
                             </FormLabel>
                             <Textarea
+                              color={flexStyle.color}
+                              bgColor={flexStyle.fieldColor}
                               id={`questions.${index}.answer`}
                               {...register(`questions.${index}.answer`)}
                             />
@@ -613,13 +670,14 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
         confirmBtnText="Yes"
       />
       <ConfirmationModal
-        isOpen={isSuccessConfirmModalOpen}
+        isOpen={isSubmitConfirmationModalOpen}
         closeFormModal={onClose}
-        closeConfirmModal={closeSuccessConfirmModal}
-        isWarning={false}
-        title="Review Submitted!"
-        message="Thank you! Your review has been submitted successfully."
-        confirmBtnText="OK"
+        closeConfirmModal={closeSubmitConfirmationModal}
+        // resetForm={onReset}
+        isWarning={confirmModalProps.isWarning}
+        title={confirmModalProps.title}
+        message={confirmModalProps.message}
+        confirmBtnText={confirmModalProps.confirmBtnText}
       />
     </>
   );

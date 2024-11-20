@@ -175,15 +175,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
 
       if (!initialCourse) {
         // If no matching course is found or no term selected, use the most recent term
-        initialCourse = coursesArray.reduce(
-          (latest: any, current: any) => {
-            if (!latest) return current;
-            const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
-            const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
-            return currentDate > latestDate ? current : latest;
-          },
-          null as ICourse | null
-        );
+        initialCourse = coursesArray.reduce((latest: any, current: any) => {
+          if (!latest) return current;
+          const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
+          const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
+          return currentDate > latestDate ? current : latest;
+        }, null as ICourse | null);
       }
 
       setCourse(initialCourse);
@@ -324,19 +321,19 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           bgColor={flexStyle.bgColor}
         >
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" gap={2} wrap="wrap">
                   <Box order={{ base: '1', sm: '1', md: '1', lg: '1' }}>
                     <Heading
+                      color={flexStyle.headingColor}
                       as="h1"
-                      color="teal"
                       fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
                       mb={2}
                     >
                       {course?.course_code}
                     </Heading>
-                    <Heading as="h2" color="teal" fontSize={{ md: '20' }}>
+                    <Heading color={flexStyle.headingColor} as="h2" fontSize={{ md: '20' }}>
                       {course?.CourseDetail.course_name}
                     </Heading>
                   </Box>
@@ -377,9 +374,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </GridItem>
           {/* Tags Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                <Heading
+                  color={flexStyle.headingColor}
+                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                >
                   Tags
                 </Heading>
               </CardHeader>
@@ -401,11 +401,11 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             gridColumn={{ base: 'span 12', md: 'span 12', lg: 'span 8' }}
             gridRow={{ base: '2', md: 'span 4' }}
           >
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" wrap="wrap" gap={2}>
                   <Heading
-                    color="teal"
+                    color={flexStyle.headingColor}
                     fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
                     order={{ base: '1', sm: '1', md: '1', lg: '1' }}
                   >
@@ -482,9 +482,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           </GridItem>
           {/* Quick Stats Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
-            <Card bgColor="gray.50">
+            <Card bgColor={flexStyle.cardBg}>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
+                <Heading
+                  color={flexStyle.headingColor}
+                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                >
                   Quick Stats
                 </Heading>
               </CardHeader>
@@ -512,24 +515,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardBody>
             </Card>
           </GridItem>
-          {/* Prerequisites Section */}
-          {/* <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
-                  Prerequisites
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <Box>
-                  <Text>WEB422 - Web Programming for Apps and Services</Text>
-                </Box>
-                <Box>
-                  <Text>BTI425 - Web Programming for Apps and Services</Text>
-                </Box>
-              </CardBody>
-            </Card>
-          </GridItem> */}
         </Grid>
       ) : (
         <Flex justifyContent="center" alignItems="center" h="100vh">

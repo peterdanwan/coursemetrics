@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 
 import Rating from './Rating';
+import { useFlexStyle } from '@/styles/styles';
 
 interface RatingScaleProps {
   index: number;
@@ -59,15 +60,17 @@ const RatingScale: React.FC<RatingScaleProps> = ({
   control,
   question_id,
 }) => {
+  const flexStyle = useFlexStyle();
   return (
     <FormControl
+      color={flexStyle.color}
       key={index}
       isInvalid={!!fieldErrors}
       h={{ base: 'auto', sm: '106.5px', md: '106.5px', lg: '106.5px' }}
     >
       <FormLabel>
         {question_text}{' '}
-        <Text as="span" color="teal" fontSize="sm">
+        <Text as="span" color={flexStyle.headingColor} fontSize="sm">
           (Required)
         </Text>
       </FormLabel>

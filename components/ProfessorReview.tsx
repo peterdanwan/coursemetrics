@@ -4,8 +4,10 @@ import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import ReviewDetailModal from './ReviewDetailModal';
 import RatingIcons from './RatingIcons';
 import { toggleReviewBookmark, isReviewBookmarked } from '@/utils/localStorageHelpers';
+import { useFlexStyle } from '@/styles/styles';
 
 export default function ProfessorReview({ review }: { review: any }) {
+  const flexStyle = useFlexStyle();
   const {
     isOpen: isReviewDetailOpen,
     onOpen: onReviewDetailOpen,
@@ -29,12 +31,12 @@ export default function ProfessorReview({ review }: { review: any }) {
         <Heading
           as="h3"
           fontSize={{ base: '22', sm: '24', md: '26', lg: '30' }}
-          color="blackAlpha.600"
+          color={flexStyle.commentTitleColor}
           pb={5}
         >
           {review.title}
         </Heading>
-        <Box color="teal" onClick={handleToggleBookmark} cursor="pointer">
+        <Box color={flexStyle.headingColor} onClick={handleToggleBookmark} cursor="pointer">
           {isBookmarked ? <FaBookmark size={25} /> : <FaRegBookmark size={25} />}
         </Box>
       </Flex>
@@ -76,7 +78,7 @@ export default function ProfessorReview({ review }: { review: any }) {
           <Button
             variant="link"
             onClick={onReviewDetailOpen}
-            color="teal"
+            colorScheme="teal"
             alignSelf="end"
             mr={{ base: '0', lg: '2' }}
           >
