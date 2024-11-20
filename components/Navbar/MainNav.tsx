@@ -98,7 +98,16 @@ export default function MainNav(props: { user: any }) {
   const [allCourses, setAllCourses] = useState<ICourse[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<ICourse[]>([]);
   const [query, setQuery] = useState<string>('');
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const limit = 15;
+
+  const handleMenuClose = () => {
+    setIsPopoverOpen(false);
+  };
+
+  const handlePopoverToggle = () => {
+    setIsPopoverOpen((prevState) => !prevState);
+  };
 
   const page = searchParams.get('page') || null;
   const coursesURL = getURL(page, limit.toString());
@@ -287,7 +296,7 @@ export default function MainNav(props: { user: any }) {
             borderColor={flexStyle.dividerColor}
           />
 
-          <Menu>
+          <Menu onClose={handleMenuClose}>
             <MenuButton
               as={IconButton}
               // icon={<Avatar size={"sm"} />}
@@ -306,7 +315,12 @@ export default function MainNav(props: { user: any }) {
                     {user?.role_id === 1 ? (
                       <>
                         <MenuItem>
-                          <Popover trigger="click" placement="right-start" closeOnBlur>
+                          <Popover
+                            trigger="click"
+                            placement="right-start"
+                            closeOnBlur={false}
+                            isOpen={isPopoverOpen}
+                          >
                             {({ isOpen }) => (
                               <>
                                 <PopoverTrigger>
@@ -321,6 +335,7 @@ export default function MainNav(props: { user: any }) {
                                     _hover={{ bg: 'gray.100' }}
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      handlePopoverToggle();
                                     }}
                                   >
                                     <Text fontWeight={isOpen ? 'bold' : 'normal'}>Manage</Text>
@@ -361,7 +376,12 @@ export default function MainNav(props: { user: any }) {
                     ) : (
                       <>
                         <MenuItem>
-                          <Popover trigger="click" placement="right-start" closeOnBlur>
+                          <Popover
+                            trigger="click"
+                            placement="right-start"
+                            closeOnBlur={false}
+                            isOpen={isPopoverOpen}
+                          >
                             {({ isOpen }) => (
                               <>
                                 <PopoverTrigger>
@@ -373,9 +393,10 @@ export default function MainNav(props: { user: any }) {
                                     width="100%"
                                     cursor="pointer"
                                     bg={isOpen ? 'gray.100' : 'transparent'}
-                                    _hover={{ bg: 'gray.100' }}
+                                    _hover={{ bg: 'transparent' }}
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      handlePopoverToggle();
                                     }}
                                   >
                                     <Text fontWeight={isOpen ? 'bold' : 'normal'}>Reviews</Text>
