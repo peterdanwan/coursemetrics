@@ -41,6 +41,7 @@ export const GET = async function fetch_reviews_by_course_code(
       };
     }
 
+    /* Get the cached review data + tags for a particular course term */
     // @ts-ignore
     const cachedData = await redisClient.get(`reviews:${courseCode}:${season}:${year}`);
 
@@ -117,11 +118,11 @@ export const GET = async function fetch_reviews_by_course_code(
 
         // @ts-ignore
         await redisClient.set(
+          // Set the key-value pair of the review 
+          // - key: its course code and term
+          // - value: reviews + tags
           `reviews:${courseCode}:${season}:${year}`,
-          JSON.stringify({ reviews: processedReviews, tags }),
-          {
-            EX: 60 * 60,
-          }
+          JSON.stringify({ reviews: processedReviews, tags })
         );
       }
     }

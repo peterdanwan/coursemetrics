@@ -6,10 +6,18 @@ Redis CLI (`redis-cli`) is a command-line tool that allows you to interact with 
 
 This document will guide you through the following common Redis operations:
 
+0. **Installing the Redis CLI**
 1. **Connecting to Redis**
 2. **Getting keys**
 3. **Setting keys**
 4. **Deleting keys**
+
+## 0. Installing the Redis CLI
+
+> Follow these platform specific guides below:
+
+- `Mac`: <https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-mac-os/>
+- `Windows (WSL)`: <https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/>
 
 ## 1. Connecting to Redis
 
