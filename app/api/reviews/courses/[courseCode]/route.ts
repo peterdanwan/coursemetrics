@@ -138,7 +138,7 @@ export const GET = async function fetch_reviews_by_course_code(
             },
             {
               model: Question,
-              attributes: ['question_text', 'is_rating'],
+              attributes: ['question_id', 'question_text', 'is_rating'],
             },
           ],
           attributes: ['review_question_id'],
@@ -163,6 +163,7 @@ export const GET = async function fetch_reviews_by_course_code(
                     Object.keys(courseTermConditions).length > 0 ? courseTermConditions : undefined,
                 },
               ],
+              attributes: ['course_code', 'course_section'],
             },
           ],
         },

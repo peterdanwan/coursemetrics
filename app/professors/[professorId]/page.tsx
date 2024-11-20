@@ -23,6 +23,7 @@ import {
   Select,
   Spinner,
   useDisclosure,
+  Divider,
 } from '@chakra-ui/react';
 import { FaHeart } from 'react-icons/fa';
 import { apiFetcher } from '@/utils';
@@ -32,6 +33,23 @@ import ProfessorReview from '@/components/ProfessorReview';
 
 import { useFlexStyle } from '@/styles/styles';
 import RatingIcons from '@/components/RatingIcons';
+
+const calculateAverageRating = (quickStats: any) => {
+  let totalRating = 0;
+  let ratingCount = 0;
+
+  // Loop through each rating field and sum the values
+  quickStats.forEach((stat: any) => {
+    totalRating += parseInt(stat.value);
+    ratingCount++;
+  });
+
+  // Calculate the average rating
+  const averageRating = totalRating / ratingCount;
+
+  // Return the average rating
+  return Math.round(averageRating * 100) / 100;
+};
 
 interface IProfessor {
   professor_id: number;
@@ -72,6 +90,8 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
   const [reviews, setReviews] = useState<any>(null);
   const [uniqueCourseCodes, setUniqueCourseCodes] = useState<any>(null);
   const [quickStats, setQuickStats] = useState<any>(null);
+  const [totalReviews, setTotalReviews] = useState<any>(null);
+  const [profAvgRating, setProfAvgRating] = useState<number>(0);
 
   // For review form modal
   const {
@@ -100,16 +120,10 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
       setProfessor(profFromDB);
       setProfCourses(profCoursesFromDB);
 
-      console.log(professorResponse);
+      // console.log(professorResponse);
 
-      console.log(profFromDB);
-      console.log(profCoursesFromDB);
-
-      // Set course tags
-      // let courseCodes = profCoursesFromDB?.map((course: any) => course.Course.course_code);
-      // let uniqueCourseCodesSet: Set<string> = new Set(courseCodes);
-      // // console.log(uniqueCourseCodesSet);
-      // // console.log(Array.from(uniqueCourseCodesSet));
+      // console.log(profFromDB);
+      // console.log(profCoursesFromDB);
 
       const uniqueCourseCodes = Array.from(
         new Set(profCoursesFromDB?.map((course: any) => course.Course.course_code))
@@ -125,9 +139,27 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
       const { quickStats: quickStatsFromDB, reviews: profReviewsFromDB } =
         professorReviewsResponse.data;
 
-      setReviews(profReviewsFromDB);
-      setQuickStats(quickStatsFromDB);
-      console.log(professorReviewsResponse.data);
+      const sortedReviews = [...profReviewsFromDB].sort(
+        (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
+      );
+
+      let quickStatsArr = [];
+      let totalReviewsData = {};
+      for (const statName in quickStatsFromDB) {
+        const stat = { name: statName, value: quickStatsFromDB[statName] };
+        if (statName === 'totalReviews') {
+          totalReviewsData = stat;
+        } else {
+          quickStatsArr.push(stat);
+        }
+      }
+
+      const avgRating = calculateAverageRating(quickStatsArr);
+      setProfAvgRating(avgRating);
+      setReviews(sortedReviews);
+      setTotalReviews(totalReviewsData);
+      setQuickStats(quickStatsArr);
+      // console.log(professorReviewsResponse.data);
     }
   }, [professorReviewsResponse, isProfReviewFormOpen, profReviewsByProfIdURL]);
 
@@ -147,9 +179,17 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
     };
   }, [isProfReviewFormOpen]);
 
+  function capFirstLetterAndAddSpaces(string: string) {
+    if (!(typeof string === 'string' && string.length)) return false;
+    const res = string.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return res
+      .split(' ') // Split the string into an array of words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word
+      .join(' '); // Join the words back into a single string
+  }
+
   return (
     <>
-      {/* Course Details Section */}
       {professor ? (
         <Grid
           gridTemplateColumns="repeat(12, 1fr)"
@@ -159,8 +199,9 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           w={{ base: '100%', '2xl': '80%' }}
           bgColor={flexStyle.bgColor}
         >
+          {/* Prof Details Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8' }}>
-            <Card>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" gap={2} wrap="wrap">
                   <Box order={{ base: '1', sm: '1', md: '1', lg: '1' }}>
@@ -179,7 +220,20 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                       <Box color="red.500">
                         <FaHeart size={25} />
                       </Box>
-                      <Text>4.5/5</Text>
+                      <Flex gap={2} alignItems="center">
+                        <Text fontSize={22}>{profAvgRating}/5 </Text>
+                        <RatingIcons
+                          rating={profAvgRating.toString()}
+                          iconSize={5}
+                          color="teal.300"
+                        />
+                        {totalReviews && (
+                          <Text as="span">
+                            ({totalReviews?.value}
+                            {totalReviews?.value > 1 ? ' reviews' : ' review'})
+                          </Text>
+                        )}
+                      </Flex>
                     </Flex>
                   </Box>
                 </Flex>
@@ -188,7 +242,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           </GridItem>
           {uniqueCourseCodes && uniqueCourseCodes.length && (
             <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-              <Card>
+              <Card bgColor="gray.50">
                 <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                   <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
                     Courses
@@ -214,7 +268,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
             gridColumn={{ base: 'span 12', md: 'span 8' }}
             gridRow={{ base: '2', md: 'span 4' }}
           >
-            <Card>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Flex align="center" wrap="wrap" gap={2}>
                   <Heading
@@ -225,15 +279,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                     Reviews
                   </Heading>
                   <Spacer order={{ base: '2', sm: '2', md: '2', lg: '2' }} />
-                  <Box order={{ base: '3', sm: '3', md: '3', lg: '3' }}>
-                    {/* <SideMenu
-                      terms={terms}
-                      sections={sections}
-                      course={course}
-                      handleTermChange={handleTermChange}
-                      handleSectionChange={handleSectionChange}
-                    /> */}
-                  </Box>
+                  <Box order={{ base: '3', sm: '3', md: '3', lg: '3' }}></Box>
                 </Flex>
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
@@ -282,7 +328,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           </GridItem>
           {/* Skills Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
                   Skills
@@ -310,48 +356,40 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
           </GridItem>
 
           {/* Quick Stats Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card>
+          <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
+            <Card bgColor="gray.50">
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
                   Quick Stats
                 </Heading>
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <Grid templateColumns="repeat(2, 1fr)" gap={2}>
-                  <GridItem>
-                    <Text as="b">Difficulty:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating="3" iconSize={8} color="teal.200" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Course Load:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Average Grade:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating="4" iconSize={8} color="teal.200" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Text as="b">Would Take Again:</Text>
-                  </GridItem>
-                  <GridItem>
-                    <RatingIcons rating="2" iconSize={8} color="teal.200" />
-                  </GridItem>
-                </Grid>
+                {/* <Grid templateColumns="repeat(1, 1fr)" gap={2}> */}
+                {quickStats && quickStats.length ? (
+                  quickStats.map((stat: any, index: number) => (
+                    <Flex key={index} gap={2} alignItems="center">
+                      <Box w="150px">
+                        <Text as="b" whiteSpace="nowrap">
+                          {capFirstLetterAndAddSpaces(stat.name)}:{' '}
+                        </Text>
+                      </Box>
+                      <Box ml={2}>
+                        <RatingIcons
+                          rating={stat.value}
+                          iconSize={{ base: '5', sm: '8', lg: '8' }}
+                          color="teal.200"
+                        />
+                      </Box>
+                    </Flex>
+                  ))
+                ) : (
+                  <Box>No stats available</Box>
+                )}
               </CardBody>
             </Card>
           </GridItem>
           {/* Prerequisites Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
+          {/* <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
             <Card>
               <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
                 <Heading color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
@@ -367,7 +405,7 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
                 </Box>
               </CardBody>
             </Card>
-          </GridItem>
+          </GridItem> */}
         </Grid>
       ) : (
         <Flex justifyContent="center" alignItems="center" h="100vh">
