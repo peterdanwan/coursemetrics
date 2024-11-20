@@ -83,10 +83,10 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   });
 
   // console.log('courseResponse');
-  // console.log(courseResponse);
+  console.log('Course Review Form', courseResponse);
 
   // Course name passed from course page
-  const courseName = courseResponse?.data.courses[0].course_code;
+  const courseName = courseResponse?.data?.courses[0].course_code;
 
   // To access "questions" fields in form
   const { fields } = useFieldArray({ name: 'questions', control });
@@ -281,6 +281,17 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   const handleFormModalClose = () => {
     openConfirmModal();
   };
+
+  if (courseProfessorResponseError || courseQuestionsResponseError)
+    return <div>Failed to load data</div>;
+  if (!courseProfessorResponse || !courseQuestionsResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
+
   return (
     <>
       <Modal
@@ -401,6 +412,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
                       <Select
                         id="professorId"
                         placeholder="Add existing professor(s)..."
+                        value={watch('professorId')}
                         {...register('professorId', {
                           required: 'Professor is required. Please select from the list.',
                         })}

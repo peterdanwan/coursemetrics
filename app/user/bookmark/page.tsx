@@ -29,10 +29,14 @@ const Bookmark = () => {
       )
     : [];
 
-  // const bookmarkedReviews = reviewData
-  //   ? reviewData?.data?.filter((review: any) => bookmarkedReviewIds.includes(review.review_id))
-  //   : [];
-
+  if (reviewError) return <div>Failed to load data</div>;
+  if (!reviewData)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
   return (
     <Box
       w={{ base: '100%', '2xl': '80%' }}

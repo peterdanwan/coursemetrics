@@ -12,6 +12,7 @@ import {
   Divider,
   Link,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -111,7 +112,13 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
 
   // Error handling for courses
   if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
-  if (!courses || !professors || !reviews) return <div>Loading...</div>;
+  if (!courses || !professors || !reviews)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
 
   const filteredCourses = Array.isArray(courses?.data?.courses)
     ? courses.data.courses.filter((course: any) => {

@@ -50,7 +50,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
           Course Code
         </Text>
         <Text flex="2" textAlign="left">
-          Review
+          Review Title
         </Text>
         <Text flex="1" textAlign="center">
           Avg. Rating
@@ -106,7 +106,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
 
                 {/* Truncated Review */}
                 <Text flex="2" color={styles.color} isTruncated m={1}>
-                  {review.comment}
+                  {review.title}
                 </Text>
 
                 {/* Average Rating */}

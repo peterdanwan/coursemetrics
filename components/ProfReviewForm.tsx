@@ -13,8 +13,6 @@ import {
   ModalBody,
   ModalCloseButton,
   Select,
-  useRadioGroup,
-  HStack,
   Radio,
   RadioGroup,
   Stack,
@@ -29,6 +27,7 @@ import RatingScale from './RatingScale';
 import ConfirmationModal from './ConfirmationModal';
 import { apiFetcher } from '@/utils';
 import useSWR from 'swr';
+import AutoFillProfReviewFormButton from './AutoFillProfReviewFormButton';
 
 type QuestionUI = {
   question_id: string;
@@ -196,6 +195,8 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
     apiFetcher
   );
 
+  console.log('profReviewQuestionsResponse', profReviewQuestionsResponse);
+
   useEffect(() => {
     if (profReviewQuestionsResponse && profReviewQuestionsResponse.status === 'ok') {
       const profReviewQuestionsFromDB = profReviewQuestionsResponse.data.questions;
@@ -263,6 +264,15 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
     openConfirmModal();
   };
 
+  if (profReviewQuestionsResponseError) return <div>Failed to load data</div>;
+  if (!profReviewQuestionsResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
+
   return (
     <>
       <Modal
@@ -277,6 +287,17 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
           <ModalHeader color="teal" fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}>
             Add Review
           </ModalHeader>
+          {/* Start Automated Form Filling - TO BE REMOVED WHEN Testing is done */}
+          <Flex gap={4} alignSelf="end">
+            <AutoFillProfReviewFormButton
+              setValue={setValue}
+              courseTerms={courseTerms}
+              courseSections={courseSections}
+              courseCodes={courseCodes}
+              fields={fields}
+            />
+            {/* End Automated Form Filling - TO BE REMOVED WHEN Testing is done */}
+          </Flex>
           <ModalCloseButton color="black" bgColor="gray.200" m={2} />
           <ModalBody color="black">
             {profReviewQuestions ? (
@@ -295,6 +316,7 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
                         id="professor"
                         defaultValue={`${professor.first_name} ${professor.last_name}` as const}
                         placeholder="Select professor from the list..."
+                        disabled
                         {...register('professor', {
                           required: 'Professor is required. Please select from the list.',
                         })}
@@ -425,28 +447,29 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
                                 (Required)
                               </Text>
                             </FormLabel>
-                            <RadioGroup defaultValue="" name="takeAgain">
-                              <Stack direction="row" spacing={4}>
-                                <Radio
-                                  value="yes"
-                                  id="takeAgain-yes"
-                                  {...register('takeAgain', {
-                                    required: 'Please indicate if you would take this course again',
-                                  })}
+                            <Controller
+                              name="takeAgain"
+                              control={control}
+                              rules={{
+                                validate: (value) =>
+                                  value !== undefined ||
+                                  'Please indicate if you would take this course again',
+                              }}
+                              render={({ field }) => (
+                                <RadioGroup
+                                  onChange={(val) => {
+                                    field.onChange(val === 'true');
+                                    field.onBlur();
+                                  }}
+                                  value={field.value ? 'true' : 'false'}
                                 >
-                                  Yes
-                                </Radio>
-                                <Radio
-                                  value="no"
-                                  id="takeAgain-no"
-                                  {...register('takeAgain', {
-                                    required: 'Please indicate if you would take this course again',
-                                  })}
-                                >
-                                  No
-                                </Radio>
-                              </Stack>
-                            </RadioGroup>
+                                  <Stack direction="row" spacing={4}>
+                                    <Radio value="true">Yes</Radio>
+                                    <Radio value="false">No</Radio>
+                                  </Stack>
+                                </RadioGroup>
+                              )}
+                            />
                             <FormErrorMessage>
                               {errors.takeAgain && errors.takeAgain.message}
                             </FormErrorMessage>

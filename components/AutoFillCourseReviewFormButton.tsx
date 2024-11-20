@@ -9,7 +9,17 @@ interface AutoFillFormButtonProps {
   setValue: UseFormSetValue<FormValues>;
   courseTerms: string[] | null;
   courseSectionsByTerm: string[] | null;
-  courseProfessors: string[] | null;
+  courseProfessors:
+    | {
+        professor_id: number;
+        first_name: string;
+        last_name: string;
+        ProfessorCourses: Array<{
+          professor_course_id: number;
+          course_id: number;
+        }>;
+      }[]
+    | null;
   fields: {
     question_id: string;
     question_text: string;
@@ -25,6 +35,7 @@ const AutoFillCourseReviewFormButton: React.FC<AutoFillFormButtonProps> = ({
   courseProfessors,
   fields,
 }) => {
+  console.log('Course Professor Auto Fill', courseProfessors);
   const generateRandomRating = (): string => {
     return Math.floor(Math.random() * 5 + 1).toString();
   };
@@ -64,7 +75,8 @@ const AutoFillCourseReviewFormButton: React.FC<AutoFillFormButtonProps> = ({
 
     // Fill Professor (select first available professor)
     if (courseProfessors?.length > 0) {
-      setValue('professor', courseProfessors[0]);
+      const firstProfessor = courseProfessors[0];
+      setValue('professorId', firstProfessor.professorId);
     }
 
     // Fill Rating Questions

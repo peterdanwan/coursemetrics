@@ -302,6 +302,15 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
       .join(' '); // Join the words back into a single string
   }
 
+  if (courseResponseError || reviewResponseError) return <div>Failed to load data</div>;
+  if (!courseResponse || !reviewResponse)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
+
   return (
     <>
       {/* Course Details Section */}
@@ -334,10 +343,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
                   <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
                     <Flex gap={5} alignItems="center">
-                      {/* Don't need to book mark it */}
-                      <Box color="red.500">
-                        <FaHeart size={25} />
-                      </Box>
                       <Flex gap={2} alignItems="center">
                         <Text fontSize={22}>{courseAverageRating}/5 </Text>
                         <RatingIcons

@@ -11,6 +11,7 @@ import {
   Heading,
   Text,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -129,7 +130,13 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   };
 
   if (professorError) return <div>Failed to load data</div>;
-  if (!professorsID) return <div>Loading...</div>;
+  if (!professorsID)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
 
   return (
     <Flex

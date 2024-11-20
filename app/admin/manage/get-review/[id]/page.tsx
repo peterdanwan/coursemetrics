@@ -17,6 +17,7 @@ import {
   Text,
   VStack,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
@@ -128,7 +129,13 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
   console.log('Sorted Review Questions:', sortedReviewQuestions);
 
   if (reviewError || policyError) return <div>Failed to load data</div>;
-  if (!reviewData || !policyData) return <div>Loading...</div>;
+  if (!reviewData || !policyData)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp; Loading ...
+      </div>
+    );
 
   return (
     <Flex

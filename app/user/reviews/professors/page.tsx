@@ -1,6 +1,16 @@
 // app/user/reviews/myprofessors/page.tsx
 'use client';
-import { Box, Flex, Stack, Text, Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Stack,
+  Text,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Spinner,
+} from '@chakra-ui/react';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
 import { useState } from 'react';
 import { apiFetcher } from '@/utils';
@@ -39,11 +49,23 @@ export default function Professors() {
   };
 
   const filteredReviews = sortedReviews.filter((review) => {
+    const searchTerm = searchValue.toLowerCase().trim();
     const normalizedRate = review.rating?.toFixed(1);
+    const fullName =
+      `${review.ProfessorCourse.Professor.first_name} ${review.ProfessorCourse.Professor.last_name}`.toLowerCase();
+    const combinedSeasonYear =
+      `${review.ProfessorCourse.Course.CourseTerm.season} ${review.ProfessorCourse.Course.CourseTerm.year}`.toLowerCase();
+
     return (
-      review.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-      review.comment.toLowerCase().includes(searchValue.toLowerCase()) ||
-      normalizedRate?.includes(searchValue)
+      review.ProfessorCourse.Professor.first_name.toLowerCase().includes(searchTerm) ||
+      review.ProfessorCourse.Professor.last_name.toLowerCase().includes(searchTerm) ||
+      review.title.toLowerCase().includes(searchTerm) ||
+      review.ProfessorCourse.Course.course_code.toLowerCase().includes(searchTerm) ||
+      review.ProfessorCourse.Course.CourseTerm.season.toLowerCase().includes(searchTerm) ||
+      String(review.ProfessorCourse.Course.CourseTerm.year).includes(searchTerm) ||
+      normalizedRate?.includes(searchTerm) ||
+      combinedSeasonYear.includes(searchTerm) ||
+      fullName.includes(searchTerm)
     );
   });
 
@@ -53,7 +75,13 @@ export default function Professors() {
   const hasReviews = filteredReviews.length > 0;
 
   if (reviewProfessorError) return <Text color="red.500">Failed to load professor reviews</Text>;
-  if (!reviewProfessorData) return <Text>Loading...</Text>;
+  if (!reviewProfessorData)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+        &nbsp;&nbsp;Loading the data ...
+      </div>
+    );
 
   return (
     <>
@@ -91,14 +119,14 @@ export default function Professors() {
         color={styles.cardColor}
         align="center"
       >
-        <Text flex="1" textAlign="left">
+        <Text flex="2" textAlign="left">
           Professor Name
         </Text>
         <Text flex="1" textAlign="left">
           Course Code
         </Text>
         <Text flex="2" textAlign="left">
-          Review
+          Review Title
         </Text>
         <Text flex="1" textAlign="center">
           Avg. Rating
@@ -148,13 +176,13 @@ export default function Professors() {
                   key={index}
                   borderWidth="1px"
                   borderRadius="lg"
-                  padding={4}
+                  padding={2}
                   bg={styles.cardBg}
                   _hover={{ bg: styles.hoverBg }}
                 >
                   <Flex justify="space-between" align="center">
                     {/* Professor Name */}
-                    <Text flex="1" color={styles.color} m={1}>
+                    <Text flex="2" color={styles.color} m={1}>
                       {review.professor_name}
                       {`${review.ProfessorCourse?.Professor?.first_name} ${review.ProfessorCourse?.Professor?.last_name}`}
                     </Text>
@@ -165,7 +193,7 @@ export default function Professors() {
 
                     {/* Truncated Review */}
                     <Text flex="2" color={styles.color} isTruncated m={1}>
-                      {review.comment}
+                      {review.title}
                     </Text>
 
                     {/* Average Rating */}
