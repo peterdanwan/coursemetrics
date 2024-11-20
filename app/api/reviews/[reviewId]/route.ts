@@ -17,6 +17,8 @@ import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
 import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
 import Policy from '@/database/models/Policy';
+// @ts-ignore
+import redisClient from '@/database/redisInstance';
 
 export const GET = async function get_review_by_id(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/reviews/[reviewId]/route.ts' });
@@ -118,6 +120,15 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
           model: ReviewStatus,
           attributes: ['review_status_id'],
         },
+        {
+          model: ProfessorCourse,
+          include: [
+            {
+              model: Course,
+              attributes: ['course_code'],
+            },
+          ],
+        },
       ],
     });
 
@@ -125,6 +136,9 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
       log.info('Review not found');
       return NextResponse.json(createErrorResponse(404, 'Review not found'), { status: 404 });
     }
+
+    const reviewJSON = review.toJSON();
+    const courseCode = reviewJSON.ProfessorCourse.Course.course_code;
 
     // Update the review status (either approved or rejected)
     review.setDataValue('review_status_id', review_status_id); // review.review_status_id <-- Property 'review_status_id' does not exist on type 'Review'.
@@ -146,6 +160,25 @@ export const PUT = async function update_review_by_id(req: NextRequest): Promise
       }));
 
       await ReviewPolicyViolationLog.bulkCreate(policyLogs);
+    }
+
+    // Delete the cached response if we are updating the review's status
+    // The GET route will get updated tags for all reviews
+    const redisKeyPattern = `reviews:${courseCode}:*`; // This pattern will match all keys starting with 'reviews:{courseCode}:'
+
+    try {
+      // @ts-ignore
+      const keys: string[] = await redisClient.keys(redisKeyPattern);
+
+      if (keys.length > 0) {
+        // @ts-ignore
+        await redisClient.del(...keys);
+        console.log(`Deleted ${keys.length} keys starting with ${redisKeyPattern}`);
+      } else {
+        console.log('No keys found to delete.');
+      }
+    } catch (error) {
+      console.error('Error deleting keys:', error);
     }
 
     // Return the updated review data (optional)
