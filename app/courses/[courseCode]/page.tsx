@@ -1,7 +1,7 @@
 // app/courses/[courseCode]/page.tsx
 
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import useSWR, { mutate } from 'swr';
 import {
   Grid,
@@ -32,6 +32,8 @@ import CourseReviewForm from '@/components/CourseReviewForm';
 import { useFlexStyle } from '@/styles/styles';
 import RatingIcons from '@/components/RatingIcons';
 import useFetchUser from '@/components/useFetchUser';
+import { set } from 'react-hook-form';
+import NotFound from '@/components/NotFound';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -94,50 +96,21 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   const [tags, setTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const { user, loading, error } = useFetchUser();
-
-  const calculateAverageRating = (quickStats: any) => {
-    let totalRating = 0;
-    let ratingCount = 0;
-
-    // Loop through each rating field and sum the values
-    quickStats.forEach((stat: any) => {
-      totalRating += parseInt(stat.value);
-      ratingCount++;
-    });
-
-    // Calculate the average rating
-    const averageRating = totalRating / ratingCount;
-
-    // Return the average rating
-    return Math.round(averageRating * 100) / 100;
-  };
-
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [reviewsURL, setReviewsURL] = useState(`/api/reviews/courses/${courseCode}`);
+  const [courseURL, setCourseURL] = useState(getURL('courses', null, null, courseCode));
+  const [selectedSectionReviews, setSectionReviews] = useState<any>(null);
   // Get year and season from query params, with fallback to current values
   const year = searchParams.get('year') || null;
   const season = searchParams.get('season') || null;
-
-  const courseURL = getURL('courses', season, year, courseCode);
-  //const reviewsURL = courseCode ? `/api/reviews/courses/${courseCode}` : null;
-  const reviewsURL = courseCode
-    ? `/api/reviews/courses/${courseCode}${year && season ? `?year=${year}&season=${season}` : ''}`
-    : null;
-
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
-
   // For review form modal
   const {
     isOpen: isCourseReviewFormOpen,
     onOpen: onCourseReviewFormOpen,
     onClose: onCourseReviewFormClose,
   } = useDisclosure();
-
-  useEffect(() => {
-    if (courseCode) {
-      const reviewsURL = `/api/reviews/courses/${courseCode}?year=${year}&season=${season}`;
-      mutate(reviewsURL); // Trigger re-fetch based on updated filters
-    }
-  }, [courseCode, year, season]);
 
   useEffect(() => {
     if (courseResponse) {
@@ -164,6 +137,7 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             courseItem.CourseTerm.year.toString() === year &&
             courseItem.CourseTerm.season.toLowerCase() === season.toLowerCase()
         );
+        setReviewsURL(`/api/reviews/courses/${courseCode}?year=${year}&season=${season}`);
       }
 
       if (!initialCourse) {
@@ -174,20 +148,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
           const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
           return currentDate > latestDate ? current : latest;
         }, null as ICourse | null);
-      }
-
-      setCourse(initialCourse);
-
-      if (initialCourse) {
-        const initialTermKey = `${initialCourse.CourseTerm.season}_${initialCourse.CourseTerm.year}`;
-        const initialSections = coursesArray.filter(
-          (courseItem: ICourse) =>
-            `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}` === initialTermKey
+        setReviewsURL(
+          `/api/reviews/courses/${courseCode}?year=${initialCourse.CourseTerm.year}&season=${initialCourse.CourseTerm.season}`
         );
-        setSections(initialSections);
       }
+      setCourse(initialCourse);
     }
-  }, [courseResponse, year, season]);
+  }, [courseCode, courseResponse, year, season]);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -195,12 +162,19 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         if (Array.isArray(reviewResponse.data.reviewContent.reviews)) {
           const { quickStats: quickStatsFromDB, reviews: reviewsFromDB } =
             reviewResponse.data.reviewContent;
-
           const sortedReviews = [...reviewsFromDB].sort(
             (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
           );
 
           setReviews(sortedReviews);
+          if (selectedSection) {
+            const sectionReviews = sortedReviews.filter(
+              (review: any) => review.ProfessorCourse.Course.course_section === selectedSection
+            );
+            setSectionReviews(sectionReviews);
+          } else {
+            setSectionReviews(sortedReviews);
+          }
 
           let quickStatsArr = [];
           let totalReviewsData = {};
@@ -224,12 +198,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
         }
       }
     };
-    // fetch reviews after submitting new one to update Course Review UI
     if (!isCourseReviewFormOpen) {
       mutate(reviewsURL);
     }
     fetchTags();
-  }, [reviewResponse, isCourseReviewFormOpen, reviewsURL]);
+
+    // fetch reviews after submitting new one to update Course Review UI
+  }, [selectedSection, reviewResponse, isCourseReviewFormOpen, reviewsURL]);
 
   // Hide page's scrollbar when form modal is open:
   useEffect(() => {
@@ -247,8 +222,29 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     };
   }, [isCourseReviewFormOpen]);
 
-  const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedTermKey = e.target.value;
+  const calculateAverageRating = (quickStats: any) => {
+    let totalRating = 0;
+    let ratingCount = 0;
+
+    // Loop through each rating field and sum the values
+    quickStats.forEach((stat: any) => {
+      totalRating += parseInt(stat.value);
+      ratingCount++;
+    });
+
+    // Calculate the average rating
+    const averageRating = totalRating / ratingCount;
+
+    // Return the average rating
+    return Math.round(averageRating * 100) / 100;
+  };
+
+  const handleTermChange = (term: string) => {
+    if (!term) {
+      setSections([]);
+      return;
+    }
+    const selectedTermKey = term;
     const [selectedSeason, selectedYear] = selectedTermKey.split('_');
 
     // Filter courses that match the selected term
@@ -259,17 +255,34 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     );
 
     if (selectedCourses.length > 0) {
+      const newReviewsURL = `/api/reviews/courses/${courseCode}?year=${selectedYear}&season=${selectedSeason}`;
+      setReviewsURL(newReviewsURL);
       setSections(selectedCourses);
       setCourse(selectedCourses[0]); // Set the first course as default
+    } else {
+      setSections([]);
     }
   };
 
-  const handleSectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCourseId = Number(e.target.value);
-    const selectedCourse = sections.find((course) => course.course_id === selectedCourseId);
+  const handleSectionChange = (section: string) => {
+    setSelectedSection(section);
+
+    const selectedCourse = courses.find((course) => course.course_section === section);
     if (selectedCourse) {
       setCourse(selectedCourse);
+      if (selectedSection) {
+        setSectionReviews([]);
+        const sectionReviews = reviews.filter(
+          (review: any) => review.ProfessorCourse.Course.course_section === section
+        );
+
+        setSectionReviews(sectionReviews);
+      } else {
+        setSectionReviews(reviews);
+      }
+      // Fetch reviews for the selected course
     }
+    console.log('Section Reviews:', selectedSectionReviews);
   };
 
   function capFirstLetterAndAddSpaces(string: string) {
@@ -399,8 +412,8 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                       terms={terms}
                       sections={sections}
                       course={course}
-                      handleTermChange={handleTermChange}
-                      handleSectionChange={handleSectionChange}
+                      handleTermChange={(term) => handleTermChange(term)}
+                      handleSectionChange={(section) => handleSectionChange(section)}
                     />
                   </Box>
                 </Flex>
@@ -416,12 +429,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   >
                     {/**** Course Review Component starts here ****/}
                     {/* Check if reviews array exist before calling .map */}
-                    {Array.isArray(reviews) ? (
-                      reviews.map((review: any, index: number) => (
+                    {Array.isArray(selectedSectionReviews) && selectedSectionReviews.length > 0 ? (
+                      selectedSectionReviews.map((review: any, index: number) => (
                         <CourseReview key={index} review={review} />
                       ))
                     ) : (
-                      <Text>No reviews available</Text>
+                      <NotFound statusCode="No reviews found. Please try another term or section." />
                     )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>

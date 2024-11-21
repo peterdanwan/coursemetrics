@@ -84,7 +84,7 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
   });
 
   // console.log('courseResponse');
-  console.log('Course Review Form', courseResponse);
+  // console.log('Course Review Form', courseResponse);
 
   // Course name passed from course page
   const courseName = courseResponse?.data?.courses[0]?.course_code;

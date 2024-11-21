@@ -1,5 +1,6 @@
 // components/SideFilterMenuCourse.tsx
 
+import { logger } from '@/utils';
 import {
   Button,
   Drawer,
@@ -15,7 +16,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface ICourseTerm {
   season: string;
@@ -32,8 +33,8 @@ interface SideFilterMenuCourseProps {
   terms: ICourseTerm[];
   sections: ICourse[];
   course: ICourse | null;
-  handleTermChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  handleSectionChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleTermChange: (term: string) => void;
+  handleSectionChange: (section: string) => void;
 }
 
 export default function SideFilterMenuCourse({
@@ -45,6 +46,26 @@ export default function SideFilterMenuCourse({
 }: SideFilterMenuCourseProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef<HTMLButtonElement>(null);
+  const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+
+  const applyChanges = () => {
+    if (selectedTerm) handleTermChange(selectedTerm);
+    if (selectedSection) handleSectionChange(selectedSection);
+    onClose();
+  };
+
+  React.useEffect(() => {
+    if (selectedTerm) {
+      handleTermChange(selectedTerm);
+    }
+  }, [handleTermChange, selectedTerm]);
+
+  React.useEffect(() => {
+    if (!selectedTerm) {
+      setSelectedSection(null);
+    }
+  }, [selectedTerm]);
 
   return (
     <>
@@ -64,13 +85,13 @@ export default function SideFilterMenuCourse({
                   <Select
                     placeholder="Select Term"
                     size="md"
-                    onChange={handleTermChange}
-                    value={course ? `${course.CourseTerm.season}_${course.CourseTerm.year}` : ''}
+                    onChange={(e) => setSelectedTerm(e.target.value || null)}
+                    value={selectedTerm || ''}
                   >
                     {terms.map((term) => (
                       <option
                         key={`${term.season}_${term.year}`}
-                        value={`${term.season}_${term.year}`}
+                        value={`${term.season}_${term.year}` || ''}
                       >
                         {term.season} {term.year}
                       </option>
@@ -78,16 +99,16 @@ export default function SideFilterMenuCourse({
                   </Select>
                 </Box>
               )}
-              {sections.length > 0 && (
+              {selectedTerm && sections.length > 0 && (
                 <Box>
                   <Select
                     placeholder="Select Section"
                     size="md"
-                    onChange={handleSectionChange}
-                    value={course?.course_id || ''}
+                    onChange={(e) => setSelectedSection(e.target.value)}
+                    value={selectedSection?.toString() || ''}
                   >
                     {sections.map((section) => (
-                      <option key={section.course_id} value={section.course_id}>
+                      <option key={section.course_id} value={section.course_section}>
                         {section.course_section}
                       </option>
                     ))}
@@ -99,6 +120,9 @@ export default function SideFilterMenuCourse({
           </DrawerBody>
 
           <DrawerFooter>
+            <Button colorScheme="teal" onClick={applyChanges}>
+              Apply
+            </Button>
             <Button variant="outline" mr={3} onClick={onClose}>
               Close
             </Button>
