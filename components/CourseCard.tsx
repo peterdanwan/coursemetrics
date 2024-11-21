@@ -11,9 +11,7 @@ import {
   Spacer,
   Button,
   Select,
-  IconButton,
 } from '@chakra-ui/react';
-import { CiBookmark } from 'react-icons/ci';
 import Link from 'next/link';
 import { useFlexStyle } from '@/styles/styles';
 
@@ -36,22 +34,21 @@ interface ICourse {
 }
 
 interface CourseCardProps {
-  courses: ICourse[]; // Array of courses for the same course_code
+  courses: ICourse[];
 }
 
 export default function CourseCard({ courses }: CourseCardProps) {
   const flexStyle = useFlexStyle();
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<ICourse>(courses[0]);
-  const [selectedTermId, setSelectedTermId] = useState(''); // Track selected term ID
+  const [selectedTermId, setSelectedTermId] = useState('');
 
   const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const termId = e.target.value;
     setSelectedTermId(termId);
 
     if (termId === '') {
-      // No term selected; you might choose to reset selectedCourse or keep it unchanged
-      setSelectedCourse(courses[0]); // Reset to default course or handle as needed
+      setSelectedCourse(courses[0]);
     } else {
       const newSelectedCourse = courses.find((course) => course.course_term_id === Number(termId));
       if (newSelectedCourse) {
@@ -60,9 +57,10 @@ export default function CourseCard({ courses }: CourseCardProps) {
     }
   };
 
+  const uniqueCourseTerms = new Set(courses.map((course) => course.course_term_id));
+
   const navigateToCourse = () => {
     if (selectedTermId === '') {
-      // Get the most recent term's course
       const mostRecentCourse = courses.reduce(
         (latest, current) => {
           if (!latest) return current;
@@ -82,11 +80,6 @@ export default function CourseCard({ courses }: CourseCardProps) {
       );
     }
   };
-
-  // May remove this bookmark from here and only have it on the views instead
-  // const handleBookmark = () => {
-  //   alert('Bookmark clicked - Still in development');
-  // };
 
   return (
     <Card bgColor={flexStyle.cardBg} border={flexStyle.borderColor} borderWidth={1}>
@@ -108,11 +101,6 @@ export default function CourseCard({ courses }: CourseCardProps) {
             </Heading>
           </Box>
           <Spacer />
-          {/* <Box color="pink.400">
-            <IconButton aria-label="Bookmark" variant="outline" onClick={handleBookmark}>
-              <CiBookmark size={20} />
-            </IconButton>
-          </Box> */}
           <Box>
             <Select
               placeholder="Select Term"
@@ -122,11 +110,15 @@ export default function CourseCard({ courses }: CourseCardProps) {
               borderColor={flexStyle.borderColor}
               focusBorderColor={flexStyle.headingColor}
             >
-              {courses.map((course) => (
-                <option key={course.course_id} value={course.course_term_id}>
-                  {course.CourseTerm.season} {course.CourseTerm.year}
-                </option>
-              ))}
+              {Array.from(uniqueCourseTerms).map((termId) => {
+                const course = courses.find((c) => c.course_term_id === termId);
+                if (!course) return null;
+                return (
+                  <option key={course.course_id} value={course.course_term_id}>
+                    {course.CourseTerm.season} {course.CourseTerm.year}
+                  </option>
+                );
+              })}
             </Select>
           </Box>
         </Flex>

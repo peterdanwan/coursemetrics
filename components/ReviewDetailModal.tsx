@@ -60,11 +60,11 @@ const ReviewDetailModal = ({
         for (let i = 0; i < reviewQuestions.length; i++) {
           for (let j = 0; j < reviewAnswers.length; j++) {
             if (reviewAnswers[j].Question.question_id === reviewQuestions[i].question_id) {
-              if (reviewAnswers[j].ReviewAnswers[0].answer === '') break;
+              if (reviewAnswers[j]?.ReviewAnswers[0]?.answer === '') break;
               const qna: QnA = {
-                question_id: reviewAnswers[j].Question.question_id,
-                question: reviewAnswers[j].Question.question_text,
-                answer: reviewAnswers[j].ReviewAnswers[0].answer,
+                question_id: reviewAnswers[j]?.Question.question_id,
+                question: reviewAnswers[j]?.Question.question_text,
+                answer: reviewAnswers[j]?.ReviewAnswers[0]?.answer,
               };
 
               qnaForUI.push(qna);
