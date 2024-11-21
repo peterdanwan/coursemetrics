@@ -1,8 +1,8 @@
 // app/courses/[courseCode]/page.tsx
 
 'use client';
-import { useState, useEffect, use } from 'react';
-import useSWR, { mutate } from 'swr';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import useSWR from 'swr';
 import {
   Grid,
   GridItem,
@@ -32,8 +32,7 @@ import CourseReviewForm from '@/components/CourseReviewForm';
 import { useFlexStyle } from '@/styles/styles';
 import RatingIcons from '@/components/RatingIcons';
 import useFetchUser from '@/components/useFetchUser';
-import { set } from 'react-hook-form';
-import NotFound from '@/components/NotFound';
+import NoResults from '@/components/NoResults';
 
 interface ICourseTerm {
   course_term_id: number;
@@ -85,26 +84,59 @@ function getURL(
 export default function CoursePage({ params }: { params: { courseCode: string } }) {
   const flexStyle = useFlexStyle();
   const courseCode = params.courseCode.toUpperCase();
-  const [courses, setCourses] = useState<ICourse[]>([]);
-  const [course, setCourse] = useState<ICourse | null>(null);
-  const [terms, setTerms] = useState<ICourseTerm[]>([]);
-  const [reviews, setReviews]: any = useState(null);
-  const [courseAverageRating, setCourseAverageRating] = useState<number>(0);
-  const [quickStats, setQuickStats]: any = useState(null);
-  const [totalReviews, setTotalReviews] = useState<any>(null);
-  const [sections, setSections] = useState<ICourse[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const { user, loading, error } = useFetchUser();
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [reviewsURL, setReviewsURL] = useState(`/api/reviews/courses/${courseCode}`);
-  const [courseURL, setCourseURL] = useState(getURL('courses', null, null, courseCode));
-  const [selectedSectionReviews, setSectionReviews] = useState<any>(null);
-  // Get year and season from query params, with fallback to current values
+
   const year = searchParams.get('year') || null;
   const season = searchParams.get('season') || null;
+
+  const courseURL = getURL('courses', null, null, courseCode);
   const { data: courseResponse, error: courseResponseError } = useSWR(courseURL, apiFetcher);
+
+  const courses: ICourse[] = useMemo(() => {
+    if (courseResponse?.data?.courses) {
+      return courseResponse.data.courses;
+    }
+    return [];
+  }, [courseResponse]);
+
+  const terms = useMemo(() => {
+    if (courses.length === 0) return [];
+    const termMap = new Map<string, ICourseTerm>();
+    courses.forEach((courseItem) => {
+      const termKey = `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}`;
+      if (!termMap.has(termKey)) {
+        termMap.set(termKey, courseItem.CourseTerm);
+      }
+    });
+    return Array.from(termMap.values());
+  }, [courses]);
+
+  const [selectedTerm, setSelectedTerm] = useState<string | null>(() => {
+    if (year && season) return `${season}_${year}`;
+    return null;
+  });
+
+  useEffect(() => {
+    if (!selectedTerm && terms.length > 0) {
+      // Set selectedTerm to the most recent term
+      const mostRecentTerm = terms[0];
+      setSelectedTerm(`${mostRecentTerm.season}_${mostRecentTerm.year}`);
+    }
+  }, [terms, selectedTerm]);
+
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+
+  const reviewsURL = useMemo(() => {
+    if (selectedTerm) {
+      const [season, year] = selectedTerm.split('_');
+      return `/api/reviews/courses/${courseCode}?year=${year}&season=${season}`;
+    }
+    // If no term is selected, attempt to fetch all reviews
+    return `/api/reviews/courses/${courseCode}`;
+  }, [courseCode, selectedTerm]);
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
+
   // For review form modal
   const {
     isOpen: isCourseReviewFormOpen,
@@ -112,104 +144,96 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     onClose: onCourseReviewFormClose,
   } = useDisclosure();
 
-  useEffect(() => {
-    if (courseResponse) {
-      const coursesArray = courseResponse.data?.courses;
-      setCourses(coursesArray);
-
-      // Extract unique terms
-      const termMap = new Map<string, ICourseTerm>();
-      coursesArray.forEach((courseItem: ICourse) => {
-        const termKey = `${courseItem.CourseTerm.season}_${courseItem.CourseTerm.year}`;
-        if (!termMap.has(termKey)) {
-          termMap.set(termKey, courseItem.CourseTerm);
-        }
-      });
-      const uniqueTerms = Array.from(termMap.values());
-      setTerms(uniqueTerms);
-
-      // Find the course that matches the season and year from the URL
-      let initialCourse;
-
-      if (year && season) {
-        initialCourse = coursesArray.find(
-          (courseItem: ICourse) =>
-            courseItem.CourseTerm.year.toString() === year &&
-            courseItem.CourseTerm.season.toLowerCase() === season.toLowerCase()
-        );
-        setReviewsURL(`/api/reviews/courses/${courseCode}?year=${year}&season=${season}`);
+  const course = useMemo(() => {
+    if (!selectedTerm) {
+      if (courses.length > 0) {
+        // Assuming courses are sorted by date
+        return courses[0];
       }
-
-      if (!initialCourse) {
-        // If no matching course is found or no term selected, use the most recent term
-        initialCourse = coursesArray.reduce(
-          (latest: any, current: any) => {
-            if (!latest) return current;
-            const latestDate = new Date(`${latest.CourseTerm.year}-${latest.CourseTerm.season}`);
-            const currentDate = new Date(`${current.CourseTerm.year}-${current.CourseTerm.season}`);
-            return currentDate > latestDate ? current : latest;
-          },
-          null as ICourse | null
-        );
-        setReviewsURL(
-          `/api/reviews/courses/${courseCode}?year=${initialCourse.CourseTerm.year}&season=${initialCourse.CourseTerm.season}`
-        );
-      }
-      setCourse(initialCourse);
+      return null;
     }
-  }, [courseCode, courseResponse, year, season]);
-
-  useEffect(() => {
-    const fetchTags = async () => {
-      if (reviewResponse && reviewResponse.status === 'ok') {
-        if (Array.isArray(reviewResponse.data.reviewContent.reviews)) {
-          const { quickStats: quickStatsFromDB, reviews: reviewsFromDB } =
-            reviewResponse.data.reviewContent;
-          const sortedReviews = [...reviewsFromDB].sort(
-            (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
-          );
-
-          setReviews(sortedReviews);
-          if (selectedSection) {
-            const sectionReviews = sortedReviews.filter(
-              (review: any) => review.ProfessorCourse.Course.course_section === selectedSection
-            );
-            setSectionReviews(sectionReviews);
-          } else {
-            setSectionReviews(sortedReviews);
-          }
-
-          let quickStatsArr = [];
-          let totalReviewsData = {};
-          for (const statName in quickStatsFromDB) {
-            const stat = { name: statName, value: quickStatsFromDB[statName] };
-            if (statName === 'totalReviews') {
-              totalReviewsData = stat;
-            } else {
-              quickStatsArr.push(stat);
-            }
-          }
-
-          setQuickStats(quickStatsArr);
-          setTotalReviews(totalReviewsData);
-
-          const averageRating = calculateAverageRating(quickStatsArr);
-          setCourseAverageRating(averageRating);
-          setTags(reviewResponse.data.tags);
-        } else {
-          setReviews([]);
-        }
-      }
-    };
-    if (!isCourseReviewFormOpen) {
-      mutate(reviewsURL);
+    const [selectedSeason, selectedYear] = selectedTerm.split('_');
+    let filteredCourses = courses.filter(
+      (course) =>
+        course.CourseTerm.season === selectedSeason &&
+        course.CourseTerm.year.toString() === selectedYear
+    );
+    if (selectedSection) {
+      filteredCourses = filteredCourses.filter(
+        (course) => course.course_section === selectedSection
+      );
     }
-    fetchTags();
+    return filteredCourses[0] || null;
+  }, [courses, selectedTerm, selectedSection]);
 
-    // fetch reviews after submitting new one to update Course Review UI
-  }, [selectedSection, reviewResponse, isCourseReviewFormOpen, reviewsURL]);
+  // Extract reviews and related data
+  const reviews = useMemo(() => {
+    if (reviewResponse?.data?.reviewContent?.reviews) {
+      const reviewsFromDB = reviewResponse.data.reviewContent.reviews;
+      return [...reviewsFromDB].sort(
+        (r1: any, r2: any) => parseInt(r2.review_id) - parseInt(r1.review_id)
+      );
+    }
+    return [];
+  }, [reviewResponse]);
 
-  // Hide page's scrollbar when form modal is open:
+  const selectedSectionReviews = useMemo(() => {
+    if (selectedSection) {
+      return reviews.filter(
+        (review) => review.ProfessorCourse.Course.course_section === selectedSection
+      );
+    }
+    return reviews;
+  }, [reviews, selectedSection]);
+
+  const quickStats = useMemo(() => {
+    if (reviewResponse?.data?.reviewContent?.quickStats) {
+      const quickStatsFromDB = reviewResponse.data.reviewContent.quickStats;
+      return Object.entries(quickStatsFromDB)
+        .filter(([key]) => key !== 'totalReviews')
+        .map(([name, value]) => ({ name, value }));
+    }
+    return [];
+  }, [reviewResponse]);
+
+  const totalReviews = useMemo(() => {
+    if (reviewResponse?.data?.reviewContent?.quickStats?.totalReviews) {
+      return reviewResponse.data.reviewContent.quickStats.totalReviews;
+    }
+    return 0;
+  }, [reviewResponse]);
+
+  const courseAverageRating = useMemo(() => {
+    if (quickStats.length > 0) {
+      const totalRating = quickStats.reduce(
+        (sum, stat) => sum + parseFloat(stat.value as string),
+        0
+      );
+      return Math.round((totalRating / quickStats.length) * 100) / 100;
+    }
+    return 0;
+  }, [quickStats]);
+
+  const tags = useMemo(() => {
+    if (reviewResponse?.data?.tags) {
+      return reviewResponse.data.tags;
+    }
+    return [];
+  }, [reviewResponse]);
+
+  useEffect(() => {}, [reviewResponse]);
+
+  // Handlers
+  const handleTermChange = useCallback((term: string | null) => {
+    setSelectedTerm(term);
+    setSelectedSection(null);
+  }, []);
+
+  const handleSectionChange = useCallback((section: string | null) => {
+    setSelectedSection(section);
+  }, []);
+
+  // Hide page's scrollbar when form modal is open
   useEffect(() => {
     if (isCourseReviewFormOpen) {
       // Hide page scrollbar when modal is open
@@ -225,76 +249,13 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
     };
   }, [isCourseReviewFormOpen]);
 
-  const calculateAverageRating = (quickStats: any) => {
-    let totalRating = 0;
-    let ratingCount = 0;
-
-    // Loop through each rating field and sum the values
-    quickStats.forEach((stat: any) => {
-      totalRating += parseInt(stat.value);
-      ratingCount++;
-    });
-
-    // Calculate the average rating
-    const averageRating = totalRating / ratingCount;
-
-    // Return the average rating
-    return Math.round(averageRating * 100) / 100;
-  };
-
-  const handleTermChange = (term: string) => {
-    if (!term) {
-      setSections([]);
-      return;
-    }
-    const selectedTermKey = term;
-    const [selectedSeason, selectedYear] = selectedTermKey.split('_');
-
-    // Filter courses that match the selected term
-    const selectedCourses = courses.filter(
-      (course) =>
-        course.CourseTerm.season === selectedSeason &&
-        course.CourseTerm.year.toString() === selectedYear
-    );
-
-    if (selectedCourses.length > 0) {
-      const newReviewsURL = `/api/reviews/courses/${courseCode}?year=${selectedYear}&season=${selectedSeason}`;
-      setReviewsURL(newReviewsURL);
-      setSections(selectedCourses);
-      setCourse(selectedCourses[0]); // Set the first course as default
-    } else {
-      setSections([]);
-    }
-  };
-
-  const handleSectionChange = (section: string) => {
-    setSelectedSection(section);
-
-    const selectedCourse = courses.find((course) => course.course_section === section);
-    if (selectedCourse) {
-      setCourse(selectedCourse);
-      if (selectedSection) {
-        setSectionReviews([]);
-        const sectionReviews = reviews.filter(
-          (review: any) => review.ProfessorCourse.Course.course_section === section
-        );
-
-        setSectionReviews(sectionReviews);
-      } else {
-        setSectionReviews(reviews);
-      }
-      // Fetch reviews for the selected course
-    }
-    console.log('Section Reviews:', selectedSectionReviews);
-  };
-
   function capFirstLetterAndAddSpaces(string: string) {
-    if (!(typeof string === 'string' && string.length)) return false;
+    if (!(typeof string === 'string' && string.length)) return '';
     const res = string.replace(/([a-z])([A-Z])/g, '$1 $2');
     return res
-      .split(' ') // Split the string into an array of words
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word
-      .join(' '); // Join the words back into a single string
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   if (courseResponseError || reviewResponseError) return <div>Failed to load data</div>;
@@ -336,24 +297,26 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                     </Heading>
                   </Box>
                   <Spacer order={{ base: '3', sm: '2', md: '2', lg: '2' }} />
-                  <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
-                    <Flex gap={5} alignItems="center">
-                      <Flex gap={2} alignItems="center">
-                        <Text fontSize={22}>{courseAverageRating}/5 </Text>
-                        <RatingIcons
-                          rating={courseAverageRating.toString()}
-                          iconSize={5}
-                          color="teal.300"
-                        />
-                        {totalReviews && (
-                          <Text as="span">
-                            ({totalReviews?.value}
-                            {totalReviews?.value > 1 ? ' reviews' : ' review'})
-                          </Text>
-                        )}
+                  {Array.isArray(selectedSectionReviews) && selectedSectionReviews.length > 0 && (
+                    <Box order={{ base: '2', sm: '3', md: '3', lg: '3' }}>
+                      <Flex gap={5} alignItems="center">
+                        <Flex gap={2} alignItems="center">
+                          <Text fontSize={22}>{courseAverageRating}/5 </Text>
+                          <RatingIcons
+                            rating={courseAverageRating.toString()}
+                            iconSize={5}
+                            color="teal.300"
+                          />
+                          {totalReviews && (
+                            <Text as="span">
+                              ({totalReviews?.value}
+                              {totalReviews?.value > 1 ? ' reviews' : ' review'})
+                            </Text>
+                          )}
+                        </Flex>
                       </Flex>
-                    </Flex>
-                  </Box>
+                    </Box>
+                  )}
                 </Flex>
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
@@ -371,29 +334,31 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             </Card>
           </GridItem>
           {/* Tags Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card bgColor={flexStyle.cardBg}>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading
-                  color={flexStyle.headingColor}
-                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
-                >
-                  Tags
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <List listStyleType="none">
-                  <Flex wrap="wrap" gap={5}>
-                    {tags.map((tag: any, index: number) => (
-                      <ListItem key={index}>
-                        <Tag colorScheme="cyan">{tag}</Tag>
-                      </ListItem>
-                    ))}
-                  </Flex>
-                </List>
-              </CardBody>
-            </Card>
-          </GridItem>
+          {Array.isArray(selectedSectionReviews) && selectedSectionReviews.length > 0 && (
+            <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
+              <Card bgColor={flexStyle.cardBg}>
+                <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+                  <Heading
+                    color={flexStyle.headingColor}
+                    fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                  >
+                    Tags
+                  </Heading>
+                </CardHeader>
+                <CardBody p={{ base: '3', sm: '3', md: '3' }}>
+                  <List listStyleType="none">
+                    <Flex wrap="wrap" gap={5}>
+                      {tags.map((tag: any, index: number) => (
+                        <ListItem key={index}>
+                          <Tag colorScheme="cyan">{tag}</Tag>
+                        </ListItem>
+                      ))}
+                    </Flex>
+                  </List>
+                </CardBody>
+              </Card>
+            </GridItem>
+          )}
           {/* Course Reviews Section: make it scrollable too see more reviews */}
           <GridItem
             gridColumn={{ base: 'span 12', md: 'span 12', lg: 'span 8' }}
@@ -413,10 +378,11 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                   <Box order={{ base: '3', sm: '3', md: '3', lg: '3' }}>
                     <SideMenu
                       terms={terms}
-                      sections={sections}
-                      course={course}
-                      handleTermChange={(term) => handleTermChange(term)}
-                      handleSectionChange={(section) => handleSectionChange(section)}
+                      courses={courses}
+                      selectedTerm={selectedTerm}
+                      selectedSection={selectedSection}
+                      handleTermChange={handleTermChange}
+                      handleSectionChange={handleSectionChange}
                     />
                   </Box>
                 </Flex>
@@ -437,7 +403,10 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                         <CourseReview key={index} review={review} />
                       ))
                     ) : (
-                      <NotFound statusCode="No reviews found. Please try another term or section." />
+                      <NoResults
+                        statusCode="No reviews found"
+                        statusMessage="Try searching for another term or section."
+                      />
                     )}
                     {/**** Course Review Component ends here ****/}
                   </Stack>
@@ -477,40 +446,43 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
             </Card>
           </GridItem>
           {/* Quick Stats Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
-            <Card bgColor={flexStyle.cardBg}>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading
-                  color={flexStyle.headingColor}
-                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
-                >
-                  Quick Stats
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                {quickStats && quickStats.length ? (
-                  quickStats.map((stat: any, index: number) => (
-                    <Flex key={index} gap={2} alignItems="center">
-                      <Box w="150px">
-                        <Text as="b" whiteSpace="nowrap">
-                          {capFirstLetterAndAddSpaces(stat.name)}:{' '}
-                        </Text>
-                      </Box>
-                      <Box ml={2}>
-                        <RatingIcons
-                          rating={stat.value}
-                          iconSize={{ base: '5', sm: '8', lg: '8' }}
-                          color="teal.200"
-                        />
-                      </Box>
-                    </Flex>
-                  ))
-                ) : (
-                  <Box>No stats available</Box>
-                )}
-              </CardBody>
-            </Card>
-          </GridItem>
+          {/* only render if quickStats is not empty */}
+          {Array.isArray(selectedSectionReviews) && selectedSectionReviews.length > 0 && (
+            <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
+              <Card bgColor={flexStyle.cardBg}>
+                <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
+                  <Heading
+                    color={flexStyle.headingColor}
+                    fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
+                  >
+                    Quick Stats
+                  </Heading>
+                </CardHeader>
+                <CardBody p={{ base: '3', sm: '3', md: '3' }}>
+                  {quickStats && quickStats.length ? (
+                    quickStats.map((stat: any, index: number) => (
+                      <Flex key={index} gap={2} alignItems="center">
+                        <Box w="150px">
+                          <Text as="b" whiteSpace="nowrap">
+                            {capFirstLetterAndAddSpaces(stat.name)}:{' '}
+                          </Text>
+                        </Box>
+                        <Box ml={2}>
+                          <RatingIcons
+                            rating={stat.value}
+                            iconSize={{ base: '5', sm: '8', lg: '8' }}
+                            color="teal.200"
+                          />
+                        </Box>
+                      </Flex>
+                    ))
+                  ) : (
+                    <Box>No stats available</Box>
+                  )}
+                </CardBody>
+              </Card>
+            </GridItem>
+          )}
         </Grid>
       ) : (
         <Flex justifyContent="center" alignItems="center" h="100vh">

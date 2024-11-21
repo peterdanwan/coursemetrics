@@ -1,6 +1,4 @@
 // components/SideFilterMenuCourse.tsx
-
-import { logger } from '@/utils';
 import {
   Button,
   Drawer,
@@ -16,7 +14,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface ICourseTerm {
   season: string;
@@ -31,41 +29,61 @@ interface ICourse {
 
 interface SideFilterMenuCourseProps {
   terms: ICourseTerm[];
-  sections: ICourse[];
-  course: ICourse | null;
-  handleTermChange: (term: string) => void;
-  handleSectionChange: (section: string) => void;
+  courses: ICourse[];
+  selectedTerm: string | null;
+  selectedSection: string | null;
+  handleTermChange: (term: string | null) => void;
+  handleSectionChange: (section: string | null) => void;
 }
 
 export default function SideFilterMenuCourse({
   terms,
-  sections,
-  course,
+  courses,
+  selectedTerm,
+  selectedSection,
   handleTermChange,
   handleSectionChange,
 }: SideFilterMenuCourseProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef<HTMLButtonElement>(null);
-  const [selectedTerm, setSelectedTerm] = useState<string | null>(null);
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [localSelectedTerm, setLocalSelectedTerm] = useState<string | null>(selectedTerm);
+  const [localSelectedSection, setLocalSelectedSection] = useState<string | null>(selectedSection);
+  const [availableSections, setAvailableSections] = useState<string[]>([]);
+
+  useEffect(() => {
+    setLocalSelectedTerm(selectedTerm);
+  }, [selectedTerm]);
+
+  useEffect(() => {
+    setLocalSelectedSection(selectedSection);
+  }, [selectedSection]);
+
+  useEffect(() => {
+    if (localSelectedTerm) {
+      const [season, year] = localSelectedTerm.split('_');
+      const sectionsForTerm = courses
+        .filter(
+          (course) =>
+            course.CourseTerm.season === season && course.CourseTerm.year.toString() === year
+        )
+        .map((course) => course.course_section);
+
+      // Remove duplicates
+      const uniqueSections = Array.from(new Set(sectionsForTerm));
+      setAvailableSections(uniqueSections);
+    } else {
+      setAvailableSections([]);
+    }
+
+    // Reset localSelectedSection when term changes
+    setLocalSelectedSection(null);
+  }, [localSelectedTerm, courses]);
 
   const applyChanges = () => {
-    if (selectedTerm) handleTermChange(selectedTerm);
-    if (selectedSection) handleSectionChange(selectedSection);
+    handleTermChange(localSelectedTerm);
+    handleSectionChange(localSelectedSection);
     onClose();
   };
-
-  React.useEffect(() => {
-    if (selectedTerm) {
-      handleTermChange(selectedTerm);
-    }
-  }, [handleTermChange, selectedTerm]);
-
-  React.useEffect(() => {
-    if (!selectedTerm) {
-      setSelectedSection(null);
-    }
-  }, [selectedTerm]);
 
   return (
     <>
@@ -80,41 +98,52 @@ export default function SideFilterMenuCourse({
 
           <DrawerBody>
             <VStack spacing={4} align="stretch">
-              {terms.length > 0 && (
-                <Box>
-                  <Select
-                    placeholder="Select Term"
-                    size="md"
-                    onChange={(e) => setSelectedTerm(e.target.value || null)}
-                    value={selectedTerm || ''}
-                  >
-                    {terms.map((term) => (
+              <Box>
+                <Select
+                  placeholder="Select Term"
+                  size="md"
+                  onChange={(e) => setLocalSelectedTerm(e.target.value || null)}
+                  value={localSelectedTerm || ''}
+                >
+                  {terms.length > 0 ? (
+                    terms.map((term) => (
                       <option
                         key={`${term.season}_${term.year}`}
                         value={`${term.season}_${term.year}` || ''}
                       >
                         {term.season} {term.year}
                       </option>
-                    ))}
-                  </Select>
-                </Box>
-              )}
-              {selectedTerm && sections.length > 0 && (
-                <Box>
-                  <Select
-                    placeholder="Select Section"
-                    size="md"
-                    onChange={(e) => setSelectedSection(e.target.value)}
-                    value={selectedSection?.toString() || ''}
-                  >
-                    {sections.map((section) => (
-                      <option key={section.course_id} value={section.course_section}>
-                        {section.course_section}
+                    ))
+                  ) : (
+                    <option value="" disabled>
+                      No terms available
+                    </option>
+                  )}
+                </Select>
+              </Box>
+
+              <Box>
+                <Select
+                  placeholder="Select Section"
+                  size="md"
+                  onChange={(e) => setLocalSelectedSection(e.target.value)}
+                  value={localSelectedSection || ''}
+                  isDisabled={!localSelectedTerm || availableSections.length === 0}
+                >
+                  {availableSections.length > 0 ? (
+                    availableSections.map((section) => (
+                      <option key={section} value={section}>
+                        {section}
                       </option>
-                    ))}
-                  </Select>
-                </Box>
-              )}
+                    ))
+                  ) : (
+                    <option value="" disabled>
+                      No sections available
+                    </option>
+                  )}
+                </Select>
+              </Box>
+
               {/* Add any additional filters here */}
             </VStack>
           </DrawerBody>

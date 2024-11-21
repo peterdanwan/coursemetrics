@@ -4,19 +4,7 @@
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { useSearchParams } from 'next/navigation';
-import {
-  Grid,
-  GridItem,
-  Box,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  Text,
-  Spinner,
-  Flex,
-} from '@chakra-ui/react';
+import { Grid, GridItem, Text, Spinner, Flex } from '@chakra-ui/react';
 import CourseCard from '@/components/CourseCard'; // Ensure the path is correct
 import { apiFetcher } from '@/utils';
 import { useFlexStyle } from '@/styles/styles';
@@ -62,7 +50,6 @@ export default function CoursesPage() {
   const coursesURL = getURL(page, limit);
 
   const { data: coursesResponse, error } = useSWR(coursesURL, apiFetcher);
-  console.log('Course Resoonse in Courses page', coursesResponse);
 
   useEffect(() => {
     if (coursesResponse) {
