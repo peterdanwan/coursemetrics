@@ -149,7 +149,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
       }
 
       const data = await response.json();
-      console.log('Course updated successfully:', data);
+      //console.log('Course updated successfully:', data);
       toast({
         title: `Course ${updatedCourseData.course_id} successfully updated`,
         description: `The course ${updatedCourseData.course_code} has been successfully updated.`,
@@ -172,17 +172,6 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const handleCancel = () => {
     router.push('/admin/manage?option=courses');
   };
-
-  // Error handling for courses
-  if (courseError || professorError || courseDeliveryFormatsError)
-    return <div>Failed to load data</div>;
-  if (!coursesID || !professorData || !courseDeliveryFormats)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
 
   return (
     <Flex

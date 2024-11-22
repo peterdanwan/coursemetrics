@@ -12,7 +12,6 @@ import {
   Divider,
   Link,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -37,7 +36,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   const { data: courses, error: courseError } = useSWR('/api/courses', apiFetcher);
   //console.log('Professors Data:', professors);
   //console.log('Reviews Data Manage Page:', reviews);
-  console.log('Courses Data:', courses);
+  // console.log('Courses Data:', courses);
 
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
@@ -77,8 +76,17 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
         isClosable: true,
       });
       mutate('/api/professors');
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      // console.error(error);
+      toast({
+        title: `Error deleting professor.`,
+        description:
+          error.message ||
+          `An error occurred while trying to delete the professor with ID ${professorId}.`,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
@@ -105,20 +113,19 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
       });
 
       mutate('/api/courses');
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      // console.error(error);
+      toast({
+        title: `Error deleting course.`,
+        description:
+          error.message ||
+          `An error occurred while trying to delete the course with ID ${courseId}.`,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
-
-  // Error handling for courses
-  if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
-  if (!courses || !professors || !reviews)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
 
   const filteredCourses = Array.isArray(courses?.data?.courses)
     ? courses.data.courses.filter((course: any) => {

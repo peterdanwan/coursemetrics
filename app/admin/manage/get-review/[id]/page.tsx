@@ -17,7 +17,6 @@ import {
   Text,
   VStack,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
@@ -68,7 +67,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
 
       if (response.ok) {
         // Handle success (e.g., navigate back or show success message)
-        console.log('Review approved successfully:', data);
+        // console.log('Review approved successfully:', data);
         toast({
           title: 'Review Approved',
           description: `The review id ${reviewId} has been approved successfully.`,
@@ -103,8 +102,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       //console.log('Response Review Rejected:', data);
 
       if (response.ok) {
-        // Handle success (e.g., navigate back or show success message)
-        console.log('Review rejected successfully:', data);
+        // console.log('Review rejected successfully:', data);
         toast({
           title: 'Review Rejected',
           description: `The review id ${reviewId} has been rejected successfully.`,
@@ -117,25 +115,10 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
         // Handle error response
         console.error('Error rejecting review:', data.message);
       }
-    } catch (error) {
-      console.error('Error rejecting review:', error);
+    } catch (error: any) {
+      console.error('Error rejecting review:', error.message);
     }
   };
-
-  const sortedReviewQuestions = reviewData?.data?.ReviewQuestions?.sort(
-    (a: any, b: any) => a.question_id - b.question_id
-  );
-
-  console.log('Sorted Review Questions:', sortedReviewQuestions);
-
-  if (reviewError || policyError) return <div>Failed to load data</div>;
-  if (!reviewData || !policyData)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
 
   return (
     <Flex
@@ -157,10 +140,10 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       >
         <Flex justify="space-between" align="center" mb={4}>
           <Heading as="h1" size="lg" mb={4} color={styles.headingColor}>
-            Review #{reviewData.data.review_id}
+            Review #{reviewData?.data?.review_id}
           </Heading>
           <Box mb={4}>
-            <ReviewsStatusIcon status={reviewData.data.review_status_id} />
+            <ReviewsStatusIcon status={reviewData?.data?.review_status_id} />
           </Box>
         </Flex>
         <Box mb={4}>
@@ -188,9 +171,9 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
             {reviewData?.data?.ReviewQuestions?.map((review: any, index: number) => (
               <Tr key={index}>
                 <Td color={styles.color} fontWeight="bold">
-                  {review.Question.question_text}
+                  {review?.Question?.question_text}
                 </Td>
-                <Td color={styles.color}>{review.ReviewAnswers[0]?.answer}</Td>
+                <Td color={styles.color}>{review?.ReviewAnswers[0]?.answer}</Td>
               </Tr>
             ))}
           </Tbody>
@@ -208,7 +191,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
               <>
                 <FormLabel>Select Type of Violation:</FormLabel>
                 <Select
-                  options={policyData.data.map(
+                  options={policyData?.data?.map(
                     (policy: {
                       policy_name: string;
                       policy_id: number;
@@ -216,7 +199,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
                     }) => ({
                       label: policy.policy_name,
                       value: policy.policy_id,
-                      description: policy.policy_description,
+                      description: policy?.policy_description,
                     })
                   )}
                   onChange={handlePolicyChange}
@@ -256,7 +239,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
             ) : (
               <Box mt={4} bg={styles.bgColor}>
                 <VStack align="start" spacing={4} width="full">
-                  {reviewData.data.ReviewPolicyViolationLogs?.map((violation: any) => (
+                  {reviewData?.data?.ReviewPolicyViolationLogs?.map((violation: any) => (
                     <Box
                       key={violation.policy_id}
                       p={4}

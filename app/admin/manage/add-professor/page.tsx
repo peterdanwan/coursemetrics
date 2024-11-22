@@ -82,7 +82,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
           });
 
           const createNewData = await createNewResponse.json();
-          console.log('New professor added despite duplication:', createNewData);
+          //console.log('New professor added despite duplication:', createNewData);
           toast({
             title: 'Professor successfully created',
             description: `The new professor ${professorData.first_name} ${professorData.last_name} has been successfully created.`,
@@ -96,7 +96,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             throw new Error(data.error.message);
           }
         } else {
-          console.log('Cancelled adding professor');
+          //console.log('Cancelled adding professor');
           router.push('/admin/manage/add-professor');
         }
       }
