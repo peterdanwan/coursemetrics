@@ -312,16 +312,6 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
     openConfirmModal();
   };
 
-  if (courseProfessorResponseError || courseQuestionsResponseError)
-    return <div>Failed to load data</div>;
-  if (!courseProfessorResponse || !courseQuestionsResponse)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
-
   return (
     <>
       <Modal

@@ -27,7 +27,6 @@ import {
   PopoverBody,
   PopoverCloseButton,
   useColorMode,
-  Spinner,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FiLogIn, FiLogOut } from 'react-icons/fi';
@@ -213,15 +212,6 @@ export default function MainNav(props: { user: any }) {
         return 'Search';
     }
   };
-
-  if (error) return <div>Failed to load data</div>;
-  if (!coursesResponse)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
 
   return (
     <Box className="sticky z-50 top-0">
