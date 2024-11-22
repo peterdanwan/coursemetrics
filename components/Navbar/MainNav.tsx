@@ -331,8 +331,7 @@ export default function MainNav(props: { user: any }) {
                                     alignItems="center"
                                     width="100%"
                                     cursor="pointer"
-                                    bg={isOpen ? 'gray.100' : 'transparent'}
-                                    _hover={{ bg: 'gray.100' }}
+                                    _hover={{ bg: 'transparent' }}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handlePopoverToggle();
@@ -348,21 +347,21 @@ export default function MainNav(props: { user: any }) {
                                     <MenuItem
                                       as="a"
                                       href="/admin/manage?option=courses"
-                                      _hover={{ bg: 'gray.100' }}
+                                      _hover={{ bg: flexStyle.cardHoverBg }}
                                     >
                                       Course Management
                                     </MenuItem>
                                     <MenuItem
                                       as="a"
                                       href="/admin/manage?option=professors"
-                                      _hover={{ bg: 'gray.100' }}
+                                      _hover={{ bg: flexStyle.cardHoverBg }}
                                     >
                                       Professor Management
                                     </MenuItem>
                                     <MenuItem
                                       as="a"
                                       href="/admin/manage?option=reviews"
-                                      _hover={{ bg: 'gray.100' }}
+                                      _hover={{ bg: flexStyle.cardHoverBg }}
                                     >
                                       Review Management
                                     </MenuItem>
@@ -392,7 +391,6 @@ export default function MainNav(props: { user: any }) {
                                     alignItems="center"
                                     width="100%"
                                     cursor="pointer"
-                                    bg={isOpen ? 'gray.100' : 'transparent'}
                                     _hover={{ bg: 'transparent' }}
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -409,14 +407,14 @@ export default function MainNav(props: { user: any }) {
                                     <MenuItem
                                       as="a"
                                       href="/user/reviews/courses"
-                                      _hover={{ bg: 'gray.100' }}
+                                      _hover={{ bg: flexStyle.cardHoverBg }}
                                     >
                                       Courses
                                     </MenuItem>
                                     <MenuItem
                                       as="a"
                                       href="/user/reviews/professors"
-                                      _hover={{ bg: 'gray.100' }}
+                                      _hover={{ bg: flexStyle.cardHoverBg }}
                                     >
                                       Professors
                                     </MenuItem>
