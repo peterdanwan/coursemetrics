@@ -276,15 +276,6 @@ const ProfReviewForm: React.FC<ReviewFormProps> = ({
     openConfirmModal();
   };
 
-  if (profReviewQuestionsResponseError) return <div>Failed to load data</div>;
-  if (!profReviewQuestionsResponse)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
-
   return (
     <>
       <Modal
