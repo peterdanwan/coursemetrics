@@ -267,7 +267,9 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
                 id="term-year"
                 value={{ value: selectedTermYear, label: selectedTermYear }}
                 onChange={(selectedOption) => setSelectedTermYear(selectedOption?.value || '')}
-                options={years.map((year) => ({ value: year.toString(), label: year.toString() }))}
+                options={years
+                  .sort((a, b) => b - a)
+                  .map((year) => ({ value: year.toString(), label: year.toString() }))}
                 required
                 placeholder="Select term year"
                 styles={customStyles}
