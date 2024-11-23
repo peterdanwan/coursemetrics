@@ -12,7 +12,6 @@ import {
   Textarea,
   Text,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -88,7 +87,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
       })),
     };
 
-    console.log('Course Data being sent:', JSON.stringify(courseData, null, 2));
+    //console.log('Course Data being sent:', JSON.stringify(courseData, null, 2));
 
     try {
       const response = await fetch('/api/courses', {
@@ -112,7 +111,7 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
       }
 
       const data = await response.json();
-      console.log('Course created successfully:', data);
+      //console.log('Course created successfully:', data);
       toast({
         title: 'Course successfully created',
         description: `The course ${courseData.course_code} has been successfully created.`,
@@ -145,15 +144,6 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
 
     setSelectedProfessors(professorsWithIds);
   };
-
-  if (professorError || courseDeliveryFormatsError) return <div>Failed to load data</div>;
-  if (!professorData || !courseDeliveryFormats)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
 
   return (
     <Flex
@@ -277,7 +267,9 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
                 id="term-year"
                 value={{ value: selectedTermYear, label: selectedTermYear }}
                 onChange={(selectedOption) => setSelectedTermYear(selectedOption?.value || '')}
-                options={years.map((year) => ({ value: year.toString(), label: year.toString() }))}
+                options={years
+                  .sort((a, b) => b - a)
+                  .map((year) => ({ value: year.toString(), label: year.toString() }))}
                 required
                 placeholder="Select term year"
                 styles={customStyles}

@@ -70,7 +70,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
       });
 
       const data = await response.json();
-      console.log('Professor updated successfully:', data);
+      // console.log('Professor updated successfully:', data);
       toast({
         title: `Professor ${professorId} successfully updated`,
         description: `The professor ${updatedProfessor.first_name} ${updatedProfessor.last_name} has been successfully updated.`,
@@ -100,7 +100,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
             });
 
             const retryData = await retryResponse.json();
-            console.log('Professor force updated successfully:', retryData);
+            // console.log('Professor force updated successfully:', retryData);
             toast({
               title: `Professor ${professorId} successfully updated`,
               description: `The professor ${updatedProfessor.first_name} ${updatedProfessor.last_name} has been successfully updated.`,
@@ -112,7 +112,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
               throw new Error(data.error.message);
             }
           } else {
-            console.log('Cancelled updating professor');
+            // console.log('Cancelled updating professor');
             router.push(`/admin/manage/edit-professor/${professorId}`);
           }
         }
@@ -128,15 +128,6 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const handleCancel = () => {
     router.push('/admin/manage?option=professors');
   };
-
-  if (professorError) return <div>Failed to load data</div>;
-  if (!professorsID)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp; Loading ...
-      </div>
-    );
 
   return (
     <Flex

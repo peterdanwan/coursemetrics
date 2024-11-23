@@ -30,24 +30,15 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
   const { data: professorData, error: professorError } = useSWR('/api/professors', fetcher);
   const { data: courseData, error: courseError } = useSWR('/api/courses', fetcher);
   const { data: reviewData, error: reviewError } = useSWR('/api/reviews', fetcher);
-  console.log('Professors Data: ', professorData);
-  console.log('Courses Data: ', courseData);
-  console.log('Reviews Data: ', reviewData);
+  // console.log('Professors Data: ', professorData);
+  // console.log('Courses Data: ', courseData);
+  // console.log('Reviews Data: ', reviewData);
 
   const numberOfProfessors = professorData?.data.totalProfessors || 0;
   const numberOfCourses = courseData?.data.totalCourses || 0;
   const numberOfPendingReviews = reviewData
     ? reviewData.data.filter((review: any) => review.review_status_id === 1).length
     : 0;
-
-  if (courseError || professorError || reviewError) return <div>Failed to load data</div>;
-  if (!courseData || !professorData || !reviewData)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-        &nbsp;&nbsp;Loading the data ...
-      </div>
-    );
 
   return (
     <Flex
@@ -94,7 +85,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
                   textAlign="center"
                   my={2}
                 >
-                  {courseData ? numberOfCourses : 'Loading...'}
+                  {courseData ? numberOfCourses : 0}
                 </Text>
               </CardHeader>
               <CardBody>
@@ -126,7 +117,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
                   textAlign="center"
                   my={2}
                 >
-                  {professorData ? numberOfProfessors : 'Loading...'}
+                  {professorData ? numberOfProfessors : 0}
                 </Text>
               </CardHeader>
               <CardBody>
@@ -158,7 +149,7 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
                   textAlign="center"
                   my={2}
                 >
-                  {reviewData ? numberOfPendingReviews : 'Loading...'}
+                  {reviewData ? numberOfPendingReviews : 0}
                 </Text>
               </CardHeader>
               <CardBody>
