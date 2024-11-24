@@ -6,6 +6,7 @@
   "insertPragma": false,
   "proseWrap": "preserve",
   "requirePragma": false,
+  "jsxSingleQuote": false,
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "es5",

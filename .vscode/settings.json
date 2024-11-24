@@ -1,22 +1,22 @@
 {
-  "editor.insertSpaces": true,
-  "editor.tabSize": 2,
+  "prettier.arrowParens": "always",
+  "prettier.bracketSpacing": true,
+  "prettier.embeddedLanguageFormatting": "auto",
+  "prettier.endOfLine": "lf",
+  "prettier.insertPragma": false,
+  "prettier.proseWrap": "preserve",
+  "prettier.requirePragma": false,
+  "prettier.jsxSingleQuote": false,
+  "prettier.singleQuote": true,
+  "prettier.tabWidth": 2,
+  "prettier.trailingComma": "es5",
+  "prettier.useTabs": false,
+  "prettier.printWidth": 100,
   "editor.detectIndentation": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
-  "files.eol": "\n",
-  "files.insertFinalNewline": true,
-  "prettier.jsxSingleQuote": true,
-  "prettier.singleQuote": true,
-  "typescript.preferences.quoteStyle": "single",
-  "javascript.preferences.quoteStyle": "single",
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "files.insertFinalNewline": true
 }
