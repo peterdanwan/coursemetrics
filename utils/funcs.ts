@@ -10,8 +10,8 @@ export const calculateAverageRating = (reviews: any): number => {
     0
   );
 
-  const averageRating = totalRating / validRatings.length;
-  return Math.round(averageRating);
+  const averageRating = Math.round((totalRating / validRatings.length) * 100) / 100;
+  return averageRating;
 };
 
 export const getReviewResponses = (data: any): string[] => {

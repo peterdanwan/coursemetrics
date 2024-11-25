@@ -111,7 +111,7 @@ const ReviewsTable: React.FC<{ reviews: any[] }> = ({ reviews }) => {
 
                 {/* Average Rating */}
                 <Text flex="1" color={styles.color} m={1} textAlign="center">
-                  {review.rating.toFixed(1)} / 5
+                  {review.rating.toFixed(2)} / 5
                 </Text>
 
                 {/* Options Buttons */}

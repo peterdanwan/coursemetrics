@@ -47,7 +47,7 @@ const seedDB = async () => {
     await seedReviewTypes();
     await seedReviewStatuses();
     await seedQuestions();
-    await seedReviews();
+    // await seedReviews();
     await seedReviewQuestions();
     await seedReviewAnswers();
     await seedPolicies();
