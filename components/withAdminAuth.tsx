@@ -23,15 +23,6 @@ const withAdminAuth = (WrappedComponent: React.ComponentType<any>) => {
       }
     }, [loading, user, error, router]);
 
-    if (loading) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <Spinner />
-          &nbsp;&nbsp;Loading the data ...
-        </div>
-      );
-    }
-
     return user && user.role_id === 1 ? <WrappedComponent {...props} user={user} /> : null;
   };
 
