@@ -159,16 +159,22 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
     : [];
 
   // Safely filter reviews if defined
+  const statusMapping: { [key: number]: string } = {
+    1: 'Pending',
+    2: 'Approved',
+    3: 'Rejected',
+  };
   const filteredReviews = Array.isArray(reviews?.data)
     ? reviews.data.filter((review: any) => {
         const searchTerm = searchValue.toLowerCase().trim();
         const normalizedRate = review.rating.toFixed(1);
+        const reviewStatus = statusMapping[review.review_status_id]?.toLowerCase();
 
         return (
           review.title.toLowerCase().includes(searchTerm) ||
           review.comment.toLowerCase().includes(searchTerm) ||
           review.ProfessorCourse.Course.course_code.toLowerCase().includes(searchTerm) ||
-          String(review.review_status_id).includes(searchTerm) ||
+          (reviewStatus && reviewStatus.includes(searchTerm)) ||
           normalizedRate.includes(searchTerm)
         );
       })
