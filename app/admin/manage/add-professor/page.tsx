@@ -81,7 +81,6 @@ export default withAdminAuth(function AdminAddCourse({ user }: { user: any }) {
             }),
           });
 
-          const createNewData = await createNewResponse.json();
           //console.log('New professor added despite duplication:', createNewData);
           toast({
             title: 'Professor successfully created',

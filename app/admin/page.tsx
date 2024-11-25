@@ -34,11 +34,33 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
   // console.log('Courses Data: ', courseData);
   // console.log('Reviews Data: ', reviewData);
 
+  const isLoading = !professorData || !courseData || !reviewData;
+
   const numberOfProfessors = professorData?.data.totalProfessors || 0;
   const numberOfCourses = courseData?.data.totalCourses || 0;
   const numberOfPendingReviews = reviewData
     ? reviewData.data.filter((review: any) => review.review_status_id === 1).length
     : 0;
+
+  // Loading Spinner
+  if (isLoading) {
+    return (
+      <Flex
+        direction="column"
+        justify="center"
+        align="center"
+        width="100%"
+        height="90vh"
+        bg={styles.bgColor}
+        color={styles.color}
+      >
+        <Spinner size="xl" />
+        <Text fontSize="lg" mt={4}>
+          Loading Dashboard...
+        </Text>
+      </Flex>
+    );
+  }
 
   return (
     <Flex

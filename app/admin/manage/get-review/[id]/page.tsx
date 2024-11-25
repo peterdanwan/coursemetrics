@@ -17,6 +17,7 @@ import {
   Text,
   VStack,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import ReviewsStatusIcon from '@/components/ReviewsStatusIcon';
@@ -40,6 +41,7 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
 
   //console.log('Review Data Get Page:', reviewData);
   //console.log('Policy Data Get Page:', policyData);
+  const isLoading = !reviewData || !policyData;
 
   // Handle the change event when a policy is selected
   const handlePolicyChange = (selectedOptions: any) => {
@@ -119,6 +121,26 @@ export default withAdminAuth(function ReviewDetails({ user }: { user: any }) {
       console.error('Error rejecting review:', error.message);
     }
   };
+
+  // Loading Spinner
+  if (isLoading) {
+    return (
+      <Flex
+        direction="column"
+        justify="center"
+        align="center"
+        width="100%"
+        height="90vh"
+        bg={styles.bgColor}
+        color={styles.color}
+      >
+        <Spinner size="xl" />
+        <Text fontSize="lg" mt={4}>
+          Loading Review...
+        </Text>
+      </Flex>
+    );
+  }
 
   return (
     <Flex

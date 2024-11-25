@@ -39,6 +39,7 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
     apiFetcher
   );
   //console.log('Professors Data:', professorsID);
+  const isLoading = !professorsID;
 
   useEffect(() => {
     if (professorsID) {
@@ -128,6 +129,26 @@ export default withAdminAuth(function EditCourse({ user }: { user: any }) {
   const handleCancel = () => {
     router.push('/admin/manage?option=professors');
   };
+
+  // Loading Spinner
+  if (isLoading) {
+    return (
+      <Flex
+        direction="column"
+        justify="center"
+        align="center"
+        width="100%"
+        height="90vh"
+        bg={styles.bgColor}
+        color={styles.color}
+      >
+        <Spinner size="xl" />
+        <Text fontSize="lg" mt={4}>
+          Loading Form...
+        </Text>
+      </Flex>
+    );
+  }
 
   return (
     <Flex
