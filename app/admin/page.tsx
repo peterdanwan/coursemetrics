@@ -62,6 +62,26 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
     );
   }
 
+  // Loading Spinner
+  if (isLoading) {
+    return (
+      <Flex
+        direction="column"
+        justify="center"
+        align="center"
+        width="100%"
+        height="90vh"
+        bg={styles.bgColor}
+        color={styles.color}
+      >
+        <Spinner size="xl" />
+        <Text fontSize="lg" mt={4}>
+          Loading Dashboard...
+        </Text>
+      </Flex>
+    );
+  }
+
   return (
     <Flex
       direction="column"
