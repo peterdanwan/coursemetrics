@@ -321,15 +321,6 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
               </CardHeader>
               <CardBody p={{ base: '3', sm: '3', md: '3' }}>
                 <Text fontSize={{ md: '14' }}>{course?.CourseDetail.course_description}</Text>
-                <Text fontSize={{ md: '14' }}>
-                  Course Section: <b>{course?.course_section}</b>
-                </Text>
-                <Text fontSize={{ md: '14' }}>
-                  Term: <b>{`${course?.CourseTerm.season} ${course?.CourseTerm.year}`}</b>
-                </Text>
-                <Text fontSize={{ md: '14' }}>
-                  Delivery Format: <b>{course?.course_delivery_format_id}</b>
-                </Text>
               </CardBody>
             </Card>
           </GridItem>
