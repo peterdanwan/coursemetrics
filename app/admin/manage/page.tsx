@@ -10,10 +10,12 @@ import {
   Button,
   Flex,
   Divider,
-  Link,
   useToast,
+  Spinner,
+  Text,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import CoursesTable from '@/components/CoursesTable';
 import ProfessorsTable from '@/components/ProfessorsTable';
@@ -37,6 +39,8 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   //console.log('Professors Data:', professors);
   //console.log('Reviews Data Manage Page:', reviews);
   // console.log('Courses Data:', courses);
+
+  const isLoading = !professors || !reviews || !courses;
 
   useEffect(() => {
     // If the initial option is empty, you can set it to courses
@@ -180,6 +184,26 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
       })
     : [];
 
+       // Loading Spinner
+    if (isLoading) {
+        return (
+            <Flex
+            direction="column"
+            justify="center"
+            align="center"
+            width="100%"
+            height="90vh"
+            bg={styles.bgColor}
+            color={styles.color}
+            >
+            <Spinner size="xl" />
+            <Text fontSize="lg" mt={4}>
+                Loading Database Data...
+            </Text>
+            </Flex>
+        );
+        }
+
   return (
     <Box p={4} bg={styles.bgColor} color={styles.color}>
       <Flex justify="space-between" align="center" mb={4}>
@@ -224,14 +248,14 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
         </Stack>
         {/* Conditionally render Add button only for 'courses' and 'professors' */}
         {selectedOption === 'courses' && (
-          <Link href="/admin/manage/add-course">
+          <Link href="/admin/manage/add-course" passHref>
             <Button as="a" colorScheme="teal" px={6}>
               Add
             </Button>
           </Link>
         )}
         {selectedOption === 'professors' && (
-          <Link href="/admin/manage/add-professor">
+          <Link href="/admin/manage/add-professor" passHref>
             <Button as="a" colorScheme="teal" px={6}>
               Add
             </Button>
