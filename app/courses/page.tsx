@@ -53,7 +53,7 @@ export default function CoursesPage() {
 
   useEffect(() => {
     if (coursesResponse) {
-      const coursesArray = coursesResponse?.data.courses || [];
+      const coursesArray = coursesResponse?.data?.courses || [];
       // Filter courses based on search query
       const filteredCourses = searchQuery
         ? coursesArray.filter(

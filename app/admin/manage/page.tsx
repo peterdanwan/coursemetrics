@@ -167,7 +167,7 @@ export default withAdminAuth(function Manage({ user }: { user: any }) {
   const filteredReviews = Array.isArray(reviews?.data)
     ? reviews.data.filter((review: any) => {
         const searchTerm = searchValue.toLowerCase().trim();
-        const normalizedRate = review.rating.toFixed(1);
+        const normalizedRate = review.rating.toFixed(2);
         const reviewStatus = statusMapping[review.review_status_id]?.toLowerCase();
 
         return (
