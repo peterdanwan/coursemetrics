@@ -358,38 +358,6 @@ export default function ProfessorPage({ params }: { params: { professorId: strin
               </CardBody>
             </Card>
           </GridItem>
-          {/* Skills Section */}
-          <GridItem gridColumn={{ base: 'span 12', md: 'span 4' }}>
-            <Card bgColor={flexStyle.cardBg}>
-              <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-                <Heading
-                  color={flexStyle.headingColor}
-                  fontSize={{ base: '24', sm: '30', md: '30', lg: '36' }}
-                >
-                  Skills
-                </Heading>
-              </CardHeader>
-              <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-                <List listStyleType="none">
-                  <Flex wrap="wrap" gap={5}>
-                    <ListItem>
-                      <Tag colorScheme="cyan">AWS</Tag>
-                    </ListItem>
-                    <ListItem>
-                      <Tag colorScheme="cyan">Cloud Computing</Tag>
-                    </ListItem>
-                    <ListItem>
-                      <Tag colorScheme="cyan">JavaScript</Tag>
-                    </ListItem>
-                    <ListItem>
-                      <Tag colorScheme="cyan">HTML</Tag>
-                    </ListItem>
-                  </Flex>
-                </List>
-              </CardBody>
-            </Card>
-          </GridItem>
-
           {/* Quick Stats Section */}
           <GridItem gridColumn={{ base: 'span 12', md: 'span 8', lg: 'span 4' }}>
             <Card bgColor={flexStyle.cardBg}>
