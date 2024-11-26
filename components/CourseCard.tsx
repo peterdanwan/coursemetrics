@@ -8,7 +8,6 @@ import {
   Box,
   Text,
   Flex,
-  Spacer,
   Button,
   Select,
 } from '@chakra-ui/react';
@@ -84,7 +83,7 @@ export default function CourseCard({ courses }: CourseCardProps) {
   return (
     <Card bgColor={flexStyle.cardBg} border={flexStyle.borderColor} borderWidth={1}>
       <CardHeader p={{ base: '3', sm: '3', md: '3' }}>
-        <Flex align="center" gap={2} wrap="wrap">
+        <Flex align="start" gap={2} direction="column">
           <Box>
             <Link href={`/courses/${selectedCourse.course_code}`}>
               <Heading
@@ -100,34 +99,34 @@ export default function CourseCard({ courses }: CourseCardProps) {
               {selectedCourse.CourseDetail.course_name}
             </Heading>
           </Box>
-          <Spacer />
-          <Box>
-            <Select
-              placeholder="Select Term"
-              size="sm"
-              onChange={handleTermChange}
-              value={selectedTermId}
-              borderColor={flexStyle.borderColor}
-              focusBorderColor={flexStyle.headingColor}
-            >
-              {Array.from(uniqueCourseTerms).map((termId) => {
-                const course = courses.find((c) => c.course_term_id === termId);
-                if (!course) return null;
-                return (
-                  <option key={course.course_id} value={course.course_term_id}>
-                    {course.CourseTerm.season} {course.CourseTerm.year}
-                  </option>
-                );
-              })}
-            </Select>
-          </Box>
         </Flex>
       </CardHeader>
-      <CardBody p={{ base: '3', sm: '3', md: '3' }}>
-        <Text fontSize={{ md: '14' }} color={flexStyle.color}>
+      <CardBody px={{ base: '3', sm: '3', md: '3' }} py={0}>
+        <Text fontSize={{ md: '14' }} color={flexStyle.color} noOfLines={1}>
           {selectedCourse.CourseDetail.course_description}
         </Text>
       </CardBody>
+      <Box p={{ base: '3', sm: '3', md: '3' }} width="100%" maxW="150px">
+        <Select
+          placeholder="Select Term"
+          size="sm"
+          onChange={handleTermChange}
+          value={selectedTermId}
+          borderColor={flexStyle.borderColor}
+          focusBorderColor={flexStyle.headingColor}
+          borderRadius="md"
+        >
+          {Array.from(uniqueCourseTerms).map((termId) => {
+            const course = courses.find((c) => c.course_term_id === termId);
+            if (!course) return null;
+            return (
+              <option key={course.course_id} value={course.course_term_id}>
+                {course.CourseTerm.season} {course.CourseTerm.year}
+              </option>
+            );
+          })}
+        </Select>
+      </Box>
       <Button colorScheme="teal" size="sm" onClick={navigateToCourse} mt={2}>
         View Reviews
       </Button>

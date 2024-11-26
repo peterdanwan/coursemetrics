@@ -38,8 +38,8 @@ export default withAdminAuth(function Admin({ user }: { user: any }) {
 
   const numberOfProfessors = professorData?.data.totalProfessors || 0;
   const numberOfCourses = courseData?.data.totalCourses || 0;
-  const numberOfPendingReviews = reviewData
-    ? reviewData.data.filter((review: any) => review.review_status_id === 1).length
+  const numberOfPendingReviews = Array.isArray(reviewData?.data)
+    ? reviewData?.data.filter((review: any) => review.review_status_id === 1).length
     : 0;
 
   // Loading Spinner
