@@ -87,6 +87,9 @@ class ReviewEvaluator {
     return `
       You are analyzing whether the following review content adheres to a set of clearly defined policies given below. 
 
+      With regards to informal language, please allow it if the language isn't profane. Whenever you feel a review is incomplete, so long as
+      it makes some sense, DO NOT FLAG it.
+
       Here are the policies. Policy list looks like this: ['Policy1 Name: Description1', 'Policy2 Name: Description2']:
       Policies: [${policyList}]
       
