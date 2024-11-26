@@ -107,6 +107,7 @@ export default function CourseCard({ courses }: CourseCardProps) {
               value={selectedTermId}
               borderColor={flexStyle.borderColor}
               focusBorderColor={flexStyle.headingColor}
+              borderRadius="md"
             >
               {Array.from(uniqueCourseTerms).map((termId) => {
                 const course = courses.find((c) => c.course_term_id === termId);
