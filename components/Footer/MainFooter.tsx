@@ -30,10 +30,18 @@ export default function MainFooter() {
             align={{ base: 'center', md: 'flex-start' }}
             textAlign={{ base: 'center', md: 'left' }}
           >
-            <Link href="/">Home</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact Us</Link>
-            <Link href="/faq">FAQ</Link>
+            <Link href="/">
+              <Text _hover={{ textDecoration: 'underline' }}>Home</Text>
+            </Link>
+            <Link href="/about">
+              <Text _hover={{ textDecoration: 'underline' }}>About</Text>
+            </Link>
+            <Link href="/contact">
+              <Text _hover={{ textDecoration: 'underline' }}>Contact Us</Text>
+            </Link>
+            <Link href="/faq">
+              <Text _hover={{ textDecoration: 'underline' }}>FAQ</Text>
+            </Link>
           </Flex>
 
           {/* Social Media Icons Section */}

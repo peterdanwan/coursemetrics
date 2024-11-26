@@ -14,8 +14,9 @@ import {
   Divider,
 } from '@chakra-ui/react';
 import { useFlexStyle } from '@/styles/styles';
-
-import { FcAssistant, FcDonate, FcInTransit } from 'react-icons/fc';
+import { SiChakraui } from 'react-icons/si';
+import { BiLogoPostgresql, BiSupport } from 'react-icons/bi';
+import { FaDatabase, FaCode, FaGithub } from 'react-icons/fa';
 
 interface FeatureProps {
   title: string;
@@ -34,13 +35,13 @@ const Feature = ({ title, text, icon }: FeatureProps) => {
         justify={'center'}
         color={flexStyle.color}
         rounded={'full'}
-        bg={'gray.100'}
+        bg={flexStyle.bgColor}
         mb={1}
       >
         {icon}
       </Flex>
       <Text fontWeight={600}>{title}</Text>
-      <Text color={'gray.600'}>{text}</Text>
+      <Text color={flexStyle.color}>{text}</Text>
     </Stack>
   );
 };
@@ -115,20 +116,8 @@ export default function About() {
                     </Box>
                   ))}
                 </SimpleGrid>
-
-                {/* Button to Scroll to "Meet Our Team" */}
               </Stack>
-              <Flex flex={1} />
             </Stack>
-            {/* <Flex justify="center">
-              <Button
-                onClick={scrollToTeamSection}
-                colorScheme="teal"
-                size="lg"
-              >
-                Meet Our Team
-              </Button>
-            </Flex> */}
           </Container>
         </Box>
       </Container>
@@ -146,45 +135,37 @@ export default function About() {
           <Divider orientation="horizontal" height="30px" mx={1} mb={20} />
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
             <Feature
-              icon={<Icon as={FcAssistant} w={10} h={10} />}
+              icon={<Icon as={BiSupport} w={10} h={10} />}
               title={'Mimi Dang'}
               text={
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
+                'Full-Stack Developer: Bridging the Front-end experience with Robust Back-end Solutions.'
               }
             />
             <Feature
-              icon={<Icon as={FcDonate} w={10} h={10} />}
+              icon={<Icon as={BiLogoPostgresql} w={10} h={10} />}
               title={'Aryan Khurana'}
-              text={
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
-              }
+              text={'Back-end Architect: Ensuring Scalable and Efficient Server-Side Operations.'}
             />
             <Feature
-              icon={<Icon as={FcInTransit} w={10} h={10} />}
+              icon={<Icon as={FaDatabase} w={10} h={10} />}
               title={'Jeremy Lee'}
-              text={
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
-              }
+              text={'Back-end Developer: Crafting Secure and Reliable Back-end Systems.'}
             />
             <Feature
-              icon={<Icon as={FcInTransit} w={10} h={10} />}
+              icon={<Icon as={FaCode} w={10} h={10} />}
               title={'Vinh Nhan'}
-              text={
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
-              }
+              text={'Front-end SpecialistL Designing Intuitive and Engaging User Interfaces.'}
             />
             <Feature
-              icon={<Icon as={FcInTransit} w={10} h={10} />}
+              icon={<Icon as={SiChakraui} w={10} h={10} />}
               title={'Tomas Rochwerger'}
-              text={
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
-              }
+              text={'UI/UX Developer: Enhancing User Interaction and Visual Appeal'}
             />
             <Feature
-              icon={<Icon as={FcInTransit} w={10} h={10} />}
+              icon={<Icon as={FaGithub} w={10} h={10} />}
               title={'Peter Wan'}
               text={
-                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore...'
+                'Team Leader & Back-end Strategist: Steering the Project and Optimizing Back-end Infrastructure.'
               }
             />
           </SimpleGrid>
@@ -231,13 +212,4 @@ const stats = [
       </>
     ),
   },
-  //   {
-  //     title: "250M+",
-  //     content: (
-  //       <>
-  //         <StatsText>Plants</StatsText> currently connected and monitored by the
-  //         NewLife™ software
-  //       </>
-  //     ),
-  //   },
 ];
