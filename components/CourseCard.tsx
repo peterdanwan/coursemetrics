@@ -99,34 +99,34 @@ export default function CourseCard({ courses }: CourseCardProps) {
               {selectedCourse.CourseDetail.course_name}
             </Heading>
           </Box>
-          <Box width="100%" maxW="150px">
-            <Select
-              placeholder="Select Term"
-              size="sm"
-              onChange={handleTermChange}
-              value={selectedTermId}
-              borderColor={flexStyle.borderColor}
-              focusBorderColor={flexStyle.headingColor}
-              borderRadius="md"
-            >
-              {Array.from(uniqueCourseTerms).map((termId) => {
-                const course = courses.find((c) => c.course_term_id === termId);
-                if (!course) return null;
-                return (
-                  <option key={course.course_id} value={course.course_term_id}>
-                    {course.CourseTerm.season} {course.CourseTerm.year}
-                  </option>
-                );
-              })}
-            </Select>
-          </Box>
         </Flex>
       </CardHeader>
-      <CardBody p={{ base: '3', sm: '3', md: '3' }}>
+      <CardBody px={{ base: '3', sm: '3', md: '3' }} py={0}>
         <Text fontSize={{ md: '14' }} color={flexStyle.color} noOfLines={1}>
           {selectedCourse.CourseDetail.course_description}
         </Text>
       </CardBody>
+      <Box p={{ base: '3', sm: '3', md: '3' }} width="100%" maxW="150px">
+        <Select
+          placeholder="Select Term"
+          size="sm"
+          onChange={handleTermChange}
+          value={selectedTermId}
+          borderColor={flexStyle.borderColor}
+          focusBorderColor={flexStyle.headingColor}
+          borderRadius="md"
+        >
+          {Array.from(uniqueCourseTerms).map((termId) => {
+            const course = courses.find((c) => c.course_term_id === termId);
+            if (!course) return null;
+            return (
+              <option key={course.course_id} value={course.course_term_id}>
+                {course.CourseTerm.season} {course.CourseTerm.year}
+              </option>
+            );
+          })}
+        </Select>
+      </Box>
       <Button colorScheme="teal" size="sm" onClick={navigateToCourse} mt={2}>
         View Reviews
       </Button>
