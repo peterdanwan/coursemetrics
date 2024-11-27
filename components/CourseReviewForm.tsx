@@ -287,7 +287,6 @@ const CourseReviewForm: React.FC<CourseReviewFormProps> = ({ isOpen, onClose, co
       }
 
       // If submitted successfully, display success modal:
-      // If submitted successfully, display success modal:
       setConfirmModalProps({
         isWarning: false,
         title: 'Review Submitted!',
