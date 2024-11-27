@@ -18,6 +18,8 @@ import { Op } from 'sequelize';
 import { sequelizeInstance } from '@/database/sequelizeInstance';
 import { calculateAverageRating } from '@/utils/funcs';
 
+export const dynamic = 'force-dynamic';
+
 const processReviews = (data: any) => {
   // Initialize the reviews and quickStats objects
   const result: any = {

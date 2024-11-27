@@ -20,6 +20,8 @@ import Policy from '@/database/models/Policy';
 // @ts-ignore
 import redisClient from '@/database/redisInstance';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async function get_review_by_id(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/reviews/[reviewId]/route.ts' });
 

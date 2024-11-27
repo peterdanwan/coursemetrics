@@ -6,6 +6,8 @@ import { createSuccessResponse, createErrorResponse } from '@/utils';
 import Professor from '@/database/models/Professor';
 import { logger } from '@/utils';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH ALL PROFESSORS (available to all users) =====
 export const GET = async function get_professors(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/professors/route.ts' });
