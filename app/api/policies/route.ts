@@ -3,6 +3,8 @@ import { connectDB } from '@/database/connectDB';
 import Policy from '@/database/models/Policy';
 import { logger } from '@/utils';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async function getPolicies(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/policies/route.ts' });
 

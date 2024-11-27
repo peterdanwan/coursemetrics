@@ -15,6 +15,8 @@ import Course from '@/database/models/Course'; // Assuming you have a Course mod
 import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async function fetch_reviews(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/reviews/route.ts' });
 

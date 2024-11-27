@@ -8,6 +8,8 @@ import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Course from '@/database/models/Course';
 import { logger } from '@/utils';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH PROFESSORS BY COURSE CODE =====
 export const GET = async function get_professors_by_course(
   req: NextRequest,

@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // output: 'export',
+
   // This will ignore the warnings related to Sequelize
   webpack: (config, { isServer }) => {
     if (isServer) {

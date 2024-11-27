@@ -11,6 +11,8 @@ import ProfessorCourse from '@/database/models/ProfessorCourse';
 import CourseTerm from '@/database/models/CourseTerm';
 import { Op } from 'sequelize';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async function get_professor_by_professor_id(
   req: NextRequest
 ): Promise<NextResponse> {

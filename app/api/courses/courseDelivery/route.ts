@@ -7,6 +7,8 @@ import { createSuccessResponse, createErrorResponse } from '@/utils';
 import { logger } from '@/utils';
 import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH COURSE DELIVERY FORMATS =====
 export const GET = async function get_course_delivery_formats(
   req: NextRequest

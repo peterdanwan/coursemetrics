@@ -13,6 +13,8 @@ import Course from '@/database/models/Course';
 import CourseTerm from '@/database/models/CourseTerm';
 import Professor from '@/database/models/Professor';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO CREATE A NEW USER IF THEY DON'T EXIST ALREADY =====
 export const POST = async function create_user(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/auth/route.ts' });

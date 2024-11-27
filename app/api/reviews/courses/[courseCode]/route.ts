@@ -27,6 +27,8 @@ import {
 import redisClient from '@/database/redisInstance';
 import { ReviewEvaluator } from '@/utils/ai';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = async function fetch_reviews_by_course_code(
   req: NextRequest
 ): Promise<NextResponse> {
