@@ -13,6 +13,8 @@ import Professor from '@/database/models/Professor';
 import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
 import { Op } from 'sequelize';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH COURSE BY COURSE ID =====
 export const GET = withApiAuthRequired(async function get_course_by_course_id(
   req: NextRequest

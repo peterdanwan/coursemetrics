@@ -6,6 +6,8 @@ import { createSuccessResponse, createErrorResponse } from '@/utils';
 import Question from '@/database/models/Question';
 import { logger } from '@/utils';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH QUESTIONS BASED ON REVIEW TYPE =====
 export const GET = async function get_questions(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/questions/route.ts' });

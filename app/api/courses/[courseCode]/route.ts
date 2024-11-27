@@ -9,6 +9,8 @@ import { logger } from '@/utils';
 import CourseDetail from '@/database/models/CourseDetail';
 import CourseTerm from '@/database/models/CourseTerm';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH COURSE BY COURSE CODE =====
 export const GET = async function get_course_by_course_code(
   req: NextRequest

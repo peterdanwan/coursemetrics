@@ -16,6 +16,7 @@ if (process.env.BUILD_ENV === 'dev') {
     port: 5433,
     dialectModule: pg,
     benchmark: true,
+    logging: false,
   };
 } else if (process.env.BUILD_ENV === 'prod') {
   // Production DB Setup
@@ -27,6 +28,7 @@ if (process.env.BUILD_ENV === 'dev') {
     dialect: 'postgres',
     dialectModule: pg,
     benchmark: true,
+    logging: false,
     dialectOptions: {
       ssl: {
         require: true,

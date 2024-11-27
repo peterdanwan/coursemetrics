@@ -12,6 +12,8 @@ import CourseDeliveryFormat from '@/database/models/CourseDeliveryFormat';
 import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
 
+export const dynamic = 'force-dynamic';
+
 // ===== API ROUTE TO FETCH ALL COURSES =====
 export const GET = async function get_courses(req: NextRequest): Promise<NextResponse> {
   const log = logger.child({ module: 'app/api/courses/route.ts' });
