@@ -15,7 +15,6 @@ interface ConfirmationModalProps {
   isOpen: boolean;
   closeFormModal: () => void;
   closeConfirmModal: () => void;
-  // resetForm: () => void;
   isWarning?: boolean;
   title: string;
   message?: string;
@@ -26,18 +25,19 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   closeFormModal,
   closeConfirmModal,
-  // resetForm,
   isWarning,
   title,
   message,
   confirmBtnText,
 }) => {
   const flexStyle = useFlexStyle();
+
   const confirmCloseAndReset = () => {
-    // resetForm();
-    // reset to default form values should be handled in the parent component's useEffect
     closeConfirmModal();
     closeFormModal();
+    if (!isWarning) {
+      window.location.reload();
+    }
   };
   return (
     <Modal isOpen={isOpen} onClose={closeConfirmModal} isCentered>

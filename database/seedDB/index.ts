@@ -48,11 +48,11 @@ const seedDB = async () => {
     await seedReviewStatuses();
     await seedQuestions();
     // await seedReviews();
-    await seedReviewQuestions();
-    await seedReviewAnswers();
+    // await seedReviewQuestions();
+    // await seedReviewAnswers();
     await seedPolicies();
-    await seedReviewPolicyViolationLogs();
-    await seedReviewHistories();
+    // await seedReviewPolicyViolationLogs();
+    // await seedReviewHistories();
     await seedAdminActionTypes();
     await seedAdminActions();
   }

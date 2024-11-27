@@ -3,13 +3,18 @@ import { createClient } from 'redis'; // https://www.npmjs.com/package/redis
 let redisClient;
 
 if (process.env.BUILD_ENV === 'dev') {
-  redisClient = createClient();
+  redisClient = createClient({
+    socket: {
+      host: 'localhost',
+      port: 6378,
+    },
+  });
 } else {
   redisClient = createClient({
     password: process.env.REDIS_PASSWORD,
     socket: {
       host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379, // Default Redis port
+      port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
     },
   });
 }

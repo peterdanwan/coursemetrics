@@ -137,6 +137,9 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
   }, [courseCode, selectedTerm]);
   const { data: reviewResponse, error: reviewResponseError } = useSWR(reviewsURL, apiFetcher);
 
+  console.log('reviewResponse');
+  console.log(reviewResponse);
+
   // For review form modal
   const {
     isOpen: isCourseReviewFormOpen,

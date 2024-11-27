@@ -13,9 +13,16 @@ import ProfessorCourse from '@/database/models/ProfessorCourse';
 import Professor from '@/database/models/Professor';
 import Question from '@/database/models/Question';
 import Course from '@/database/models/Course';
+import Policy from '@/database/models/Policy';
 import { logger } from '@/utils';
 import CourseTerm from '@/database/models/CourseTerm';
-import { calculateAverageRating, processReviews, getFirstTenComments } from '@/utils/funcs';
+import ReviewPolicyViolationLog from '@/database/models/ReviewPolicyViolationLog';
+import {
+  calculateAverageRating,
+  processReviews,
+  getFirstTenComments,
+  getReviewResponses,
+} from '@/utils/funcs';
 // @ts-ignore
 import redisClient from '@/database/redisInstance';
 import { ReviewEvaluator } from '@/utils/ai';
@@ -48,91 +55,84 @@ export const GET = async function fetch_reviews_by_course_code(
     let reviews: any[] = [];
     let tags: string[] = [];
 
-    if (cachedData) {
-      const cachedReviews = JSON.parse(cachedData);
-      reviews = cachedReviews.reviews;
-      tags = cachedReviews.tags;
-    } else {
-      reviews = await Review.findAll({
-        where: {
-          review_type_id: 1,
-          review_status_id: 2,
+    reviews = await Review.findAll({
+      where: {
+        review_type_id: 1,
+        review_status_id: 2,
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['user_id', 'full_name', 'email'],
         },
-        include: [
-          {
-            model: User,
-            attributes: ['user_id', 'full_name', 'email'],
-          },
-          {
-            model: ReviewQuestion,
-            include: [
-              {
-                model: ReviewAnswer,
-                attributes: ['answer'],
-              },
-              {
-                model: Question,
-                attributes: ['question_id', 'question_text', 'is_rating'],
-              },
-            ],
-            attributes: ['review_question_id'],
-          },
-          {
-            model: ProfessorCourse,
-            required: true,
-            attributes: ['professor_course_id'],
-            include: [
-              {
-                model: Professor,
-                as: 'Professor',
-                attributes: ['first_name', 'last_name'],
-              },
-              {
-                model: Course,
-                where: { course_code: courseCode },
-                include: [
-                  {
-                    model: CourseTerm,
-                    where:
-                      Object.keys(courseTermConditions).length > 0
-                        ? courseTermConditions
-                        : undefined,
-                  },
-                ],
-                attributes: ['course_code', 'course_section'],
-              },
-            ],
-          },
-        ],
-      });
+        {
+          model: ReviewQuestion,
+          include: [
+            {
+              model: ReviewAnswer,
+              attributes: ['answer'],
+            },
+            {
+              model: Question,
+              attributes: ['question_id', 'question_text', 'is_rating'],
+            },
+          ],
+          attributes: ['review_question_id'],
+        },
+        {
+          model: ProfessorCourse,
+          required: true,
+          attributes: ['professor_course_id'],
+          include: [
+            {
+              model: Professor,
+              as: 'Professor',
+              attributes: ['first_name', 'last_name'],
+            },
+            {
+              model: Course,
+              where: { course_code: courseCode },
+              include: [
+                {
+                  model: CourseTerm,
+                  where:
+                    Object.keys(courseTermConditions).length > 0 ? courseTermConditions : undefined,
+                },
+              ],
+              attributes: ['course_code', 'course_section'],
+            },
+          ],
+        },
+      ],
+    });
 
-      const processedReviews = processReviews(reviews);
+    const processedReviews = processReviews(reviews);
 
+    if (cachedData) {
+      const cachedDataJson = JSON.parse(cachedData);
+      tags = cachedDataJson.tags;
+    } else {
       const reviewEvaluator = new ReviewEvaluator();
 
       if (reviews.length > 0) {
         const tagResponse: { tags: string[] } = await reviewEvaluator.generateTags(
           getFirstTenComments(processedReviews.reviews)
         );
-        const tags = tagResponse.tags.length > 5 ? tagResponse.tags.slice(0, 5) : tagResponse.tags;
+
+        tags = tagResponse.tags.length > 5 ? tagResponse.tags.slice(0, 5) : tagResponse.tags;
 
         // @ts-ignore
-        await redisClient.set(
-          // Set the key-value pair of the review
-          // - key: its course code and term
-          // - value: reviews + tags
-          `reviews:${courseCode}:${season}:${year}`,
-          JSON.stringify({ reviews: processedReviews, tags })
-        );
+        await redisClient.set(`reviews:${courseCode}:${season}:${year}`, JSON.stringify({ tags }));
       }
     }
 
+    console.log(reviews);
+
     log.info('Reviews and tags fetched successfully');
-    return NextResponse.json(createSuccessResponse({ reviewContent: reviews, tags }), {
+    return NextResponse.json(createSuccessResponse({ reviewContent: processedReviews, tags }), {
       status: 200,
     });
   } catch (error) {
-    console.error(error);
     log.error('Error fetching reviews', { error });
     return NextResponse.json(
       createErrorResponse(500, 'Something went wrong. A server-side issue occurred.'),
@@ -164,16 +164,15 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       });
     }
 
-    log.error(
-      {
-        courseReviewData,
-      },
-      'Received course review data'
-    );
-
     const professorId = parseInt(courseReviewData.professorId);
     const courseCode = courseReviewData.courseName;
     const [season, year] = courseReviewData.term.split(' ');
+
+    if (!professorId) {
+      return NextResponse.json(createErrorResponse(400, 'Professor not provided'), {
+        status: 400,
+      });
+    }
 
     if (!courseCode) {
       return NextResponse.json(createErrorResponse(400, 'Course code not provided'), {
@@ -181,9 +180,21 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       });
     }
 
-    //const reviewEvaluator = new ReviewEvaluator();
+    if (!season) {
+      return NextResponse.json(createErrorResponse(400, 'Season not provided'), {
+        status: 400,
+      });
+    }
 
-    // Start a transaction to ensure all operations succeed or fail together
+    if (!year) {
+      return NextResponse.json(createErrorResponse(400, 'Year not provided'), {
+        status: 400,
+      });
+    }
+
+    // Create a placeholder that stores the review created so that it can be reused later in the AI scanning part
+    let postedReviewData: any = null;
+
     const postTransaction = await sequelizeInstance.transaction();
 
     try {
@@ -193,30 +204,6 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       });
 
       const userInstanceJson = userInstance.toJSON();
-
-      // let policiesData = await Policy.findAll<any>();
-      // let policies = [];
-      // let reviewStatus = 1;
-
-      // if (!policiesData.length) {
-      //   log.info('No policies found in the database.');
-      //   policies = [];
-      // }
-
-      // policies = policiesData.map((policy) => {
-      //   return `${policy.policy_name}: ${policy.policy_description}`;
-      // });
-
-      // const reviewResponses = getReviewResponses(courseReviewData);
-
-      // const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
-      //   reviewResponses,
-      //   policies
-      // );
-
-      // if (!evaluationResult.approvedByModel) {
-      //   reviewStatus = 3;
-      // }
 
       const course = await Course.findOne<any>({
         where: { course_code: courseCode },
@@ -243,12 +230,12 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
       const professorCourseJson = professorCourse.toJSON();
 
-      const averageRating: number = calculateAverageRating(courseReviewData?.questions);
+      const averageRating: number = Math.floor(calculateAverageRating(courseReviewData?.questions));
 
       const review = await Review.create(
         {
           review_type_id: 1,
-          review_status_id: 1,
+          review_status_id: 1, // Review is set to the "pending" state by default waiting for the AI to approve/flag it
           professor_course_id: professorCourseJson.professor_course_id,
           user_id: userInstanceJson.user_id,
           rating: averageRating,
@@ -260,6 +247,8 @@ export const POST = async function post_course_review(req: NextRequest): Promise
       );
 
       const reviewJson = review.toJSON();
+
+      postedReviewData = reviewJson;
 
       // Add questions and answers if provided
       if (courseReviewData.questions && courseReviewData.questions.length > 0) {
@@ -286,16 +275,55 @@ export const POST = async function post_course_review(req: NextRequest): Promise
 
       await postTransaction.commit();
 
-      // Log the violation if any at the end when everything is created
-      // if (reviewStatus === 3) {
-      //   const reason = evaluationResult.reason || 'No specific reason provided.';
-      //   await ReviewPolicyViolationLog.create({
-      //     review_id: reviewJson.review_id,
-      //     policy_id: evaluationResult.violatedPolicyIndex + 1,
-      //     reason: reason,
-      //   });
-      // }
+      const reviewEvaluationTransaction = await sequelizeInstance.transaction();
 
+      const reviewEvaluator = new ReviewEvaluator();
+
+      // Get the review that was recently posted => postedReviewData
+      // Get all the policies that we have from the database
+      let policiesData = await Policy.findAll<any>();
+      let policies = [];
+
+      if (!policiesData.length) {
+        log.info('No policies found in the database.');
+        policies = [];
+      }
+
+      policies = policiesData.map((policy) => {
+        return `${policy.policy_name}: ${policy.policy_description}`;
+      });
+
+      const reviewResponses = getReviewResponses(courseReviewData);
+
+      const evaluationResult = await reviewEvaluator.evaluateMultipleReviews(
+        reviewResponses,
+        policies
+      );
+
+      if (evaluationResult.approvedByModel) {
+        // Update the review that we just posted and change the status ID to pending => 2
+        await Review.update(
+          { review_status_id: 2 },
+          {
+            where: {
+              review_id: postedReviewData.review_id,
+            },
+            transaction: reviewEvaluationTransaction,
+          }
+        );
+      } else {
+        // Log the violation
+        const reason = evaluationResult.reason || 'No specific reason provided.';
+        await ReviewPolicyViolationLog.create({
+          review_id: postedReviewData.review_id,
+          policy_id: evaluationResult.violatedPolicyIndex + 1 || 1,
+          reason,
+        });
+      }
+
+      await reviewEvaluationTransaction.commit();
+
+      // START REDIS LOGIC: DELETE PREVIOUSLY CACHED DATA
       const redisKeyPattern = `reviews:${courseCode}:*`; // This pattern will match all keys starting with 'reviews:{courseCode}:'
 
       try {
@@ -310,8 +338,10 @@ export const POST = async function post_course_review(req: NextRequest): Promise
           console.log('No keys found to delete.');
         }
       } catch (error) {
-        console.error('Error deleting keys:', error);
+        log.error('Error deleting keys:', error);
       }
+
+      // END REDIS LOGIC: DELETE PREVIOUSLY CACHED DATA
 
       log.info('Review successfully created and associated with course and professor.');
       return NextResponse.json(
@@ -330,7 +360,6 @@ export const POST = async function post_course_review(req: NextRequest): Promise
     // Start another transaction with regards to changing the review_status_id
     // const aiTransaction = await sequelizeInstance.transaction();
   } catch (error) {
-    console.error(error);
     log.error('Error posting the course review', { error });
 
     return NextResponse.json(
