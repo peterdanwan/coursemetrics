@@ -7,8 +7,6 @@ const log = logger.child({ module: 'app/api/auth/[auth0]/route.ts' });
 
 log.info('Using Auth0 for authentication');
 
-export const dynamic = 'force-dynamic';
-
 /*
   This creates the following routes:
 
