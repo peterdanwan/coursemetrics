@@ -5,326 +5,375 @@
 1. [System architecture and design diagrams](#1-system-architecture-and-design-diagrams)
 2. [Explanation of core functionalities and modules](#2-explanation-of-core-functionalities-and-modules)
 3. [API documentation](#3-api-documentation)
-4. [Database schema](#4-database-schema) ✅
+4. [Database schema](#4-database-schema)
 5. [Troubleshooting and error-handling details](#5-troubleshooting-and-error-handling-details)
 6. [Instructions for scaling or enhancing the project](#6-instructions-for-scaling-or-enhancing-the-project)
 
 ## 1. System architecture and design diagrams
 
-Activity Diagrams
+### System Overview
+
+This architecture integrates a Next.js application as the primary frontend and backend framework. Users access the platform via a client browser, which interacts with the application through HTTP/HTTPS. Auth0 handles user authentication, providing a secure and scalable solution for identity management. Data is cached in Redis to improve response times for frequently accessed information, while PostgreSQL serves as the primary database for persistent data storage. For advanced functionalities like content analysis and personalized recommendations, Google Gemini AI is utilized. The system is divided into three distinct layers: the frontend layer (user interface), the application layer (business logic), and the backend services (data management and AI processing).
+
+```mermaid
+graph TB
+    Client[Client Browser]
+    NextJS[Next.js Application]
+    Auth0[Auth0 Authentication]
+    Redis[Redis Cache]
+    Postgres[PostgreSQL Database]
+    Gemini[Google Gemini AI]
+
+    Client -->|HTTP/HTTPS| NextJS
+    NextJS -->|Authentication| Auth0
+    NextJS -->|Cache Layer| Redis
+    NextJS -->|Data Storage| Postgres
+    NextJS -->|AI Processing| Gemini
+
+    subgraph "Backend Services"
+        Redis
+        Postgres
+        Gemini
+    end
+
+    subgraph "Frontend Layer"
+        Client
+    end
+
+    subgraph "Application Layer"
+        NextJS
+        Auth0
+    end
+```
+
+## Authentication Flow
+
+The authentication flow ensures secure user login. When a user clicks Login on the frontend, they are redirected to Auth0, which handles authentication. Upon successful login, Auth0 provides a token that the frontend sends to the backend for validation. The backend verifies the token with Auth0 to confirm its authenticity. Once validated, the backend queries the database for user-specific information and sends it back to the frontend. This flow ensures a seamless login experience while maintaining security through token-based authentication.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Auth0
+    participant Backend
+    participant Database
+
+    User->>Frontend: Click Login
+    Frontend->>Auth0: Redirect to Auth0
+    Auth0->>Auth0: Authenticate User
+    Auth0->>Frontend: Return with Token
+    Frontend->>Backend: Send Token
+    Backend->>Auth0: Verify Token
+    Auth0->>Backend: Token Valid
+    Backend->>Database: Get User Data
+    Database->>Backend: Return User Data
+    Backend->>Frontend: Send User Info
+```
+
+## Review Creation Flow
+
+The review creation process captures user feedback while ensuring quality and performance. When a user submits a review, the frontend sends the data to the backend. The backend forwards the content to an AI system (e.g., Google Gemini) for analysis, such as sentiment or spam detection. After receiving the analysis results, the backend saves the review in the database. The cache is then invalidated to ensure updated information for future queries. The backend confirms the submission to the frontend, which notifies the user of success. This flow combines robust validation and real-time updates for an enhanced user experience.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant AI
+    participant Cache
+    participant Database
+
+    User->>Frontend: Submit Review
+    Frontend->>Backend: Send Review Data
+    Backend->>AI: Check Content
+    AI->>Backend: Content Analysis
+    Backend->>Database: Save Review
+    Database->>Backend: Confirm Save
+    Backend->>Cache: Invalidate Cache
+    Backend->>Frontend: Confirm Submission
+    Frontend->>User: Show Success
+```
+
+## Caching Strategy
+
+The caching strategy minimizes database load and improves response times. When a client makes a request, the system first checks if the data is already in the cache. If the cache contains the data, it is returned directly to the client. If not, the system queries the database, stores the resulting data in the cache, and then returns it to the client. This approach ensures quick access to frequently used data while maintaining accuracy through cache invalidation strategies.
+
+```mermaid
+flowchart TD
+    A[Client Request] --> B{Cache Exists?}
+    B -->|Yes| C[Return Cached Data]
+    B -->|No| D[Query Database]
+    D --> E[Store in Cache]
+    E --> F[Return Data]
+    C --> G[Client Response]
+    F --> G
+```
+
+## AI Integration Flow
+
+AI powers intelligent features like content analysis and personalized recommendations. When a user submits content, the frontend sends it to the backend, which forwards the request to Google Gemini AI. The AI processes the content, providing analysis or recommendations that the backend stores in the database for future use. The backend then returns the AI-generated results to the frontend, which displays them to the user. This flow leverages advanced AI capabilities to enhance the platform's functionality and user experience.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant GeminiAI
+    participant Database
+
+    User->>Frontend: Submit Content
+    Frontend->>Backend: Send for Analysis
+    Backend->>GeminiAI: Request Analysis
+    GeminiAI->>Backend: Return Analysis
+    Backend->>Database: Store Results
+    Backend->>Frontend: Return Response
+    Frontend->>User: Show Results
+```
 
 ## 2. Explanation of core functionalities and modules
 
-## 3. API documentation
+### `app` folder
 
-This document outlines all available API endpoints for the Course Review System.
+Core application folder containing pages and routing logic
+
+### `app/api` folder
+
+API routes handling data operations
+
+- `courses/`: Course-related API endpoints
+- `reviews/`: Review management endpoints
+- `professors/`: Professor data endpoints
+- `admin/`: Protected administrative endpoints
+- `auth/`: Authentication-related endpoints
+
+### `app/admin` folder
+
+Administrative interface and management tools
+
+- `manage/`: Course and professor management
+- `reviews/`: Review moderation interface
+- `users/`: User management dashboard
+- `stats/`: System statistics and analytics
+
+### `components` folder
+
+Reusable React components
+
+### `database` folder
+
+Database configuration and models
+
+- `connectDB.ts`: Database connection setup
+- `sequelizeInstance.ts`: Sequelize ORM configuration
+- `redisInstance.ts`: Redis cache configuration
+- `models/`: Database models
+  - `Course.ts`: Course model
+  - `Professor.ts`: Professor model
+  - `Review.ts`: Review model
+  - `User.ts`: User model
+  - Additional related models
+
+### `database/seedDB` folder
+
+Database seeding scripts
+
+- `index.ts`: Main seeding orchestration
+- `seedCourses.ts`: Course data seeding
+- `seedProfessors.ts`: Professor data seeding
+- `seedReviews.ts`: Sample review data
+- `seedUsers.ts`: User account seeding
+- Additional seeding scripts for other models
+
+### `styles` folder
+
+Styling configurations and theme
+
+- `theme.ts`: ChakraUI theme customization
+- `styles.ts`: Shared style utilities
+- Additional style configurations
+
+### `utils` folder
+
+Utility functions and helpers
+
+- `api.ts`: API fetching utilities
+- `logger.ts`: Logging configuration
+- `response.ts`: API response formatters
+- `ai.ts`: AI integration utilities
+- `funcs.ts`: General utility functions
+
+### `public` folder
+
+Static assets and resources
+
+- `images/`: Image assets
+- `icons/`: Icon assets
+- Additional static files
+
+### Configuration Files
+
+Project configuration and setup
+
+- `next.config.mjs`: Next.js configuration
+- `package.json`: Project dependencies
+- `tsconfig.json`: TypeScript configuration
+- `docker-compose.yml`: Docker configuration
+- `.env.local`: Environment variables
+- `.prettierrc`: Code formatting rules
+- `.eslintrc`: Linting configuration
+
+### Documentation Files
+
+Project documentation
+
+- `README.md`: Project overview
+- `ARCHITECTURE.md`: System architecture
+- `SCALING.md`: Scaling instructions
+- `LICENSE`: Project license
+- Additional documentation in `_documents/`
+
+### Development Configuration
+
+Development tooling setup
+
+- `.vscode/`: VS Code settings
+- `.github/`: GitHub workflows
+- `.husky/`: Git hooks
+- `.gitignore`: Git ignore rules
+
+This structure follows a modular organization that separates concerns and makes the codebase maintainable and scalable. Each folder has a specific purpose and contains related files, making it easier for developers to locate and modify components of the system.
+
+Here is the API documentation with inputs, query parameters, and response details laid out in a cleaner and structured format, similar to your original style, but now with a table format for better presentation:
+
+## 3. API Documentation
+
+This document outlines all available API endpoints for the **Course Review System**.
 
 ### Authentication
 
 #### Auth0 Routes
 
-```typescript
-GET / api / auth / login; // Perform login with Auth0
-GET / api / auth / logout; // Log the user out
-GET / api / auth / callback; // Auth0 redirect after successful login
-GET / api / auth / me; // Fetch user profile
-```
+| **Route**                         | **Description**                                 |
+|-----------------------------------|-------------------------------------------------|
+| `GET /api/auth/login`             | Perform login with Auth0.                      |
+| `GET /api/auth/logout`            | Log the user out.                              |
+| `GET /api/auth/callback`          | Auth0 redirect after successful login.         |
+| `GET /api/auth/me`                | Fetch the user profile.                        |
 
 ### Users
 
 #### Create/Get User
 
-```typescript
-POST / api / users;
-```
-
-Creates a new user if they don't exist already.
-
-**Response:**
-
-- `200 OK` - User processed successfully
-- `401 Unauthorized` - User not authenticated
-- `500 Internal Server Error` - Server-side issue
-
-```typescript
-GET / api / users;
-```
-
-Retrieves user information including their reviews.
-
-**Response:**
-
-- `200 OK` - User data retrieved successfully
-- `401 Unauthorized` - User not authenticated
-- `404 Not Found` - User not found
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `POST /api/users`                 | Creates a new user if they don't exist already. | `200 OK` - User processed successfully<br> `401 Unauthorized` - User not authenticated<br> `500 Internal Server Error` - Server-side issue |
+| `GET /api/users`                  | Retrieves user information, including reviews.  | `200 OK` - User data retrieved successfully<br> `401 Unauthorized` - User not authenticated<br> `404 Not Found` - User not found<br> `500 Internal Server Error` - Server-side issue |
 
 ### Courses
 
 #### Get All Courses
 
-```typescript
-GET / api / courses;
-```
-
-Fetches all courses.
-
-**Response:**
-
-- `200 OK` - List of courses
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `GET /api/courses`                | Fetches all courses.                           | `200 OK` - List of courses<br> `500 Internal Server Error` - Server-side issue |
 
 #### Create Course
 
-```typescript
-POST / api / courses;
-```
-
-Creates a new course.
-
-**Required Fields:**
-
-- `course_code`
-- `course_section`
-- `course_name`
-- `course_description`
-- `course_delivery_format_id`
-- `season`
-- `year`
-
-**Response:**
-
-- `200 OK` - Course created successfully
-- `400 Bad Request` - Missing required fields
-- `409 Conflict` - Course already exists
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Required Fields**                               | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `POST /api/courses`               | Creates a new course.                           | `course_code`, `course_section`, `course_name`, `course_description`, `course_delivery_format_id`, `season`, `year` | `200 OK` - Course created successfully<br> `400 Bad Request` - Missing required fields<br> `409 Conflict` - Course already exists<br> `500 Internal Server Error` - Server-side issue |
 
 #### Get Course by Code
 
-```typescript
-GET / api / courses / { courseCode };
-```
-
-Fetches course by course code.
-
-**Query Parameters:**
-
-- `season` (optional)
-- `year` (optional)
-
-**Response:**
-
-- `200 OK` - Course details
-- `404 Not Found` - Course not found
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Query Parameters**                              | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `GET /api/courses/{courseCode}`   | Fetches course by course code.                  | `season` (optional), `year` (optional)           | `200 OK` - Course details<br> `404 Not Found` - Course not found<br> `500 Internal Server Error` - Server-side issue |
 
 #### Get Course Delivery Formats
 
-```typescript
-GET / api / courses / courseDelivery;
-```
-
-Fetches course delivery formats.
-
-**Query Parameters:**
-
-- `format` (optional) - Filter by format name
-- `id` (optional) - Filter by ID
-
-**Response:**
-
-- `200 OK` - List of delivery formats
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Query Parameters**                              | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `GET /api/courses/courseDelivery` | Fetches course delivery formats.               | `format` (optional) - Filter by format name<br> `id` (optional) - Filter by ID | `200 OK` - List of delivery formats<br> `500 Internal Server Error` - Server-side issue |
 
 ### Professors
 
 #### Get All Professors
 
-```typescript
-GET / api / professors;
-```
-
-Fetches all professors.
-
-**Response:**
-
-- `200 OK` - List of professors
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `GET /api/professors`             | Fetches all professors.                         | `200 OK` - List of professors<br> `500 Internal Server Error` - Server-side issue |
 
 #### Create Professor
 
-```typescript
-POST / api / professors;
-```
-
-Creates a new professor.
-
-**Required Fields:**
-
-- `first_name`
-- `last_name`
-
-**Response:**
-
-- `201 Created` - Professor created successfully
-- `400 Bad Request` - Missing required fields
-- `409 Conflict` - Professor already exists
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Required Fields**                               | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `POST /api/professors`            | Creates a new professor.                        | `first_name`, `last_name`                        | `201 Created` - Professor created successfully<br> `400 Bad Request` - Missing required fields<br> `409 Conflict` - Professor already exists<br> `500 Internal Server Error` - Server-side issue |
 
 #### Get Professor by ID
 
-```typescript
-GET / api / professors / { professorId };
-```
-
-Fetches professor details and associated courses.
-
-**Response:**
-
-- `200 OK` - Professor details and courses
-- `404 Not Found` - Professor not found
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `GET /api/professors/{professorId}` | Fetches professor details and associated courses. | `200 OK` - Professor details and courses<br> `404 Not Found` - Professor not found<br> `500 Internal Server Error` - Server-side issue |
 
 #### Get Professors by Course
 
-```typescript
-GET / api / professors / course / { courseCode };
-```
-
-Fetches professors teaching a specific course.
-
-**Response:**
-
-- `200 OK` - List of professors
-- `404 Not Found` - No professors found
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `GET /api/professors/course/{courseCode}` | Fetches professors teaching a specific course. | `200 OK` - List of professors<br> `404 Not Found` - No professors found<br> `500 Internal Server Error` - Server-side issue |
 
 ### Reviews
 
 #### Get Course Reviews
 
-```typescript
-GET / api / reviews / courses / { courseCode };
-```
-
-Fetches reviews for a specific course.
-
-**Query Parameters:**
-
-- `season` (optional)
-- `year` (optional)
-
-**Response:**
-
-- `200 OK` - Course reviews and tags
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Query Parameters**                              | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `GET /api/reviews/courses/{courseCode}` | Fetches reviews for a specific course.       | `season` (optional), `year` (optional)           | `200 OK` - Course reviews and tags<br> `500 Internal Server Error` - Server-side issue |
 
 #### Create Course Review
 
-```typescript
-POST / api / reviews / courses / { courseCode };
-```
-
-Creates a new course review.
-
-**Required Fields:**
-
-- `professorId`
-- `courseName`
-- `term`
-- `rating`
-- `questions`
-
-**Response:**
-
-- `201 Created` - Review created successfully
-- `400 Bad Request` - Missing required fields
-- `401 Unauthorized` - User not authenticated
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Required Fields**                               | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `POST /api/reviews/courses/{courseCode}` | Creates a new course review.                  | `professorId`, `courseName`, `term`, `rating`, `questions` | `201 Created` - Review created successfully<br> `400 Bad Request` - Missing required fields<br> `401 Unauthorized` - User not authenticated<br> `500 Internal Server Error` - Server-side issue |
 
 #### Get Professor Reviews
 
-```typescript
-GET / api / reviews / professors / { professorId };
-```
-
-Fetches reviews for a specific professor.
-
-**Response:**
-
-- `200 OK` - Professor reviews
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `GET /api/reviews/professors/{professorId}` | Fetches reviews for a specific professor.     | `200 OK` - Professor reviews<br> `500 Internal Server Error` - Server-side issue |
 
 #### Create Professor Review
 
-```typescript
-POST / api / reviews / professors / { professorId };
-```
-
-Creates a new professor review.
-
-**Required Fields:**
-
-- `courseName`
-- `term`
-- `questions`
-- `commentTitle`
-- `comment`
-- `grade`
-
-**Response:**
-
-- `201 Created` - Review created successfully
-- `400 Bad Request` - Missing required fields
-- `401 Unauthorized` - User not authenticated
-- `404 Not Found` - Professor/Course not found
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Required Fields**                               | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `POST /api/reviews/professors/{professorId}` | Creates a new professor review.                | `courseName`, `term`, `questions`, `commentTitle`, `comment`, `grade` | `201 Created` - Review created successfully<br> `400 Bad Request` - Missing required fields<br> `401 Unauthorized` - User not authenticated<br> `404 Not Found` - Professor/Course not found<br> `500 Internal Server Error` - Server-side issue |
 
 ### Questions
 
 #### Get Questions
 
-```typescript
-GET / api / questions;
-```
-
-Fetches questions based on review type.
-
-**Query Parameters:**
-
-- `type` (required) - Review type ID
-
-**Response:**
-
-- `200 OK` - List of questions
-- `400 Bad Request` - Missing review type
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Query Parameters**                              | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
+| `GET /api/questions`              | Fetches questions based on review type.         | `type` (required) - Review type ID               | `200 OK` - List of questions<br> `400 Bad Request` - Missing review type<br> `500 Internal Server Error` - Server-side issue |
 
 ### Policies
 
 #### Get Policies
 
-```typescript
-GET / api / policies;
-```
-
-Fetches all review policies.
-
-**Response:**
-
-- `200 OK` - List of policies
-- `404 Not Found` - No policies found
-- `500 Internal Server Error` - Server-side issue
+| **Route**                         | **Description**                                 | **Response**                                      |
+|-----------------------------------|-------------------------------------------------|--------------------------------------------------|
+| `GET /api/policies`              | Fetches all review policies.                    | `200 OK` - List of policies<br> `404 Not Found` - No policies found<br> `500 Internal Server Error` - Server-side issue |
 
 ### Error Responses
 
 All endpoints may return the following error responses:
 
-- `400 Bad Request` - Invalid request parameters
-- `401 Unauthorized` - Authentication required
-- `404 Not Found` - Resource not found
-- `409 Conflict` - Resource already exists
-- `500 Internal Server Error` - Server-side error
+| **Status Code** | **Message**                |
+|-----------------|----------------------------|
+| `400`           | Invalid request parameters |
+| `401`           | Authentication required    |
+| `404`           | Resource not found         |
+| `409`           | Resource already exists    |
+| `500`           | Server-side error          |
 
 Each error response includes:
 
@@ -354,10 +403,6 @@ Successful responses include:
 ![database-schema](images/database-schema.png)
 
 ## 5. Troubleshooting and error-handling details
-
-### API
-
-## Common Error Patterns
 
 ### Authentication Errors
 
@@ -474,9 +519,9 @@ Successful responses include:
 2. Check for case sensitivity in course codes
 3. Ensure the resource hasn't been deleted
 
-## Transaction Handling
+### Transaction Handling
 
-### Review Creation Transaction Flow
+#### Review Creation Transaction Flow
 
 ```typescript
 try {
@@ -497,9 +542,9 @@ try {
 3. Ensure database connection is stable
 4. Check for concurrent operations that might conflict
 
-## Redis Cache Issues
+### Redis Cache Issues
 
-### Cache Invalidation
+#### Cache Invalidation
 
 ```typescript
 const redisKeyPattern = `reviews:${courseCode}:*`;
@@ -515,17 +560,17 @@ const redisKeyPattern = `reviews:${courseCode}:*`;
 
 1. Clear Redis cache manually:
 
-```bash
-redis-cli KEYS "reviews:*" | xargs redis-cli DEL
-```
+    ```bash
+    redis-cli KEYS "reviews:*" | xargs redis-cli DEL
+    ```
 
 2. Verify Redis connection settings
 3. Check Redis memory usage
 4. Monitor cache hit/miss rates
 
-## Logging and Debugging
+### Logging and Debugging
 
-### Logger Implementation
+#### Logger Implementation
 
 ```typescript
 const log = logger.child({ module: 'app/api/route.ts' });
@@ -541,9 +586,9 @@ log.error('Error description', { error });
 3. Monitor error patterns in logs
 4. Use transaction IDs for tracking requests
 
-## Common Integration Points
+### Common Integration Points
 
-### Auth0 Integration
+#### Auth0 Integration
 
 ```typescript
 export const GET = handleAuth();
@@ -569,9 +614,9 @@ await connectDB();
 3. Monitor connection pool
 4. Check for database locks
 
-## Performance Optimization
+### Performance Optimization
 
-### Query Optimization
+#### Query Optimization
 
 ```typescript
 const reviews = await Review.findAll({
@@ -594,88 +639,6 @@ const reviews = await Review.findAll({
 const cachedData = await redisClient.get(`reviews:${courseCode}:${season}:${year}`);
 ```
 
-**Optimization Steps:**
-
-1. Cache frequently accessed data
-2. Implement cache warming
-3. Set appropriate TTL values
-4. Monitor cache size
-
-## Environment-Specific Issues
-
-### Development Environment
-
-- Check `.env.local` configuration
-- Verify development database connection
-- Monitor development logs
-
-### Production Environment
-
-- Validate environment variables
-- Check production database connection
-- Monitor production logs
-- Review error tracking service
-
-## Security Considerations
-
-### API Protection
-
-1. Rate limiting
-2. Input validation
-3. SQL injection prevention
-4. XSS protection
-
-### Data Access
-
-1. Role-based access control
-2. Data encryption
-3. Secure communication channels
-
-## Monitoring and Alerts
-
-### Key Metrics to Monitor
-
-1. API response times
-2. Error rates
-3. Database connection pool
-4. Cache hit/miss ratio
-5. Authentication failures
-
-### Alert Thresholds
-
-1. High error rates (>1%)
-2. Slow response times (>2s)
-3. Database connection issues
-4. Cache failures
-5. Authentication spikes
-
-## Support and Escalation
-
-### Level 1 Support
-
-- Basic troubleshooting
-- Log analysis
-- Common error resolution
-
-### Level 2 Support
-
-- Database issues
-- Performance problems
-- Integration failures
-
-### Level 3 Support
-
-- System architecture issues
-- Security incidents
-- Critical production issues
-- [Authentication](#authentication)
-- [Users](#users)
-- [Courses](#courses)
-- [Professors](#professors)
-- [Reviews](#reviews)
-- [Questions](#questions)
-- [Policies](#policies)
-  
 ## 6. Instructions for scaling or enhancing the project
 
 **CourseMetrics** is a dynamic platform that needs robust scaling and enhancements to meet user demands and ensure long-term viability. Below is a detailed plan to scale the platform's infrastructure, enhance its features, and improve the overall user experience.
@@ -702,7 +665,7 @@ Application scalability ensures smooth user experiences, even during high traffi
 
 Explore guides like [AWS Auto-Scaling](https://aws.amazon.com/autoscaling/) for more details.
 
-### **Feature Enhancements**
+### Feature Enhancements
 
 Enhanced features drive user engagement and satisfaction. Key focus areas include authentication, review systems, and user experience.
 
@@ -714,7 +677,7 @@ Enhanced features drive user engagement and satisfaction. Key focus areas includ
 
 For inspiration, check out [React Native Mobile Development](https://reactnative.dev/docs/getting-started).
 
-### **API Enhancements**
+### API Enhancements
 
 APIs are the backbone of modern applications, requiring flexibility and reliability.
 
@@ -725,7 +688,7 @@ APIs are the backbone of modern applications, requiring flexibility and reliabil
 
 Explore [GraphQL Documentation](https://graphql.org/learn/) for more information.
 
-### **Security Enhancements**
+### Security Enhancements
 
 Robust security measures protect user data and maintain platform trust.
 
@@ -736,7 +699,7 @@ Robust security measures protect user data and maintain platform trust.
 
 Learn more about GDPR at [GDPR Compliance Guide](https://gdpr.eu/).
 
-### **Testing and DevOps Improvements**
+### Testing and DevOps Improvements
 
 Testing and DevOps practices ensure smooth deployments and high-quality code.
 
@@ -747,7 +710,7 @@ Testing and DevOps practices ensure smooth deployments and high-quality code.
 
 Visit [Cypress Testing](https://www.cypress.io/) and [GitHub Actions](https://docs.github.com/en/actions) to enhance your workflows.
 
-### **Documentation and Maintenance**
+### Documentation and Maintenance
 
 Well-maintained documentation and proactive monitoring simplify onboarding and system upkeep.
 
@@ -758,235 +721,8 @@ Well-maintained documentation and proactive monitoring simplify onboarding and s
 
 Check out [Swagger OpenAPI](https://swagger.io/specification/) for effective API documentation strategies.
 
-### **Next Steps**
+### Next Steps
 
 - Prioritize features based on user needs and business value.
 - Maintain backward compatibility where possible.
 - Regularly test all enhancements to ensure reliability.
-
-This guide provides a structured roadmap to scale and enhance CourseMetrics, ensuring it remains competitive and user-friendly.
-
-### Scaling and Enhancing CourseMetrics  
-
-**CourseMetrics** is a dynamic platform requiring robust scaling and enhancements to meet user demands and ensure long-term viability. Below is a concise plan to scale its infrastructure, enhance features, and improve the overall user experience.  
-
----
-
-### Database Scaling  
-
-Effective database scaling ensures **CourseMetrics** handles growing data volumes seamlessly, leveraging **PostgreSQL** and **Redis**.  
-
-- **Database Optimization**: Add indexes to frequently queried columns and partition large tables like `reviews` for improved performance. Connection pooling optimizes resources during high traffic.  
-- **Redis Caching**: Expand Redis to cache more endpoints like course recommendations. Implement cache warming to pre-load popular data for faster responses.  
-
-*Example*: "Adding Redis caching for 'top courses' API cut response times from 800ms to 120ms."  
-
-Learn more at [PostgreSQL Table Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html) and [Redis Best Practices](https://redis.io/docs/manual/best-practices/).  
-
----
-
-### Application Scaling  
-
-Scalability ensures smooth user experiences, even with increased traffic.  
-
-- **Performance**: Use server-side pagination and lazy loading for images to improve load times. Optimize JavaScript bundles with code splitting.  
-- **Infrastructure**: Configure auto-scaling to handle traffic spikes, and use CDNs for faster delivery of static assets.  
-
-*Example*: "Auto-scaling enabled the system to manage a 300% Black Friday traffic surge without downtime."  
-
-See [AWS Auto-Scaling](https://aws.amazon.com/autoscaling/) for more details.  
-
----
-
-### Feature Enhancements  
-
-Improved features drive engagement and satisfaction.  
-
-- **Authentication**: Add role-based access control (RBAC) and two-factor authentication for enhanced security.  
-- **Review System**: Enable rich-text reviews and AI-powered sentiment analysis for insights.  
-- **User Experience**: Develop a mobile app using React Native and enhance accessibility with screen-reader compatibility.  
-
-*Example*: "Adding two-factor authentication reduced account breaches by 40%."  
-
-Explore [React Native Mobile Development](https://reactnative.dev/docs/getting-started).  
-
----
-
-### API Enhancements  
-
-Flexible APIs ensure better integration and data management.  
-
-- **Architecture**: Introduce versioning (e.g., `v1/`) and adopt GraphQL for more flexible data fetching.  
-- **Integration**: Add webhooks for real-time notifications and API key management for secure access.  
-
-*Example*: "Using GraphQL reduced payload sizes by 60%."  
-
-Learn more at [GraphQL Documentation](https://graphql.org/learn/).  
-
----
-
-### Security Enhancements  
-
-Robust security measures protect data and build trust.  
-
-- **Features**: Enforce CSRF protection, security headers, and regular security audits.  
-- **Data Protection**: Encrypt data at rest and implement GDPR-compliant retention policies.  
-
-*Example*: "Encryption at rest enabled compliance with enterprise clients, unlocking new markets."  
-
-Refer to [GDPR Compliance Guide](https://gdpr.eu/).  
-
-### Testing and DevOps  
-
-Reliable deployments and high-quality code are critical.  
-
-- **Testing**: Use Cypress for end-to-end testing and automate performance testing to identify bottlenecks.  
-- **CI/CD**: Implement blue-green deployments to reduce downtime.  
-
-*Example*: "Blue-green deployments minimized downtime to under 1 minute."  
-
-Check [Cypress Testing](https://www.cypress.io/) and [GitHub Actions](https://docs.github.com/en/actions).  
-
-### Documentation and Maintenance  
-
-Clear documentation simplifies onboarding, and proactive monitoring ensures reliability.  
-
-- **Technical Docs**: Maintain API references with tools like Swagger/OpenAPI.  
-- **Monitoring**: Use Sentry for error tracking and set performance benchmarks.  
-
-*Example*: "OpenAPI documentation reduced integration time for partners by 25%."  
-
-See [Swagger OpenAPI](https://swagger.io/specification/).  
-
-### Next Steps  
-
-- Focus on high-impact features based on user needs.  
-- Ensure backward compatibility and thorough testing.  
-- Keep documentation and monitoring updated.  
-
-This roadmap equips **CourseMetrics** to scale efficiently, enhance usability, and remain competitive.
-
-### System Overview
-
-```mermaid
-graph TB
-    Client[Client Browser]
-    NextJS[Next.js Application]
-    Auth0[Auth0 Authentication]
-    Redis[Redis Cache]
-    Postgres[PostgreSQL Database]
-    Gemini[Google Gemini AI]
-
-    Client -->|HTTP/HTTPS| NextJS
-    NextJS -->|Authentication| Auth0
-    NextJS -->|Cache Layer| Redis
-    NextJS -->|Data Storage| Postgres
-    NextJS -->|AI Processing| Gemini
-
-    subgraph "Backend Services"
-        Redis
-        Postgres
-        Gemini
-    end
-
-    subgraph "Frontend Layer"
-        Client
-    end
-
-    subgraph "Application Layer"
-        NextJS
-        Auth0
-    end
-```
-
-## Database Schema Overview
-
-```mermaid
-erDiagram
-    USERS ||--o{ REVIEWS : creates
-    USERS ||--o{ USER_PROFILES : has
-    USERS }|--|| USER_ROLES : has
-    REVIEWS ||--o{ REVIEW_QUESTIONS : contains
-    REVIEWS ||--o{ REVIEW_ANSWERS : has
-    REVIEWS }|--|| REVIEW_TYPES : has
-    REVIEWS }|--|| REVIEW_STATUSES : has
-    COURSES ||--o{ PROFESSOR_COURSES : has
-    PROFESSORS ||--o{ PROFESSOR_COURSES : teaches
-    REVIEWS }|--|| PROFESSOR_COURSES : about
-```
-
-## Authentication Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant Auth0
-    participant Backend
-    participant Database
-
-    User->>Frontend: Click Login
-    Frontend->>Auth0: Redirect to Auth0
-    Auth0->>Auth0: Authenticate User
-    Auth0->>Frontend: Return with Token
-    Frontend->>Backend: Send Token
-    Backend->>Auth0: Verify Token
-    Auth0->>Backend: Token Valid
-    Backend->>Database: Get User Data
-    Database->>Backend: Return User Data
-    Backend->>Frontend: Send User Info
-```
-
-## Review Creation Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant Backend
-    participant AI
-    participant Cache
-    participant Database
-
-    User->>Frontend: Submit Review
-    Frontend->>Backend: Send Review Data
-    Backend->>AI: Check Content
-    AI->>Backend: Content Analysis
-    Backend->>Database: Save Review
-    Database->>Backend: Confirm Save
-    Backend->>Cache: Invalidate Cache
-    Backend->>Frontend: Confirm Submission
-    Frontend->>User: Show Success
-```
-
-## Caching Strategy
-
-```mermaid
-flowchart TD
-    A[Client Request] --> B{Cache Exists?}
-    B -->|Yes| C[Return Cached Data]
-    B -->|No| D[Query Database]
-    D --> E[Store in Cache]
-    E --> F[Return Data]
-    C --> G[Client Response]
-    F --> G
-```
-
-## AI Integration Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant Backend
-    participant GeminiAI
-    participant Database
-
-    User->>Frontend: Submit Content
-    Frontend->>Backend: Send for Analysis
-    Backend->>GeminiAI: Request Analysis
-    GeminiAI->>Backend: Return Analysis
-    Backend->>Database: Store Results
-    Backend->>Frontend: Return Response
-    Frontend->>User: Show Results
-```

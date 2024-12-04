@@ -310,12 +310,12 @@ export default function CoursePage({ params }: { params: { courseCode: string } 
                             iconSize={5}
                             color="teal.300"
                           />
-                          {totalReviews && (
+                          {/* {totalReviews && (
                             <Text as="span">
                               ({totalReviews?.value}
                               {totalReviews?.value > 1 ? ' reviews' : ' review'})
                             </Text>
-                          )}
+                          )} */}
                         </Flex>
                       </Flex>
                     </Box>
